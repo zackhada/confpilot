@@ -1,6 +1,6 @@
 import type { KnowledgeStatus, Term } from '@contracts'
 import { Check, Lock, Sparkles } from 'lucide-react'
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import type { ComponentType } from 'react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/shared/cn'
@@ -54,7 +54,7 @@ function Band({ band }: { band: MapBand }) {
   const more = band.count - band.sample.length
   const headingId = `map-${band.key}`
   return (
-    <motion.section
+    <m.section
       aria-labelledby={headingId}
       initial={{ y: 28, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
@@ -88,7 +88,7 @@ function Band({ band }: { band: MapBand }) {
         ))}
         {more > 0 && <li className="self-center text-(length:--text-note)">and {more} more</li>}
       </ul>
-    </motion.section>
+    </m.section>
   )
 }
 

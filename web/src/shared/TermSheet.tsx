@@ -1,5 +1,5 @@
 import { X } from 'lucide-react'
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 import { Dialog } from 'radix-ui'
 import { Button } from '@/components/ui/button'
 import { TermCard } from '@/live/TermCard'
@@ -26,7 +26,7 @@ export function TermSheet() {
           className="pb-safe fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-xl px-3 outline-none"
         >
           <Dialog.Title className="sr-only">{term?.term ?? 'Term'}</Dialog.Title>
-          <motion.div
+          <m.div
             initial={{ y: 36, opacity: 0.9 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: 'spring', stiffness: 520, damping: 40, mass: 0.7 }}
@@ -56,7 +56,7 @@ export function TermSheet() {
                 onSave={() => toggleSave(termId)}
               />
             )}
-          </motion.div>
+          </m.div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

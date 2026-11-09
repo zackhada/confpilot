@@ -1,5 +1,5 @@
 import type { CardShownEvent, Speaker } from '@contracts'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m } from 'motion/react'
 import { Captions } from '@/live/Captions'
 import { TermCard } from '@/live/TermCard'
 import { useCaptions } from '@/live/useCaptions'
@@ -67,7 +67,7 @@ export function StagePhone({ owner, side }: StagePhoneProps) {
           <ul aria-label={`Cards shown to ${owner.name}`} className="flex flex-col gap-2 px-5 pb-6">
             <AnimatePresence initial={false} mode="popLayout">
               {[...full].reverse().map((card, index, list) => (
-                <motion.li
+                <m.li
                   key={card.card_id}
                   layout="position"
                   initial={ENTER}
@@ -84,7 +84,7 @@ export function StagePhone({ owner, side }: StagePhoneProps) {
                     terms={terms}
                     knowledge={{}}
                   />
-                </motion.li>
+                </m.li>
               ))}
             </AnimatePresence>
           </ul>
