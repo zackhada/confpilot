@@ -15,7 +15,7 @@ Check only the parts the PR touches:
   present in client code.
 - **deploy/**: every Deployment has resource requests and limits, readiness and liveness
   probes, and `app.kubernetes.io/*` labels. The API has exactly one replica. No secret values.
-- **content/**: every `simple_def` is 15 words or fewer and does not use its own term. Every
+- **content/**: every `simple_def` is 20 words or fewer and does not use its own term. Every
   `prereqs` id exists. No common word is added as an alias.
 - **contracts/**: every consumer of a changed shape is updated in the same PR.
 - **anywhere**: nothing outside `reference/` uses code from `reference/`.

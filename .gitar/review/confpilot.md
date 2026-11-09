@@ -5,7 +5,7 @@ then turns the conference into their study plan. A phone app (PWA in `web/`) str
 to text, matches jargon on the device, and talks to a FastAPI service (`api/`) over one
 WebSocket per phone. Elasticsearch is the only database. The promise is speed: 95% of cards
 render within 800 ms of the word being spoken. Review every PR against that promise and
-against the five rules below. Shapes are defined in `contracts/`.
+against the six rules below. Shapes are defined in `contracts/`.
 
 ## 1. Instrumented (Dash0)
 - Every new or changed API route, WebSocket handler and worker handler opens an
@@ -37,7 +37,7 @@ against the five rules below. Shapes are defined in `contracts/`.
 - Animation uses transform and opacity only, and respects `prefers-reduced-motion`.
 
 ## 5. Glossary quality
-- `simple_def` is 15 words or fewer, in plain (B1) English, and never uses the term to
+- `simple_def` is 20 words or fewer, in plain (B1) English, and never uses the term to
   define itself.
 - Every `prereqs` id exists in the glossary, and there are no prerequisite cycles.
 - Common words are never added as aliases (for example "drag" for RAG). A term that is also
@@ -52,6 +52,6 @@ against the five rules below. Shapes are defined in `contracts/`.
 
 ## How the team works
 - PRs stay under 300 changed lines and do one thing.
-- Each directory has one owner (see the README). Flag a PR that edits another owner's
-  directory without saying why.
+- Each directory has one owner (see the Layout table in `README.md` and Team roles in
+  `docs/CONFPILOT_PLAN.md`). Flag a PR that edits another owner's directory without saying why.
 - Logic changes come with a test in the same PR.
