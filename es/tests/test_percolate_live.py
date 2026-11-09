@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import statistics
 import time
+from pathlib import Path
 
 import pytest
 
@@ -15,12 +16,18 @@ from .conftest import MATCHER_CASES
 pytestmark = pytest.mark.live
 
 CASES = json.loads(MATCHER_CASES.read_text(encoding="utf-8"))
+TWO_FORM_CASES = json.loads((Path(__file__).parent / "two_form_cases.json").read_text(encoding="utf-8"))
 LATENCY_SAMPLES = 40
 
 
 @pytest.mark.parametrize("case", CASES, ids=[case["text"] for case in CASES])
 async def test_matcher_case(store: EsStore, case: dict) -> None:
     assert sorted(await store.percolate(case["text"])) == sorted(case["expect"])
+
+
+@pytest.mark.parametrize("case", TWO_FORM_CASES, ids=[case["text"] for case in TWO_FORM_CASES])
+async def test_two_form_case(store: EsStore, case: dict) -> None:
+    assert await store.percolate(case["text"]) == case["expect"]
 
 
 async def test_matches_come_back_in_spoken_order(store: EsStore) -> None:
