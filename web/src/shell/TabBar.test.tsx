@@ -16,7 +16,7 @@ describe('TabBar', () => {
     renderAt('/')
     const nav = screen.getByRole('navigation', { name: 'Main' })
     expect(nav).toBeInTheDocument()
-    for (const name of ['Live', 'Recap', 'Cards', 'Agent']) {
+    for (const name of ['Live', 'Recap', 'Cards', 'Ask']) {
       expect(screen.getByRole('link', { name })).toBeInTheDocument()
     }
   })

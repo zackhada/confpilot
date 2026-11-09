@@ -88,6 +88,11 @@ export function fetchRecap(name: string, room: string, userId: string): Promise<
   return call(name, `/api/rooms/${encodeURIComponent(room)}/recap?${query}`, isRecap, { timeoutMs: 6000 })
 }
 
+export async function searchRoom(name: string, room: string, q: string, limit = 8): Promise<SearchHit[]> {
+  const query = new URLSearchParams({ q, room, limit: String(limit) })
+  return (await call(name, `/api/search?${query}`, isSearchResponse, { timeoutMs: 8000 })).hits
+}
+
 export async function askRoom(
   name: string,
   body: AskRequest,
@@ -101,13 +106,14 @@ export async function askRoom(
     signal,
   })
   if (!response.ok || !response.body) throw new Error(`Ask failed (${response.status}).`)
-  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
   let pending = ''
   try {
     for (;;) {
       const { value, done } = await reader.read()
       if (done) throw new Error('Ask ended before an answer arrived.')
-      const frames = (pending + value).split('\n\n')
+      const frames = (pending + decoder.decode(value, { stream: true })).split('\n\n')
       pending = frames.pop() ?? ''
       for (const frame of frames) {
         if (!frame.startsWith('data: ')) continue

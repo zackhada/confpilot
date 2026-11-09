@@ -218,7 +218,7 @@ def test_agent_streams_null_answer_when_llm_key_is_missing(talked: TestClient, m
     assert events[1] == {"type": "answer", "answer": None}
 
 
-def test_agent_streams_null_answer_when_llm_request_fails(talked: TestClient, monkeypatch) -> None:
+def test_agent_streams_null_answer_when_llm_request_fails(talked: TestClient, monkeypatch, spans) -> None:
     def fail(request: httpx.Request) -> httpx.Response:
         return httpx.Response(503)
 
@@ -232,3 +232,5 @@ def test_agent_streams_null_answer_when_llm_request_fails(talked: TestClient, mo
     assert response.status_code == 200
     assert events[0]["type"] == "moments"
     assert events[1] == {"type": "answer", "answer": None}
+    span = next(s for s in spans.get_finished_spans() if s.name == "ask.answer")
+    assert span.events[0].attributes["exception.type"] == "HTTPStatusError"
