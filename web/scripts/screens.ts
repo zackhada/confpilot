@@ -52,6 +52,33 @@ async function waitForCard(page: Page, term: string, timeout = 70_000): Promise<
   await page.waitForTimeout(700)
 }
 
+/** Recap, flashcards (front and answer) and search, once a conversation has happened. */
+async function afterTalkShots(page: Page): Promise<void> {
+  const tab = (name: string) => page.getByRole('link', { name, exact: true }).click()
+  await tab('Recap')
+  await page.getByRole('heading', { name: 'Learn next' }).waitFor()
+  await shot(page, 'recap-375-dark')
+  await page.getByRole('heading', { name: 'Learn next' }).locator('..').getByRole('button').first().click()
+  await page.waitForTimeout(500)
+  await shot(page, 'recap-375-dark-term')
+  await page.getByRole('button', { name: 'Close' }).click()
+
+  await tab('Cards')
+  await shot(page, 'cards-375-dark-start')
+  await page.getByRole('button', { name: 'Start reviewing' }).click()
+  await page.waitForTimeout(300)
+  await shot(page, 'cards-375-dark')
+  await page.getByRole('button', { name: 'Show the answer' }).click()
+  await page.waitForTimeout(600)
+  await shot(page, 'cards-375-dark-answer')
+
+  await tab('Ask')
+  await shot(page, 'ask-375-dark-empty')
+  await page.getByRole('button', { name: 'What did Zack say about RAG?' }).click()
+  await page.getByText(/\d moments?$/).waitFor()
+  await shot(page, 'ask-375-dark')
+}
+
 async function phoneShots(browser: Browser): Promise<void> {
   const joinPage = await openPhone(browser, { room: 'shots-join', persona: 'Clayton' })
   await shot(joinPage, 'join-375-dark')
@@ -68,11 +95,7 @@ async function phoneShots(browser: Browser): Promise<void> {
   await waitForCard(dark, 'RRF')
   await shot(dark, 'live-375-dark')
   await dark.getByRole('button', { name: 'Save', exact: true }).click()
-  for (const tab of ['Recap', 'Cards', 'Ask']) {
-    await dark.getByRole('link', { name: tab }).click()
-    await dark.waitForTimeout(250)
-    await shot(dark, `${tab.toLowerCase()}-375-dark`)
-  }
+  await afterTalkShots(dark)
   await dark.context().close()
   await light.context().close()
 }
