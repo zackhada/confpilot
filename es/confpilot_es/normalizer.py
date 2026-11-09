@@ -2,7 +2,7 @@
 
 `base_tokens` lowercases, turns hyphens and slashes into spaces and deletes other punctuation.
 `normalize` then applies the joining rules (number words, spelled-out letters, letter and
-number runs). The percolator is fed both forms, so an aggressive join such as
+number runs). The percolator is fed every form from `variants`, so an aggressive join such as
 "kubernetes 1.30" -> "kubernetes130" can add a match but can never hide one.
 """
 
@@ -22,6 +22,7 @@ _TENS_VALUES = {word: (index + 2) * 10 for index, word in enumerate(_TENS)}
 _DASHES = "".join(chr(code) for code in range(0x2010, 0x2016))  # Unicode hyphens and dashes
 _WORD_BREAKS = re.compile(rf"[-/\\{_DASHES}]")
 _PUNCTUATION = re.compile(r"[^\w\s]|_")
+_ARTICLES = frozenset({"a", "i"})  # one-letter words that are not always spelled-out letters
 
 
 def base_tokens(text: str) -> list[str]:
@@ -46,15 +47,19 @@ def _read_number_words(tokens: list[str]) -> list[str]:
     return out
 
 
-def _join_spelled_letters(tokens: list[str]) -> list[str]:
-    """`r r f` -> `rrf`, `k 8 s` -> `k8s`: join runs of two or more one-character tokens."""
+def _join_spelled_letters(tokens: list[str], split_article: bool = False) -> list[str]:
+    """`r r f` -> `rrf`, `k 8 s` -> `k8s`: join runs of two or more one-character tokens.
+
+    With `split_article`, a leading "a" or "i" is read as a word and left out of a longer run:
+    `a k 8 s` -> `a k8s` rather than `ak8s`.
+    """
     out: list[str] = []
     run: list[str] = []
     for token in [*tokens, ""]:
         if len(token) == 1:
             run.append(token)
             continue
-        if len(run) > 2 and run[0] in {"a", "i"}:
+        if split_article and len(run) > 2 and run[0] in _ARTICLES:
             out.append(run.pop(0))
         if run:
             out.append("".join(run))
@@ -75,9 +80,9 @@ def _join_letter_number_runs(tokens: list[str]) -> list[str]:
     return out
 
 
-def normalized_tokens(text: str) -> list[str]:
+def normalized_tokens(text: str, split_article: bool = False) -> list[str]:
     tokens = _read_number_words(base_tokens(text))
-    return _join_letter_number_runs(_join_spelled_letters(tokens))
+    return _join_letter_number_runs(_join_spelled_letters(tokens, split_article))
 
 
 def normalize(text: str) -> str:
@@ -86,6 +91,14 @@ def normalize(text: str) -> str:
 
 
 def variants(text: str) -> list[str]:
-    """The distinct forms to match against: punctuation-stripped, then fully normalized."""
-    forms = (" ".join(base_tokens(text)), normalize(text))
+    """The distinct forms to match against.
+
+    Punctuation-stripped, fully normalized, and normalized with a leading "a" or "i" kept out
+    of a spelled-out run (`a p i` must reach `api`, and `a k 8 s` must reach `k8s`).
+    """
+    forms = (
+        " ".join(base_tokens(text)),
+        normalize(text),
+        " ".join(normalized_tokens(text, split_article=True)),
+    )
     return [form for form in dict.fromkeys(forms) if form]

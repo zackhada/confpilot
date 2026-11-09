@@ -8,8 +8,8 @@ from confpilot_es.normalizer import normalize, variants
     [
         ("and R.R.F. to rank the results", "and rrf to rank the results"),
         ("and r r f to rank the results", "and rrf to rank the results"),
-        ("a R R F term", "a rrf term"),
-        ("I R R F term", "i rrf term"),
+        ("the A P I gateway", "the api gateway"),
+        ("our I A M roles", "our iam roles"),
         ("it uses BM 25 for that", "it uses bm25 for that"),
         ("it uses bm twenty five for that", "it uses bm25 for that"),
         ("It uses BM25 for keyword matches", "it uses bm25 for keyword matches"),
@@ -31,3 +31,16 @@ def test_variants_keep_the_unjoined_form() -> None:
     # The aggressive join must never hide a plain match such as "kubernetes".
     assert variants("Kubernetes 1.30 is out") == ["kubernetes 130 is out", "kubernetes130 is out"]
     assert variants("managed hybrid search") == ["managed hybrid search"]
+
+
+def test_a_leading_article_cannot_hide_a_spelled_out_term() -> None:
+    # "a" and "i" are words as well as letters, so both readings of the run are offered.
+    assert variants("deploy to a k 8 s cluster") == [
+        "deploy to a k 8 s cluster",
+        "deploy to ak8s cluster",
+        "deploy to a k8s cluster",
+    ]
+    assert "a rrf term" in variants("a R R F term")
+    assert "i rrf it" in variants("I R R F it")
+    assert "call an api" in variants("call an A P I")
+    assert variants("a b test") == ["a b test", "ab test"]  # two letters: nothing to split off
