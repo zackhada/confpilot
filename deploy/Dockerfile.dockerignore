@@ -1,0 +1,23 @@
+# Ignore file for deploy/Dockerfile. BuildKit reads <Dockerfile>.dockerignore from beside
+# the Dockerfile, so it applies when the build context is the repo root.
+# Allow-list: nothing enters the build context unless it is named here.
+*
+!api/
+!web/
+!es/
+!contracts/
+!content/glossary.json
+
+**/.env
+**/.env.*
+**/.git
+**/.venv
+**/node_modules
+**/dist
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+api/tests
+es/tests
