@@ -225,7 +225,9 @@ class RoomState(BaseModel):
     members: list[Member]
 
 
-ErrorCode = Literal["bad_request", "bad_event", "forbidden", "store_unavailable", "internal"]
+ErrorCode = Literal[
+    "unauthorized", "bad_request", "bad_event", "forbidden", "store_unavailable", "internal"
+]
 
 
 class ErrorEvent(BaseModel):

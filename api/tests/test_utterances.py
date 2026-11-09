@@ -1,9 +1,17 @@
 from fastapi.testclient import TestClient
+from helpers import room_url
 
 from confpilot.utterances import RecentFinals, is_duplicate
 
-ANA_URL = "/ws/rooms/slc1?user_id=u-ana&name=Ana&role=speaker"
-BEN_URL = "/ws/rooms/slc1?user_id=u-ben&name=Ben&role=speaker"
+
+def _ana(client: TestClient) -> str:
+    return room_url(client, "u-ana", "Ana")
+
+
+def _ben(client: TestClient) -> str:
+    return room_url(client, "u-ben", "Ben")
+
+
 SENTENCE = "we use RAG and BM 25 on Kubernetes for search"
 T0 = 1731177600000
 
@@ -78,7 +86,10 @@ def test_forget_removes_only_the_exact_admission() -> None:
 
 
 def test_finals_are_matched_and_stored_once(client: TestClient, spans) -> None:
-    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+    with (
+        client.websocket_connect(_ana(client)) as ana,
+        client.websocket_connect(_ben(client)) as ben,
+    ):
         ana.send_json(final("utt-a1", SENTENCE, is_final=False))
         ana.send_json(final("utt-a1", SENTENCE))
         settle(ana)
@@ -110,7 +121,10 @@ def test_dropped_store_work_does_not_suppress_another_speakers_copy(
     client: TestClient, spans, monkeypatch
 ) -> None:
     monkeypatch.setattr("confpilot.routes.ws.MAX_BACKGROUND_TASKS", 0)
-    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+    with (
+        client.websocket_connect(_ana(client)) as ana,
+        client.websocket_connect(_ben(client)) as ben,
+    ):
         ana.send_json(final("utt-a1", SENTENCE))
         settle(ana)
         ben.send_json(final("utt-b1", SENTENCE))
@@ -137,7 +151,10 @@ def test_a_failed_store_releases_the_final_so_the_other_copy_is_kept(
         await real_add(utterance)
 
     monkeypatch.setattr(store, "add_utterance", fail_once)
-    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+    with (
+        client.websocket_connect(_ana(client)) as ana,
+        client.websocket_connect(_ben(client)) as ben,
+    ):
         ana.send_json(final("utt-a1", SENTENCE))  # storing this one fails
         settle(ana)
         ben.send_json(final("utt-b1", SENTENCE))  # the same sentence from the other phone
@@ -148,7 +165,10 @@ def test_a_failed_store_releases_the_final_so_the_other_copy_is_kept(
 
 
 def test_a_one_word_final_cannot_suppress_or_replace_a_long_one(client: TestClient) -> None:
-    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+    with (
+        client.websocket_connect(_ana(client)) as ana,
+        client.websocket_connect(_ben(client)) as ben,
+    ):
         ben.send_json(final("utt-b1", "search"))  # arrives first, shares a word
         settle(ben)
         ana.send_json(final("utt-a1", SENTENCE))
@@ -164,7 +184,10 @@ def test_a_one_word_final_cannot_suppress_or_replace_a_long_one(client: TestClie
 
 
 def test_an_early_started_at_cannot_remove_a_stored_final(client: TestClient) -> None:
-    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+    with (
+        client.websocket_connect(_ana(client)) as ana,
+        client.websocket_connect(_ben(client)) as ben,
+    ):
         ana.send_json(final("utt-a1", SENTENCE))
         settle(ana)
         ben.send_json(final("utt-b1", SENTENCE, started_at=T0 - 60_000))  # claims to be earlier
