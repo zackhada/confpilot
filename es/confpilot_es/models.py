@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 
 KnowledgeStatus = Literal["unknown", "learning", "known"]
 KnowledgeSource = Literal["probe", "tap", "srs", "seed"]
@@ -63,6 +63,13 @@ class KnowledgePatch(BaseModel):
     reps: int | None = None
     due_at: int | None = None
     learned: bool | None = None
+
+    @model_validator(mode="after")
+    def _no_nulls(self) -> KnowledgePatch:
+        bad = [k for k in self.model_fields_set if k != "due_at" and getattr(self, k) is None]
+        if bad:
+            raise ValueError(f"fields cannot be null: {bad}")
+        return self
 
 
 class Speaker(BaseModel):

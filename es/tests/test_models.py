@@ -41,6 +41,9 @@ def test_knowledge_starts_with_sm2_defaults() -> None:
 def test_knowledge_patch_is_partial_and_cannot_touch_the_ids() -> None:
     assert KnowledgePatch(status="known").model_dump(exclude_unset=True) == {"status": "known"}
     assert KnowledgePatch(due_at=None).model_dump(exclude_unset=True) == {"due_at": None}
+    for field in ("status", "source", "encounters", "ease", "interval_days", "reps", "learned"):
+        with pytest.raises(ValidationError):
+            KnowledgePatch.model_validate({field: None})
     for bad in ({"user_id": "x"}, {"term_id": "x"}, {"status": "mastered"}, {"source": "guess"}):
         with pytest.raises(ValidationError):
             KnowledgePatch.model_validate(bad)
