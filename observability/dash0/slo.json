@@ -1,0 +1,56 @@
+{
+  "apiVersion": "openslo.com/v1",
+  "kind": "SLO",
+  "metadata": {
+    "name": "confpilot-word-to-card",
+    "labels": {
+      "dash0.com/origin": "confpilot-word-to-card-slo",
+      "app": "confpilot"
+    },
+    "annotations": {
+      "dash0.com/display-name": "Cards on screen within 800 ms"
+    }
+  },
+  "spec": {
+    "description": "95% of glossary cards are on screen within 800 ms of the word being spoken (confpilot.card.word_to_card_ms). Dash0 only supports a rolling 28-day window, so that is the window used.",
+    "budgetingMethod": "Occurrences",
+    "timeWindow": [
+      {
+        "duration": "28d",
+        "isRolling": true
+      }
+    ],
+    "indicator": {
+      "metadata": {
+        "name": "confpilot-cards-within-800ms"
+      },
+      "spec": {
+        "ratioMetric": {
+          "counter": false,
+          "good": {
+            "metricSource": {
+              "type": "Prometheus",
+              "spec": {
+                "query": "histogram_fraction(0, 800, increase({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[5m])) * histogram_count(increase({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[5m]))"
+              }
+            }
+          },
+          "total": {
+            "metricSource": {
+              "type": "Prometheus",
+              "spec": {
+                "query": "histogram_count(increase({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[5m]))"
+              }
+            }
+          }
+        }
+      }
+    },
+    "objectives": [
+      {
+        "displayName": "95% of cards within 800 ms",
+        "target": 0.95
+      }
+    ]
+  }
+}
