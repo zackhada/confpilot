@@ -1,24 +1,64 @@
 ﻿# kubectl apply -k deploy/hello
-# The deploy/k8s manifests with a public placeholder image, to prove the HTTPS tunnel
-# before the real image exists. traefik/whoami answers 200 on every path (so /healthz
-# passes) and echoes WebSocket frames on /echo. `kubectl apply -k deploy/k8s` swaps the
-# real app in.
+# The deploy/k8s manifests with a public placeholder in place of the app, to prove the
+# HTTPS tunnel before the real image exists. `kubectl apply -k deploy/k8s` swaps the real
+# app in without touching the tunnel pod, so the public URL survives the switch.
+#
+# traefik/whoami answers 200 on every path (so /healthz passes) and echoes WebSocket
+# frames on /echo. It is a debug server: it will also print its own environment to anyone
+# who asks (`/?env=true`), and the tunnel makes it public. So the placeholder must never
+# be given config or secrets. The patch below therefore REPLACES the whole pod spec of the
+# app Deployment with a self-contained one: no envFrom, no env, no volumes, no service
+# links, no pull secret. Nothing added to the real pod spec can reach it, and the
+# `Manifests` check in CI fails if the rendered placeholder ever references a Secret or
+# ConfigMap.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ../k8s
-images:
-  - name: ghcr.io/zackhada/confpilot
-    newName: traefik/whoami
-    newTag: v1.11.0
 patches:
   - target:
       kind: Deployment
       name: confpilot
     patch: |-
-      - op: add
-        path: /spec/template/spec/containers/0/args
-        value: ["--port=8000"]
       - op: replace
-        path: /spec/template/spec/containers/0/imagePullPolicy
-        value: IfNotPresent
+        path: /spec/template/spec
+        value:
+          automountServiceAccountToken: false
+          enableServiceLinks: false
+          terminationGracePeriodSeconds: 5
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: app
+              image: traefik/whoami:v1.11.0
+              imagePullPolicy: IfNotPresent
+              args: ["--port=8000"]
+              ports:
+                - name: http
+                  containerPort: 8000
+              readinessProbe:
+                httpGet:
+                  path: /healthz
+                  port: http
+                periodSeconds: 5
+              livenessProbe:
+                httpGet:
+                  path: /healthz
+                  port: http
+                periodSeconds: 10
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  cpu: 100m
+                  memory: 64Mi
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
