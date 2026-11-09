@@ -1,8 +1,45 @@
-import { Outlet } from 'react-router'
+import { useEffect } from 'react'
+import { Outlet, useSearchParams } from 'react-router'
+import { getUserId, parseRoomCode } from '@/room/identity'
+import { personaById } from '@/room/personas'
+import { useProfile } from '@/room/profile'
+import { joinRoom, leaveRoom } from '@/room/session'
+import { Join } from '@/screens/Join'
 import { TabBar } from './TabBar'
 
 /** Phone frame: the screen fills the space above a fixed bottom tab bar. */
 export function AppShell() {
+  const [params, setParams] = useSearchParams()
+  const room = parseRoomCode(params.get('room'))
+  const profile = useProfile((s) => s.profile)
+  const join = useProfile((s) => s.join)
+
+  // The room session outlives tab changes, so captions and cards keep flowing in the
+  // background while someone looks at Recap or Ask.
+  useEffect(() => {
+    if (!room || !profile) return
+    joinRoom({
+      room,
+      role: 'speaker',
+      me: { user_id: getUserId(), name: profile.name },
+      lang: profile.lang,
+      persona: personaById(profile.persona),
+    })
+    return leaveRoom
+  }, [room, profile])
+
+  if (!room || !profile) {
+    return (
+      <Join
+        initialRoom={room}
+        onJoin={(next, code) => {
+          join(next)
+          setParams({ room: code }, { replace: true })
+        }}
+      />
+    )
+  }
+
   return (
     <div className="mx-auto flex h-dvh w-full max-w-xl flex-col bg-hall">
       <a
