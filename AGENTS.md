@@ -1,29 +1,39 @@
-# ConfPilot — hackathon repo (Cloud Native Hackathon, SLC, Nov 9 2026)
+# ConfPilot: agent instructions
 
-Goal: an app that makes conferences easier, using Gitar, Dash0, Radar and Elasticsearch genuinely.
-Background, judging criteria and strategy: ../cnh-hackathon/PLAN.md and docs/.
+ConfPilot decodes the jargon each attendee doesn't know, live, then turns the conference into
+their study plan. Read `docs/CONFPILOT_PLAN.md` before any work; it is the source of truth.
+Hackathon rules and judging criteria: `docs/HACKATHON.md`.
 
-## How work is split (IMPORTANT)
-You (Codex) are the lead: plan, review, integrate, decide. Do the heavy lifting through
-DeepSeek V4 Pro subagents (cheap) instead of writing big chunks yourself:
+## Hard rules
 
-    bin/ds "task"                 # run a subagent and wait, prints its summary
-    bin/ds -b -n search "task"    # run in background
-    bin/ds-status                 # what is running / finished
-    # logs: .agents/logs/<name>.log
+- **Never use `reference/`.** It is pre-kickoff code for a different idea. Do not import it,
+  copy from it, build it or deploy it. Write ConfPilot code fresh.
+- **Every change lands as a small PR** (under 300 changed lines), reviewed by Gitar, with CI
+  green. Branches are named `<person>/<feature>`. Never push to `main`.
+- **One owner per directory** (see README). Parallel agents never touch the same files.
+- **API and event shapes live in `contracts/`.** Change them only by PR, and update every
+  consumer in the same PR.
+- **No secrets in the repo or in browser code.** Keys reach the browser only through the
+  `/token` endpoint. The repo will be public.
+- **No personal data in the repo.**
+- **Nothing staged or faked.** Do not break things on purpose for the demo, and do not use
+  the old `oom-fix` overlay.
 
-Rules for delegating:
-- Give each subagent one small, self-contained task with exact files and a definition of done.
-- Parallel subagents must never touch the same files.
-- Always review a subagent's diff (git diff) and run tests before committing. You own correctness.
-- Do it yourself only when it's tiny, or when the subagent failed twice.
+## Conventions
 
-## Hackathon rules that shape the workflow
-- Every feature lands as its own small PR on GitHub, reviewed by Gitar. Never one big PR.
-  Flow: git switch -c feat/x -> subagent builds -> review -> push -> gh pr create -> address Gitar -> merge.
-- New API endpoints need an OpenTelemetry span. UI changes need ARIA/keyboard support.
-- Session times are stored with timezone (America/Denver), never naive.
-- Elasticsearch is the core data layer, not a side feature.
+- Every new API route or worker handler opens an OpenTelemetry span with `confpilot.*`
+  attributes.
+- Every Deployment has resource requests and limits, readiness and liveness probes, and
+  `app.kubernetes.io/*` labels.
+- Every UI control has an accessible name, tap targets are at least 44 px, color never carries
+  meaning alone, and `prefers-reduced-motion` is respected.
+- Glossary definitions are 20 words or fewer, in plain (B1) English, and never use the term to
+  define itself.
+- The LLM never sits in the request path; it always runs async.
+- Elasticsearch is the only database.
 
 ## Layout
-app/ backend + frontend · data/ talks dataset + ES ingest · deploy/ Docker, k8s, CI · docs/ setup, PR plan, demo
+
+`contracts/` shapes · `api/` FastAPI · `es/` mappings and queries · `web/` phone app and stage
+view · `observability/` Dash0 · `deploy/` EKS · `content/` glossary · `stt/` speech-to-text ·
+`worker/` LLM definer · `docs/` plan and setup · `reference/` do not use
