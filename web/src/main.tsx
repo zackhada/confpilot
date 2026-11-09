@@ -15,7 +15,8 @@ registerSW({ immediate: true })
 const root = document.getElementById('root')
 if (!root) throw new Error('Nautilus could not start: the #root element is missing.')
 
-// A demo link (?demo=returning or ?demo=new) must set up storage before the app reads it.
+// A demo link (?demo=returning or ?demo=new) must set up storage before the app reads it,
+// so the app module (and the profile store it creates on import) loads afterwards.
 void applyDemoLink().finally(async () => {
   const { default: App } = await import('./App.tsx')
   createRoot(root).render(
