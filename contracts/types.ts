@@ -119,6 +119,12 @@ export interface SearchHit {
 }
 export interface SearchResponse { hits: SearchHit[] }
 
+// POST /api/ask (room members only). SSE sends moments first, then the answer when ready.
+export interface AskRequest { room: string; question: string }
+export type AskEvent =
+  | { type: "moments"; hits: SearchHit[] }
+  | { type: "answer"; answer: string | null };
+
 // ---------- Room WebSocket: /ws/rooms/{room}?session=&name=&role= ----------
 // The user id comes from the session; there is no user_id parameter. The handshake is
 // refused (HTTP 403) when the Origin header is neither the API's own host nor allow-listed.

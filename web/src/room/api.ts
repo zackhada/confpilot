@@ -1,6 +1,8 @@
 // Typed calls to the ConfPilot API. Every call carries the session bearer (see auth.ts)
 // and treats the response as untrusted until a guard has checked its shape.
 import type {
+  AskEvent,
+  AskRequest,
   Knowledge,
   KnowledgePatch,
   KnowledgeStatus,
@@ -39,6 +41,8 @@ const isHit = (value: unknown): value is SearchHit =>
   isObject(value) &&
   typeof value.utterance_id === 'string' &&
   typeof value.text === 'string' &&
+  typeof value.highlight === 'string' &&
+  isStringList(value.term_ids) &&
   typeof value.spoken_at === 'number' &&
   isObject(value.speaker) &&
   typeof value.speaker.name === 'string'
@@ -89,7 +93,47 @@ export async function searchRoom(name: string, room: string, q: string, limit = 
   return (await call(name, `/api/search?${query}`, isSearchResponse, { timeoutMs: 8000 })).hits
 }
 
-/** The one LLM call a person waits for; the API allows it up to eight seconds. */
+export async function askRoom(
+  name: string,
+  body: AskRequest,
+  onEvent: (event: AskEvent) => void,
+  signal: AbortSignal,
+): Promise<void> {
+  const response = await apiFetch('/api/ask', name, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', accept: 'text/event-stream' },
+    body: JSON.stringify(body),
+    signal,
+  })
+  if (!response.ok || !response.body) throw new Error(`Ask failed (${response.status}).`)
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let pending = ''
+  try {
+    for (;;) {
+      const { value, done } = await reader.read()
+      if (done) throw new Error('Ask ended before an answer arrived.')
+      const frames = (pending + decoder.decode(value, { stream: true })).split('\n\n')
+      pending = frames.pop() ?? ''
+      for (const frame of frames) {
+        if (!frame.startsWith('data: ')) continue
+        const data: unknown = JSON.parse(frame.slice(6))
+        if (!isObject(data)) continue
+        if (data.type === 'moments' && isSearchResponse(data)) {
+          onEvent({ type: 'moments', hits: data.hits })
+        } else if (data.type === 'answer' && (typeof data.answer === 'string' || data.answer === null)) {
+          onEvent({ type: 'answer', answer: data.answer })
+          return
+        }
+      }
+    }
+  } finally {
+    await reader.cancel().catch(() => undefined)
+    reader.releaseLock()
+  }
+}
+
+/** The API allows the probe up to eight seconds. */
 export function probe(name: string, userId: string, transcript: string): Promise<ProbeResponse> {
   const body: ProbeRequest = { user_id: userId, transcript }
   return call(name, '/api/probe', isProbeResponse, { method: 'POST', body, timeoutMs: 9000 })
