@@ -1,0 +1,103 @@
+// Takes the design-review screenshots: `pnpm screens` (needs `pnpm mock` and `pnpm dev`
+// running). Phone shots are 375x812, the stage is 1440x900. Output: docs/screens/.
+import { mkdir } from 'node:fs/promises'
+import { fileURLToPath } from 'node:url'
+import { chromium, type Browser, type Page } from 'playwright'
+
+const BASE = process.env.SCREENS_BASE ?? 'http://localhost:5173'
+const API = process.env.SCREENS_API ?? 'http://localhost:8000'
+const OUT = fileURLToPath(new URL('../docs/screens/', import.meta.url))
+const PHONE = { width: 375, height: 812 }
+const STAGE = { width: 1440, height: 900 }
+const ONLY = process.argv[2] ?? 'all'
+
+type Theme = 'dark' | 'light'
+
+interface PhoneOptions {
+  room: string
+  persona: 'Clayton' | 'Zack' | 'Ana'
+  theme?: Theme
+  lang?: string
+}
+
+async function openPhone(browser: Browser, options: PhoneOptions): Promise<Page> {
+  const context = await browser.newContext({ viewport: PHONE, deviceScaleFactor: 2, hasTouch: true, isMobile: true })
+  const page = await context.newPage()
+  if (options.theme === 'light') {
+    await page.addInitScript("window.localStorage.setItem('confpilot.theme', 'light')")
+  }
+  await page.goto(`${BASE}/?room=${options.room}`)
+  await page.getByRole('radio', { name: new RegExp(options.persona) }).click()
+  if (options.lang) await page.getByLabel('Add a line in your language').selectOption(options.lang)
+  return page
+}
+
+async function shot(page: Page, name: string): Promise<void> {
+  await page.screenshot({ path: `${OUT}${name}.png` })
+  process.stdout.write(`saved ${name}.png\n`)
+}
+
+async function restartReplay(room: string): Promise<void> {
+  await fetch(`${API}/api/mock/replay?room=${room}`, { method: 'POST' })
+}
+
+async function join(page: Page): Promise<void> {
+  await page.getByRole('button', { name: 'Join the room' }).click()
+  await page.getByRole('navigation', { name: 'Main' }).waitFor()
+}
+
+/** Wait until a card for `term` is on screen, then let its spring settle. */
+async function waitForCard(page: Page, term: string, timeout = 70_000): Promise<void> {
+  await page.getByRole('heading', { name: term, exact: true }).waitFor({ timeout })
+  await page.waitForTimeout(700)
+}
+
+async function phoneShots(browser: Browser): Promise<void> {
+  const joinPage = await openPhone(browser, { room: 'shots-join', persona: 'Clayton' })
+  await shot(joinPage, 'join-375-dark')
+  await joinPage.context().close()
+
+  const dark = await openPhone(browser, { room: 'shots-dark', persona: 'Clayton', lang: 'es' })
+  const light = await openPhone(browser, { room: 'shots-light', persona: 'Ana', theme: 'light', lang: 'es' })
+  await join(dark)
+  await shot(dark, 'live-375-dark-empty')
+  await join(light)
+  await Promise.all([waitForCard(dark, 'RAG'), waitForCard(light, 'cluster')])
+  await shot(dark, 'live-375-dark-first-cards')
+  await shot(light, 'live-375-light')
+  await waitForCard(dark, 'RRF')
+  await shot(dark, 'live-375-dark')
+  for (const tab of ['Recap', 'Cards', 'Ask']) {
+    await dark.getByRole('link', { name: tab }).click()
+    await dark.waitForTimeout(250)
+    await shot(dark, `${tab.toLowerCase()}-375-dark`)
+  }
+  await dark.context().close()
+  await light.context().close()
+}
+
+async function stageShots(browser: Browser): Promise<void> {
+  const room = 'shots-stage'
+  const context = await browser.newContext({ viewport: STAGE, deviceScaleFactor: 1 })
+  const stage = await context.newPage()
+  await stage.goto(`${BASE}/stage?room=${room}`)
+  await stage.waitForTimeout(800)
+  await shot(stage, 'stage-1440-waiting')
+  const clayton = await openPhone(browser, { room, persona: 'Clayton' })
+  const zack = await openPhone(browser, { room, persona: 'Zack' })
+  await join(clayton)
+  await join(zack)
+  await restartReplay(room)
+  await waitForCard(clayton, 'RRF')
+  await shot(stage, 'stage-1440-dark')
+  await Promise.all([context.close(), clayton.context().close(), zack.context().close()])
+}
+
+await mkdir(OUT, { recursive: true })
+const browser = await chromium.launch()
+try {
+  if (ONLY === 'all' || ONLY === 'phone') await phoneShots(browser)
+  if (ONLY === 'all' || ONLY === 'stage') await stageShots(browser)
+} finally {
+  await browser.close()
+}

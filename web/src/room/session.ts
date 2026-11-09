@@ -1,4 +1,4 @@
-﻿// The live room session: one socket, one clock, one matcher. React components read the
+// The live room session: one socket, one clock, one matcher. React components read the
 // zustand store; they call the functions here to act on the room.
 import type { Lang, Role, ServerEvent, Speaker, Term, TranscriptEvent } from '@contracts'
 import { createClock } from '@/lib/clock'
@@ -168,6 +168,11 @@ export function toggleSave(termId: string): void {
   room.setKnowledge(termId, 'learning')
   storeKnowledge(useRoom.getState().knowledge)
   socket?.send({ type: 'knowledge.set', term_id: termId, status: 'learning' })
+}
+
+/** Tapping a chip brings its card back into the stack. */
+export function reopenCard(cardId: string): void {
+  useRoom.getState().reopenCard(cardId)
 }
 
 /** A transcript from this phone's own microphone: show it here and relay it to the room. */

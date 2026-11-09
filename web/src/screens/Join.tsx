@@ -1,4 +1,4 @@
-﻿import type { Lang } from '@contracts'
+import type { Lang } from '@contracts'
 import { Check } from 'lucide-react'
 import { RadioGroup } from 'radix-ui'
 import { useId, useState, type FormEvent } from 'react'

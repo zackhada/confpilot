@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   CardShownEvent,
   KnowledgeStatus,
   Lang,
@@ -175,6 +175,8 @@ interface RoomActions {
   markPainted: (cardId: string, renderedAt: number, wordToCardMs: number) => void
   setKnowledge: (termId: string, status: KnowledgeStatus) => void
   toggleSaved: (termId: string) => boolean
+  /** Bring a chip back as a full card. Its latency stamp is kept. */
+  reopenCard: (cardId: string) => void
 }
 
 export const useRoom = create<RoomData & RoomActions>((set, get) => ({
@@ -206,4 +208,11 @@ export const useRoom = create<RoomData & RoomActions>((set, get) => ({
     }))
     return !wasSaved
   },
+  reopenCard: (cardId) =>
+    set((s) => {
+      const card = s.stack.chips.find((c) => c.card_id === cardId)
+      if (!card) return s
+      const without = reduceCards(s.stack, { type: 'dismiss', term_id: card.term_id })
+      return { stack: reduceCards(without, { type: 'show', card }) }
+    }),
 }))

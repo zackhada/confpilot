@@ -1,4 +1,4 @@
-﻿@import 'tailwindcss';
+@import 'tailwindcss';
 
 /*
  * ConfPilot design tokens.
@@ -26,6 +26,7 @@
   --beyond: #98a1ba;
   --mark-bg: rgb(255 181 71 / 0.16);
   --mark-ink: #ffd08a;
+  --flash: #ffb547;
   --lit: #f6f0e2;
   --lit-ink: #131a30;
   --lit-soft: #4a5370;
@@ -51,6 +52,7 @@
   --beyond: #5b6480;
   --mark-bg: #ffe0a3;
   --mark-ink: #3d2400;
+  --flash: #ffb547;
   --lit: #131a30;
   --lit-ink: #f6f0e2;
   --lit-soft: #b4bcd4;
@@ -92,7 +94,7 @@
   --text-body: 1rem;
   --text-lead: 1.1875rem;
   --text-caption-past: 1.1875rem;
-  --text-caption-now: clamp(1.625rem, 1.2rem + 2.2vw, 2.125rem);
+  --text-caption-now: clamp(1.5rem, 1.15rem + 1.9vw, 2rem);
   --text-headword: 1.875rem;
   --text-title: clamp(2rem, 1.4rem + 3vw, 2.75rem);
 
@@ -159,7 +161,7 @@
   }
   /* Older captions fade towards the top of the caption well. */
   .fade-top {
-    mask-image: linear-gradient(to bottom, transparent 0, #000 3.5rem);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 1.5rem);
   }
   .scrollbar-none {
     scrollbar-width: none;

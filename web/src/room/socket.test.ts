@@ -1,4 +1,4 @@
-﻿import type { ClientEvent, ServerEvent } from '@contracts'
+import type { ClientEvent, ServerEvent } from '@contracts'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { backoffDelayMs, createRoomSocket, parseServerEvent, type SocketStatus } from './socket'
 
