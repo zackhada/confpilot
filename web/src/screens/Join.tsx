@@ -51,7 +51,7 @@ export function Join({ initialRoom, onJoin }: JoinProps) {
   return (
     <div className="pt-safe mx-auto flex min-h-dvh w-full max-w-xl flex-col bg-hall">
       <header className="flex min-h-13 items-center justify-between pr-1.5 pl-4">
-        <p className="font-display text-lg">ConfPilot</p>
+        <p className="font-display text-lg">Nautilus</p>
         <ThemeToggle />
       </header>
 

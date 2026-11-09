@@ -15,8 +15,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'ConfPilot',
-        short_name: 'ConfPilot',
+        name: 'Nautilus',
+        short_name: 'Nautilus',
         description: 'Live captions that explain the jargon you do not know yet.',
         lang: 'en',
         start_url: '/',

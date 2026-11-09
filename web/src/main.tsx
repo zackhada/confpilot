@@ -13,7 +13,7 @@ void initTelemetry()
 registerSW({ immediate: true })
 
 const root = document.getElementById('root')
-if (!root) throw new Error('ConfPilot could not start: the #root element is missing.')
+if (!root) throw new Error('Nautilus could not start: the #root element is missing.')
 
 createRoot(root).render(
   <StrictMode>

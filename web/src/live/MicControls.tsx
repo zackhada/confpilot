@@ -37,7 +37,7 @@ const NOTICES: Partial<Record<MicState, { text: string; retry: boolean }>> = {
     retry: true,
   },
   unsupported: {
-    text: 'This browser cannot use the microphone here. Open ConfPilot over HTTPS in Safari or Chrome.',
+    text: 'This browser cannot use the microphone here. Open Nautilus over HTTPS in Safari or Chrome.',
     retry: false,
   },
   unavailable: {

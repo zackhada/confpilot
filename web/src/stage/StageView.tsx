@@ -51,7 +51,7 @@ export function StageView() {
       <div className="flex h-dvh min-h-[40rem] flex-col bg-hall-sunk">
         <header className="flex items-center justify-between px-10 pt-6 pb-4">
           <div className="flex items-baseline gap-5">
-            <p className="font-display text-3xl">ConfPilot</p>
+            <p className="font-display text-3xl">Nautilus</p>
             <h1 className="text-(length:--text-lead) text-ink-soft">Stop nodding along.</h1>
           </div>
           <div className="flex items-center gap-2">
