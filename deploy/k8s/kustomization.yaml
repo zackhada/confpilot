@@ -1,0 +1,13 @@
+# kubectl apply -k deploy/k8s
+# Applying this resets the app image to the tag below; roll a specific build out with
+# deploy/rollout.ps1 <tag>.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+images:
+  - name: ghcr.io/zackhada/confpilot
+    newTag: main

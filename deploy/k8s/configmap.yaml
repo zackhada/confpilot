@@ -1,0 +1,18 @@
+# Non-secret runtime config. Secrets live in the `app-credentials` Secret, which a human
+# creates (see deploy/README.md); it is loaded after this ConfigMap, so it wins on a clash.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: confpilot
+  labels:
+    app.kubernetes.io/name: confpilot
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: confpilot
+    app.kubernetes.io/managed-by: kustomize
+data:
+  OTEL_SERVICE_NAME: confpilot-api
+  OTEL_RESOURCE_ATTRIBUTES: service.namespace=confpilot,deployment.environment.name=hackathon
+  OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+  # Confirm the region in Dash0 under Settings > Endpoints before relying on it.
+  OTEL_EXPORTER_OTLP_ENDPOINT: https://ingress.us-west-2.aws.dash0.com:4318
