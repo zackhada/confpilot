@@ -1,0 +1,17 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "user_id": { "type": "keyword" },
+      "term_id": { "type": "keyword" },
+      "status": { "type": "keyword" },
+      "source": { "type": "keyword" },
+      "encounters": { "type": "integer" },
+      "ease": { "type": "float" },
+      "interval_days": { "type": "float" },
+      "reps": { "type": "integer" },
+      "due_at": { "type": "date", "format": "epoch_millis" },
+      "learned": { "type": "boolean" }
+    }
+  }
+}
