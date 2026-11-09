@@ -44,6 +44,16 @@ class Health(BaseModel):
     version: str
 
 
+class SessionRequest(BaseModel):
+    name: str = Field(max_length=80)
+
+
+class SessionResponse(BaseModel):
+    user_id: SafeId  # a UUID chosen by the server
+    session: str  # send as "Authorization: Bearer <session>" and as ?session= on the room socket
+    expires_at: Ms
+
+
 class TokenRequest(BaseModel):
     user_id: SafeId
 
@@ -213,7 +223,9 @@ class RoomState(BaseModel):
     members: list[Member]
 
 
-ErrorCode = Literal["bad_request", "bad_event", "forbidden", "store_unavailable", "internal"]
+ErrorCode = Literal[
+    "unauthorized", "bad_request", "bad_event", "forbidden", "store_unavailable", "internal"
+]
 
 
 class ErrorEvent(BaseModel):

@@ -2,8 +2,9 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Query, Request
+from fastapi import APIRouter, HTTPException, Path, Query, Request
 
+from confpilot.auth import CurrentUser, require_same_user
 from confpilot.models import (
     SAFE_ID_PATTERN,
     Glossary,
@@ -23,6 +24,12 @@ IdPath = Annotated[str, Path(pattern=SAFE_ID_PATTERN)]
 IdQuery = Annotated[str | None, Query(pattern=SAFE_ID_PATTERN)]
 
 router = APIRouter(prefix="/api")
+
+
+def require_member(request: Request, room: str, user_id: str) -> None:
+    """Transcripts are only for people who are, or were, in the room."""
+    if not request.app.state.hub.was_member(room, user_id):
+        raise HTTPException(status_code=403, detail="Join this room before reading from it")
 
 
 def build_recap(
@@ -48,7 +55,8 @@ def build_recap(
 
 
 @router.get("/users/{user_id}/knowledge", response_model=KnowledgeList)
-async def list_knowledge(request: Request, user_id: IdPath) -> KnowledgeList:
+async def list_knowledge(request: Request, user_id: IdPath, user: CurrentUser) -> KnowledgeList:
+    require_same_user(user_id, user)
     store: Store = request.app.state.store
     with tracer.start_as_current_span(
         "knowledge.list", attributes={"confpilot.user_id": user_id}
@@ -60,8 +68,9 @@ async def list_knowledge(request: Request, user_id: IdPath) -> KnowledgeList:
 
 @router.put("/users/{user_id}/knowledge/{term_id}", response_model=Knowledge)
 async def put_knowledge(
-    request: Request, user_id: IdPath, term_id: IdPath, patch: KnowledgePatch
+    request: Request, user_id: IdPath, term_id: IdPath, patch: KnowledgePatch, user: CurrentUser
 ) -> Knowledge:
+    require_same_user(user_id, user)
     store: Store = request.app.state.store
     attributes = {"confpilot.user_id": user_id, "confpilot.term_id": term_id}
     with tracer.start_as_current_span("knowledge.put", attributes=attributes) as span:
@@ -71,11 +80,17 @@ async def put_knowledge(
 
 
 @router.get("/rooms/{room}/recap", response_model=Recap)
-async def get_recap(request: Request, room: IdPath, user_id: IdQuery = None) -> Recap:
+async def get_recap(
+    request: Request, room: IdPath, user: CurrentUser, user_id: IdQuery = None
+) -> Recap:
+    """The recap is always personal: it is ranked against the session user's knowledge."""
+    require_same_user(user_id, user)
+    require_member(request, room, user)
     store: Store = request.app.state.store
-    with tracer.start_as_current_span("room.recap", attributes={"confpilot.room": room}) as span:
+    attributes = {"confpilot.room": room, "confpilot.user_id": user}
+    with tracer.start_as_current_span("room.recap", attributes=attributes) as span:
         counts = await store.term_counts(room)
-        knowledge = await store.get_knowledge(user_id) if user_id else []
+        knowledge = await store.get_knowledge(user)
         recap = build_recap(room, counts, knowledge, request.app.state.glossary)
         span.set_attribute("confpilot.recap.heard_count", len(recap.heard))
         span.set_attribute("confpilot.recap.new_term_count", recap.new_term_count)
@@ -87,9 +102,12 @@ async def search(
     request: Request,
     q: Annotated[str, Query(min_length=1, max_length=200)],
     room: Annotated[str, Query(pattern=SAFE_ID_PATTERN)],
+    user: CurrentUser,
     user_id: IdQuery = None,
     limit: Annotated[int, Query(ge=1, le=50)] = 20,
 ) -> SearchResponse:
+    require_same_user(user_id, user)
+    require_member(request, room, user)
     store: Store = request.app.state.store
     attributes = {"confpilot.search.query_length": len(q), "confpilot.room": room}
     with tracer.start_as_current_span("search", attributes=attributes) as span:

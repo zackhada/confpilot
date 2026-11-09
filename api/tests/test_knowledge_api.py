@@ -1,10 +1,9 @@
 import pytest
 from fastapi.testclient import TestClient
+from helpers import bearer, room_url
 
 from confpilot.models import Glossary, Knowledge, Term
 from confpilot.routes.knowledge import build_recap
-
-ANA_URL = "/ws/rooms/slc1?user_id=u-ana&name=Ana&role=speaker"
 
 
 def say(socket, utterance_id: str, text: str) -> None:
@@ -21,10 +20,15 @@ def say(socket, utterance_id: str, text: str) -> None:
     )
 
 
+@pytest.fixture(autouse=True)
+def signed_in_as_ana(client: TestClient) -> None:
+    client.headers.update(bearer(client, "u-ana"))
+
+
 @pytest.fixture
 def talked(client: TestClient) -> TestClient:
     """A room where Ana said three things."""
-    with client.websocket_connect(ANA_URL) as ana:
+    with client.websocket_connect(room_url(client, "u-ana", "Ana")) as ana:
         say(ana, "u1", "we use RAG with <b> embeddings </b>")
         say(ana, "u2", "RAG needs vectors and embeddings")
         say(ana, "u3", "RAG again, plus lunch")
@@ -103,12 +107,22 @@ def test_recap_counts_what_was_heard_and_personalizes(talked: TestClient) -> Non
         "learn_next": ["vector", "rag", "embedding"],
     }
     assert (ana["new_term_count"], ana["learn_next"]) == (2, ["embedding", "rag"])
-    assert talked.get("/api/rooms/empty/recap").json() == {
-        "room": "empty",
-        "new_term_count": 0,
-        "heard": [],
-        "learn_next": [],
-    }
+
+
+def test_recap_and_search_are_for_room_members_only(talked: TestClient) -> None:
+    ben = bearer(talked, "u-ben")  # has a session, never joined slc1
+
+    assert talked.get("/api/rooms/slc1/recap", headers=ben).status_code == 403
+    assert talked.get("/api/search?q=rag&room=slc1", headers=ben).status_code == 403
+    assert talked.get("/api/rooms/other/recap").status_code == 403  # Ana never joined "other"
+    assert talked.get("/api/search?q=rag&room=other").status_code == 403
+    # Ana left the room when her socket closed; a past member can still read it.
+    assert talked.get("/api/rooms/slc1/recap").status_code == 200
+
+
+def test_recap_and_search_reject_someone_elses_user_id(talked: TestClient) -> None:
+    assert talked.get("/api/rooms/slc1/recap?user_id=u-ben").status_code == 403
+    assert talked.get("/api/search?q=rag&room=slc1&user_id=u-ben").status_code == 403
 
 
 def test_build_recap_treats_learned_as_known() -> None:
@@ -134,7 +148,6 @@ def test_search_finds_utterances_with_escaped_highlights(talked: TestClient, spa
         "highlight": "we use RAG with &lt;b&gt; <mark>embeddings</mark> &lt;/b&gt;",
         "term_ids": ["rag", "embedding"],
     }
-    assert talked.get("/api/search?q=rag&room=other").json() == {"hits": []}
     assert len(talked.get("/api/search?q=rag&room=slc1&limit=2").json()["hits"]) == 2
     span = next(s for s in spans.get_finished_spans() if s.name == "search")
     assert span.attributes["confpilot.search.hit_count"] == 2

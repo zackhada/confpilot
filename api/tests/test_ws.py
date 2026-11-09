@@ -2,15 +2,14 @@ import time
 
 import pytest
 from fastapi.testclient import TestClient
+from helpers import room_url, session_for
 from starlette.websockets import WebSocketDisconnect
 
 from confpilot.app import create_app
+from confpilot.auth import SessionSigner
 
 ANA = {"user_id": "u-ana", "name": "Ana"}
 BEN = {"user_id": "u-ben", "name": "Ben"}
-ANA_URL = "/ws/rooms/slc1?user_id=u-ana&name=Ana&role=speaker"
-BEN_URL = "/ws/rooms/slc1?user_id=u-ben&name=Ben&role=speaker"
-STAGE_URL = "/ws/rooms/slc1?user_id=stage-1&name=Stage&role=viewer"
 STATE_BOTH = {
     "type": "room.state",
     "members": [{**ANA, "role": "speaker"}, {**BEN, "role": "speaker"}],
@@ -48,18 +47,18 @@ def ping(socket, t0: float = 1.0) -> dict:
 
 @pytest.fixture
 def room(client: TestClient):
-    with client.websocket_connect(ANA_URL) as ana:
+    with client.websocket_connect(room_url(client, "u-ana", "Ana")) as ana:
         assert ana.receive_json() == {"type": "room.state", "members": [{**ANA, "role": "speaker"}]}
-        with client.websocket_connect(BEN_URL) as ben:
+        with client.websocket_connect(room_url(client, "u-ben", "Ben")) as ben:
             assert ben.receive_json() == STATE_BOTH
             assert ana.receive_json() == STATE_BOTH
             yield ana, ben
 
 
 def test_leaving_broadcasts_room_state(client: TestClient) -> None:
-    with client.websocket_connect(ANA_URL) as ana:
+    with client.websocket_connect(room_url(client, "u-ana", "Ana")) as ana:
         ana.receive_json()
-        with client.websocket_connect(STAGE_URL) as stage:
+        with client.websocket_connect(room_url(client, "stage-1", "Stage", role="viewer")) as stage:
             stage.receive_json()
             assert ana.receive_json()["members"][1] == {
                 "user_id": "stage-1",
@@ -102,7 +101,7 @@ def test_a_client_cannot_forge_the_speaker(room) -> None:
 
 def test_viewers_cannot_send_transcripts(client: TestClient, room) -> None:
     ana, _ = room
-    with client.websocket_connect(STAGE_URL) as stage:
+    with client.websocket_connect(room_url(client, "stage-1", "Stage", role="viewer")) as stage:
         stage.receive_json()
         ana.receive_json()
 
@@ -205,24 +204,72 @@ def test_binary_frames_get_an_error_event(room) -> None:
 @pytest.mark.parametrize(
     "url",
     [
-        "/ws/rooms/slc1?name=Ana&role=speaker",
-        "/ws/rooms/slc1?user_id=u-ana&role=admin",
-        "/ws/rooms/slc1?user_id=a/../b&role=speaker",
-        "/ws/rooms/bad%20room!?user_id=u-ana",
-        "/ws/rooms/slc1?user_id=" + "x" * 65,
+        "/ws/rooms/slc1?session={session}&role=admin",
+        "/ws/rooms/bad%20room!?session={session}",
+        "/ws/rooms/slc1?session={session}&name=" + "x" * 81,
     ],
 )
 def test_bad_join_parameters_are_refused_with_a_reason(client: TestClient, url: str) -> None:
-    with client.websocket_connect(url) as socket:
+    with client.websocket_connect(url.format(session=session_for(client, "u-ana"))) as socket:
         assert socket.receive_json()["code"] == "bad_request"
         with pytest.raises(WebSocketDisconnect) as closed:
             socket.receive_json()
     assert closed.value.code == 1008
 
 
+@pytest.mark.parametrize(
+    "query",
+    [
+        "name=Ana&role=speaker",  # no session
+        "user_id=u-ana&name=Ana",  # the old, client-claimed identity
+        "session=not-a-session&name=Ana",
+        "session={other_key}&name=Ana",  # signed with a different secret
+        "session={expired}&name=Ana",
+    ],
+)
+def test_a_missing_or_invalid_session_is_refused(client: TestClient, query: str) -> None:
+    signer = client.app.state.signer
+    query = query.format(
+        other_key=SessionSigner(b"another key").issue("u-ana")[1],
+        expired=signer.issue("u-ana", now_ms=0)[1],
+    )
+
+    with client.websocket_connect(f"/ws/rooms/slc1?{query}") as socket:
+        error = socket.receive_json()
+        with pytest.raises(WebSocketDisconnect) as closed:
+            socket.receive_json()
+
+    assert (error["type"], error["code"]) == ("error", "unauthorized")
+    assert closed.value.code == 1008
+    assert client.app.state.hub.state("slc1").members == []
+
+
+def test_the_user_id_comes_from_the_session_not_the_query(client: TestClient) -> None:
+    url = room_url(client, "u-ana", "Ana") + "&user_id=u-ben"
+
+    with client.websocket_connect(url) as ana:
+        members = ana.receive_json()["members"]
+
+    assert [m["user_id"] for m in members] == ["u-ana"]
+
+
+def test_a_cross_site_origin_is_refused_before_the_socket_opens(make_settings) -> None:
+    settings = make_settings(allowed_origins="http://localhost:5173")
+    with TestClient(create_app(settings)) as client:
+        url = room_url(client, "u-ana", "Ana")
+        for origin in ("http://testserver", "http://localhost:5173"):
+            with client.websocket_connect(url, headers={"origin": origin}) as socket:
+                assert socket.receive_json()["type"] == "room.state"
+        with pytest.raises(WebSocketDisconnect) as refused:
+            with client.websocket_connect(url, headers={"origin": "https://evil.example"}):
+                pass
+
+    assert refused.value.code == 1008
+
+
 def test_server_heartbeat_resends_room_state(make_settings) -> None:
     with TestClient(create_app(make_settings(ws_heartbeat_s=0.05))) as fast:
-        with fast.websocket_connect(ANA_URL) as ana:
+        with fast.websocket_connect(room_url(fast, "u-ana", "Ana")) as ana:
             first, second = ana.receive_json(), ana.receive_json()
 
     assert first == second == {"type": "room.state", "members": [{**ANA, "role": "speaker"}]}

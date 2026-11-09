@@ -25,7 +25,9 @@ from confpilot.models import SAFE_ID_PATTERN
 SESSION_TTL_S = 12 * 60 * 60
 MAX_SESSION_CHARS = 512
 MIN_SECRET_CHARS = 16
-MISSING = "Sign in first: send 'Authorization: Bearer <session>' with a session from POST /api/session"
+MISSING = (
+    "Sign in first: send 'Authorization: Bearer <session>' with a session from POST /api/session"
+)
 INVALID = "This session is invalid or has expired. Get a new one from POST /api/session"
 
 _SAFE_ID = re.compile(SAFE_ID_PATTERN)

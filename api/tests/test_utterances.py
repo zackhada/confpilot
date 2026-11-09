@@ -1,9 +1,8 @@
 from fastapi.testclient import TestClient
+from helpers import room_url
 
 from confpilot.utterances import RecentFinals, is_duplicate
 
-ANA_URL = "/ws/rooms/slc1?user_id=u-ana&name=Ana&role=speaker"
-BEN_URL = "/ws/rooms/slc1?user_id=u-ben&name=Ben&role=speaker"
 SENTENCE = "we use RAG and BM 25 on Kubernetes for search"
 T0 = 1731177600000
 
@@ -66,7 +65,10 @@ def test_recent_finals_keep_the_first_arrival_and_drop_a_later_copy() -> None:
 
 
 def test_finals_are_matched_and_stored_once(client: TestClient, spans) -> None:
-    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+    with (
+        client.websocket_connect(room_url(client, "u-ana", "Ana")) as ana,
+        client.websocket_connect(room_url(client, "u-ben", "Ben")) as ben,
+    ):
         ana.send_json(final("utt-a1", SENTENCE, is_final=False))
         ana.send_json(final("utt-a1", SENTENCE))
         settle(ana)
@@ -95,7 +97,10 @@ def test_finals_are_matched_and_stored_once(client: TestClient, spans) -> None:
 
 
 def test_a_one_word_final_cannot_suppress_or_replace_a_long_one(client: TestClient) -> None:
-    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+    with (
+        client.websocket_connect(room_url(client, "u-ana", "Ana")) as ana,
+        client.websocket_connect(room_url(client, "u-ben", "Ben")) as ben,
+    ):
         ben.send_json(final("utt-b1", "search"))  # arrives first, shares a word
         settle(ben)
         ana.send_json(final("utt-a1", SENTENCE))
@@ -111,7 +116,10 @@ def test_a_one_word_final_cannot_suppress_or_replace_a_long_one(client: TestClie
 
 
 def test_an_early_started_at_cannot_remove_a_stored_final(client: TestClient) -> None:
-    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+    with (
+        client.websocket_connect(room_url(client, "u-ana", "Ana")) as ana,
+        client.websocket_connect(room_url(client, "u-ben", "Ben")) as ben,
+    ):
         ana.send_json(final("utt-a1", SENTENCE))
         settle(ana)
         ben.send_json(final("utt-b1", SENTENCE, started_at=T0 - 60_000))  # claims to be earlier

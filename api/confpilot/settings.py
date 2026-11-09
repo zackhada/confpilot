@@ -25,6 +25,11 @@ class Settings(BaseSettings):
 
     ws_heartbeat_s: float = 20.0
 
+    session_secret: SecretStr | None = None  # unset: a random key per process
+    session_ttl_s: int = 12 * 60 * 60
+    allowed_origins: str = ""  # comma-separated extra origins; the API's own host is always allowed
+    rate_limit_per_minute: int = 20  # per client address (and per user where a route says so)
+
     @field_validator("*", mode="before")
     @classmethod
     def _blank_is_unset(cls, value: object, info) -> object:
