@@ -18,8 +18,10 @@ Elasticsearch work. Every phone runs the same on-device matcher over what it rec
 Only final transcripts are stored and percolated. Anything the percolator or the LLM finds
 that the phone could not have matched comes back as a `card` event (tier 2 or 3).
 
-The room hub is in memory, so **the API runs as exactly one replica**. The server pings every
-20 seconds to keep load balancer idle timeouts from closing the socket.
+The room hub is in memory, so **the API runs as exactly one replica**. The server resends
+`room.state` to every socket every 20 seconds as its heartbeat, which keeps load balancer idle
+timeouts from closing the socket. Bad input never closes the socket: the server answers with
+an `error` event whose `code` is one of the values in `ErrorCode`.
 
 ## 2. Latency is measured to the rendered card, and cards are never queued
 
@@ -39,8 +41,10 @@ wire is epoch milliseconds in server time.
 
 A phone sends `card.shown` for every card it renders. The API relays it to viewers (this is
 the stage view's feed) and records `word_to_card_ms` as the histogram
-`confpilot.card.word_to_card_ms` with attributes `confpilot.card.tier` and `confpilot.room`.
-The Dash0 SLO (95% under 800 ms) is built on that histogram.
+`confpilot.card.word_to_card_ms`. The histogram carries one attribute, `confpilot.card.tier`
+(1, 2 or 3). Room ids are chosen by clients, so they are never a metric attribute: the room
+appears as `confpilot.room` on the `card.push` span and in logs. Values outside 0 to 60 000 ms
+are relayed but not recorded. The Dash0 SLO (95% under 800 ms) is built on that histogram.
 
 ## 5. Rooms and identity
 
