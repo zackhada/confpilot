@@ -1,0 +1,18 @@
+name: Gitar auto-apply
+# Adds the gitar-managed label to every PR, which turns on Gitar auto-apply
+# (https://docs.gitar.ai/labels). Opt a PR out with `gitar auto-apply:off`.
+on:
+  pull_request_target:
+    types: [opened, reopened, ready_for_review]
+permissions:
+  pull-requests: write
+  issues: write
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh pr edit "$PR" --repo "$REPO" --add-label gitar-managed
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
