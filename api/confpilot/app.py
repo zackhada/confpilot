@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from confpilot.auth import SessionSigner
@@ -58,6 +59,8 @@ def create_app(
             allow_methods=["GET", "POST", "PUT"],
             allow_headers=["authorization", "content-type"],
         )
+    # Phones on cellular: the app's JS is about a third the size gzipped. WebSockets are untouched.
+    app.add_middleware(GZipMiddleware, minimum_size=1024)
     app.include_router(health.router)
     app.include_router(glossary.router)
     app.include_router(session.router)
