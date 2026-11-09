@@ -1,0 +1,4 @@
+.agents/logs/
+__pycache__/
+.venv/
+.env

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# ds — delegate a task to a DeepSeek V4 Pro pi subagent.
+# usage: bin/ds [-b] [-n name] [-m model] "task prompt"
+#   -b  run in background (check with bin/ds-status, read .agents/logs/<name>.log)
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"; cd "$ROOT"
+BG=0; NAME="task-$(date +%H%M%S)-$$"; MODEL="${DS_MODEL:-deepseek-v4-pro}"
+while getopts "bn:m:" o; do case $o in b) BG=1;; n) NAME=$OPTARG;; m) MODEL=$OPTARG;; esac; done
+shift $((OPTIND-1)); TASK="$*"; [ -z "$TASK" ] && { echo "usage: bin/ds [-b] [-n name] \"task\""; exit 1; }
+LOG=".agents/logs/$NAME.log"
+PRE="You are a subagent working in the repo $ROOT. Read AGENTS.md first and follow its rules. Do only the task below, touch only the files it needs, run tests for what you change, and end with a 3-line summary: files changed, how verified, anything left undone."
+cmd(){ pi -p --provider opencode-go --model "$MODEL" --no-session "$PRE
+
+TASK: $TASK" < /dev/null > "$LOG" 2>&1; echo "exit=$?" >> "$LOG"; }
+if [ $BG = 1 ]; then (cmd &) ; echo "started $NAME -> $LOG"; else cmd || true; tail -n 40 "$LOG"; fi

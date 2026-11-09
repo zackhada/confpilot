@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# show running DeepSeek subagents and finished logs
+cd "$(dirname "$0")/.."
+echo "running: $(pgrep -f 'pi -p --provider opencode-go' | wc -l | tr -d ' ')"
+for f in .agents/logs/*.log; do [ -e "$f" ] || continue; s=$(grep -q '^exit=' "$f" && grep '^exit=' "$f" || echo running); echo "$(basename "$f" .log): $s"; done

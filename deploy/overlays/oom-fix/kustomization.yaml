@@ -1,0 +1,20 @@
+# Fix overlay for the embed-worker OOMKilled demo.
+#
+# deploy/base/embed-worker-deployment.yaml caps memory at 32Mi (deliberately too
+# low) so the pod is OOMKilled and CrashLoopBackOffs — the fault Radar's AI
+# investigation diagnoses. This overlay applies the fix:
+#   - raise the memory limit/request to something the worker can actually use
+#   - shrink EMBED_WORKER_BATCH_SIZE so peak allocation stays under the limit
+#
+# Apply with:
+#   kubectl apply -k deploy/overlays/oom-fix
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: confpilot
+
+resources:
+  - ../../base
+
+patches:
+  - path: embed-worker-patch.yaml

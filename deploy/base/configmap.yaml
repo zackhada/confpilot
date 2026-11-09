@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: confpilot-config
+data:
+  # Elasticsearch is the core data layer for hybrid/semantic talk search + RAG.
+  # Point this at whatever ES you provision (in-cluster service name or external URL).
+  # If your URL embeds credentials, move it to the Secret and keep host/port here.
+  ES_URL: "http://elasticsearch:9200"
+
+  # LLM provider selection for the RAG assistant (app reads these if present).
+  LLM_PROVIDER: "openai"
+  LLM_MODEL: "gpt-4o-mini"
+
+  # The API ships OTel (traces/metrics/logs) to the in-cluster Collector,
+  # which then exports to Dash0 with the auth header applied.
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://otel-collector:4318"
+  OTEL_SERVICE_NAME: "confpilot-api"
+  OTEL_TRACES_SAMPLER: "always_on"
+
+  LOG_LEVEL: "INFO"

@@ -1,0 +1,3004 @@
+[
+  {
+    "id": "talk-001",
+    "title": "Scaling Kubernetes to 50,000 Nodes Without Losing Your Mind",
+    "abstract": "A deep dive into the control-plane bottlenecks that appear past a few thousand nodes. We cover etcd tuning, kube-apiserver sharding, and the operator changes that keep API latency flat as your fleet grows tenfold.",
+    "speakers": [
+      "Ravi Patel",
+      "Ingrid Larsen"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "kubernetes",
+      "scaling",
+      "etcd",
+      "control plane",
+      "performance"
+    ]
+  },
+  {
+    "id": "talk-002",
+    "title": "The Cluster Autoscaler Is Dead, Long Live Karpenter",
+    "abstract": "Karpenter provisions nodes in seconds and right-sizes them to the pod, not the other way around. This talk compares autoscaling strategies and shows a live migration from cluster-autoscaler to Karpenter.",
+    "speakers": [
+      "Yusuf Ali",
+      "Adrian Lupu"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "kubernetes",
+      "karpenter",
+      "autoscaling",
+      "cost optimization",
+      "aws"
+    ]
+  },
+  {
+    "id": "talk-003",
+    "title": "Multi-Cluster Service Mesh: A Field Guide",
+    "abstract": "One mesh is hard, many meshes are harder. We walk through the architectural patterns for connecting Istio and Linkerd across clusters and clouds, including east-west gateways and identity federation.",
+    "speakers": [
+      "Fatima Zahra",
+      "Umar Syed"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "kubernetes",
+      "service mesh",
+      "istio",
+      "linkerd",
+      "multi-cluster"
+    ]
+  },
+  {
+    "id": "talk-004",
+    "title": "Kubernetes Networking Demystified: From kube-proxy to Cilium",
+    "abstract": "Follow a packet from pod to service and out to the internet. We unpack CNI plugins, iptables vs eBPF data paths, and why Cilium's identity-based model changes what network policies can express.",
+    "speakers": [
+      "Stefan Bauer",
+      "Camille Laurent"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "kubernetes",
+      "networking",
+      "cilium",
+      "cnI",
+      "kube-proxy"
+    ]
+  },
+  {
+    "id": "talk-005",
+    "title": "Scheduling 101: Why Your Pods Land Where They Do",
+    "abstract": "The scheduler is the silent arbiter of your cluster's health. Learn how filtering and scoring really work, and how to bend them with node affinity, topology spread, and custom scheduler plugins.",
+    "speakers": [
+      "Anika Berg",
+      "Fatima Zahra",
+      "Zara Ahmed"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "kubernetes",
+      "scheduling",
+      "affinity",
+      "topology spread",
+      "operators"
+    ]
+  },
+  {
+    "id": "talk-006",
+    "title": "GitOps at Scale: Argo CD, Flux, and the Road to Full Automation",
+    "abstract": "Two leading GitOps engines, two philosophies. We compare Argo CD and Flux on multi-tenancy, drift detection, and progressive delivery, then share the patterns that survive 100+ clusters.",
+    "speakers": [
+      "Ravi Patel",
+      "Julia Fernandez"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "kubernetes",
+      "gitops",
+      "argo cd",
+      "flux",
+      "ci/cd"
+    ]
+  },
+  {
+    "id": "talk-007",
+    "title": "Operator Patterns: Building Controllers That Don't Break Production",
+    "abstract": "Writing a controller is easy; writing a controller that handles crashes, upgrades, and thousands of CRs is not. We cover status conditions, finalizers, leader election, and the reconciliation anti-patterns to avoid.",
+    "speakers": [
+      "Finn Andersen"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "kubernetes",
+      "operators",
+      "controllers",
+      "crd",
+      "go"
+    ]
+  },
+  {
+    "id": "talk-008",
+    "title": "Hardening Your Cluster: Kubernetes Security Best Practices",
+    "abstract": "From pod security admission to seccomp profiles, a practical checklist for locking down a cluster without slowing down developers. Includes the CIS benchmark highlights that actually matter.",
+    "speakers": [
+      "Zoe Martin",
+      "Vera Ivanova"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "kubernetes",
+      "security",
+      "pod security",
+      "cis benchmark",
+      "rbac"
+    ]
+  },
+  {
+    "id": "talk-009",
+    "title": "Windows Containers on Kubernetes in 2026",
+    "abstract": "Windows workloads are no longer second-class citizens. We cover HostProcess containers, gMSA identity, and the networking quirks that still bite teams running mixed Linux/Windows clusters.",
+    "speakers": [
+      "Leila Haddad",
+      "Ines Costa"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "kubernetes",
+      "windows",
+      "containers",
+      "gmsa",
+      "networking"
+    ]
+  },
+  {
+    "id": "talk-010",
+    "title": "eBPF-Based CNI: Cilium in Production",
+    "abstract": "Cilium replaces kube-proxy with an eBPF data plane that gives you L7 policies and Hubble visibility. We share a production rollout story: what broke, what got faster, and what we'd do differently.",
+    "speakers": [
+      "Julia Fernandez",
+      "Gabriel Santos"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "kubernetes",
+      "cilium",
+      "ebpf",
+      "networking",
+      "observability"
+    ]
+  },
+  {
+    "id": "talk-011",
+    "title": "Right-Sizing: Stop Paying for Idle CPU",
+    "abstract": "Most clusters run at 15% utilization because requests are set to guesses. Learn request/limit tuning strategies, Vertical Pod Autoscaler, and how to safely reclaim waste without risking OOMKilled.",
+    "speakers": [
+      "Andre Silva",
+      "Ben Carter"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "kubernetes",
+      "cost optimization",
+      "vpa",
+      "resources",
+      "finops"
+    ]
+  },
+  {
+    "id": "talk-012",
+    "title": "Stateful Workloads on Kubernetes: Databases Are People Too",
+    "abstract": "Running Postgres and Kafka on Kubernetes stopped being scary. We cover storage classes, PVC resizing, topology-aware scheduling, and the operator landscape that makes stateful day-2 ops survivable.",
+    "speakers": [
+      "Rita Sousa"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "kubernetes",
+      "statefulsets",
+      "databases",
+      "storage",
+      "operators"
+    ]
+  },
+  {
+    "id": "talk-013",
+    "title": "CRDs Gone Wild: API Design for Platform Teams",
+    "abstract": "Custom resources are your platform's public API. We discuss versioning, conversion webhooks, validation, and the naming/field conventions that keep a thousand CRDs from becoming unmaintainable.",
+    "speakers": [
+      "Quinn O'Rourke",
+      "Sofia Almeida"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "kubernetes",
+      "crd",
+      "api design",
+      "platform engineering",
+      "versioning"
+    ]
+  },
+  {
+    "id": "talk-014",
+    "title": "Kubernetes on the Edge: K3s and Friends",
+    "abstract": "Running full Kubernetes on a Raspberry Pi or a thousand retail stores is a solved problem. We compare K3s, K0s, and MicroK8s and cover the fleet-management patterns for disconnected environments.",
+    "speakers": [
+      "Chloe Dubois",
+      "Sana Iqbal"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "kubernetes",
+      "edge",
+      "k3s",
+      "k0s",
+      "iot"
+    ]
+  },
+  {
+    "id": "talk-015",
+    "title": "Upgrade Strategies: Zero-Downtime Cluster Version Bumps",
+    "abstract": "Version skew is the silent killer of cluster upgrades. We demonstrate a blue/green node pool strategy, feature-gate planning, and how to validate add-ons before the API server ever changes version.",
+    "speakers": [
+      "Aiko Tanaka",
+      "Grace Liu"
+    ],
+    "track": "Kubernetes",
+    "room": "Ballroom A",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "kubernetes",
+      "upgrades",
+      "zero downtime",
+      "version skew",
+      "operations"
+    ]
+  },
+  {
+    "id": "talk-016",
+    "title": "eBPF 101: From BPF to Production Observability",
+    "abstract": "A gentle introduction to extended Berkeley Packet Filter. We explain what eBPF is, how the verifier keeps you safe, and why it became the substrate for modern observability, networking, and security.",
+    "speakers": [
+      "Chen Wei",
+      "Amara Osei"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "ebpf",
+      "kernel",
+      "observability",
+      "verifier",
+      "linux"
+    ]
+  },
+  {
+    "id": "talk-017",
+    "title": "Writing Your First eBPF Program in 2026",
+    "abstract": "Live coding session: write, load, and inspect a real eBPF program with libbpf and BPF CO-RE. You will leave with a working tracer and a mental model of maps, helpers, and hooks.",
+    "speakers": [
+      "Tom Becker",
+      "Zara Ahmed",
+      "Erik Johansson"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "ebpf",
+      "libbpf",
+      "c",
+      "co-re",
+      "tracing"
+    ]
+  },
+  {
+    "id": "talk-018",
+    "title": "Cilium vs Calico: The eBPF Showdown",
+    "abstract": "Both claim the modern CNI crown. We benchmark data-plane throughput, policy capabilities, and observability to help you pick the right tool for your cluster size and security posture.",
+    "speakers": [
+      "Helena Varga",
+      "Ines Costa",
+      "Adrian Lupu"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ebpf",
+      "cilium",
+      "calico",
+      "networking",
+      "benchmarks"
+    ]
+  },
+  {
+    "id": "talk-019",
+    "title": "Falco and Runtime Security with eBPF",
+    "abstract": "Falco watches syscalls to detect anomalous behavior in real time. We explain how its eBPF probe works, how to write rules that don't drown you in alerts, and how to respond automatically.",
+    "speakers": [
+      "David Kim",
+      "Priya Sharma"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ebpf",
+      "falco",
+      "security",
+      "runtime detection",
+      "syscalls"
+    ]
+  },
+  {
+    "id": "talk-020",
+    "title": "BPF CO-RE: Write Once, Run Everywhere",
+    "abstract": "Compile-once-run-everywhere was the breakthrough that made eBPF portable. We explain BTF, CO-RE relocations, and how to ship a single object file across kernel versions and distros.",
+    "speakers": [
+      "Adrian Lupu",
+      "Nora Eide"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ebpf",
+      "co-re",
+      "btf",
+      "portability",
+      "libbpf"
+    ]
+  },
+  {
+    "id": "talk-021",
+    "title": "eBPF for Load Balancing: Replacing kube-proxy",
+    "abstract": "kube-proxy's iptables rules don't scale to huge services. We show how eBPF-based load balancers use hash maps and socket operations to push throughput up while cutting tail latency.",
+    "speakers": [
+      "Will Park",
+      "Andre Silva"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ebpf",
+      "load balancing",
+      "kube-proxy",
+      "performance",
+      "networking"
+    ]
+  },
+  {
+    "id": "talk-022",
+    "title": "Debugging the Kernel with bpftrace",
+    "abstract": "bpftrace is the awk of kernel tracing. We demo one-liners that answer 'why is this process slow?' and show how to script complex multi-probe investigations without kernel expertise.",
+    "speakers": [
+      "Finn Andersen"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "ebpf",
+      "bpftrace",
+      "debugging",
+      "tracing",
+      "performance"
+    ]
+  },
+  {
+    "id": "talk-023",
+    "title": "eBPF Security Risks: When the Tool Becomes the Attack Surface",
+    "abstract": "The same power that makes eBPF useful makes it dangerous. We analyze real CVEs, privilege-escalation paths, and the kernel-side mitigations that keep unprivileged eBPF from becoming a backdoor.",
+    "speakers": [
+      "Diego Morales",
+      "Quinn O'Rourke",
+      "Cesar Vega"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ebpf",
+      "security",
+      "vulnerabilities",
+      "kernel",
+      "privilege escalation"
+    ]
+  },
+  {
+    "id": "talk-024",
+    "title": "Tetragon: Runtime Enforcement at Scale",
+    "abstract": "Tetragon goes beyond detection to enforce policy with eBPF, down to individual syscalls and file accesses. We demo real-time enforcement and the design trade-offs of blocking vs auditing.",
+    "speakers": [
+      "Carlos Delgado",
+      "James Okafor"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ebpf",
+      "tetragon",
+      "cilium",
+      "enforcement",
+      "security"
+    ]
+  },
+  {
+    "id": "talk-025",
+    "title": "eBPF and AI: Accelerating Inference in the Kernel",
+    "abstract": "Can eBPF make your ML serving faster? We explore filtering and in-kernel pre-processing that removes work before it ever reaches the GPU, plus the risks of moving logic into the kernel.",
+    "speakers": [
+      "Dina Khalil",
+      "Noah Stein"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ebpf",
+      "ai",
+      "gpu",
+      "inference",
+      "performance"
+    ]
+  },
+  {
+    "id": "talk-026",
+    "title": "Performance Analysis with eBPF: A Deep Dive",
+    "abstract": "CPU flame graphs, off-CPU time, and block I/O latency all from eBPF. We work through a real incident where eBPF data pointed to a fix that dashboards and logs completely missed.",
+    "speakers": [
+      "Dina Khalil",
+      "Grace Liu"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ebpf",
+      "performance",
+      "flame graphs",
+      "profiling",
+      "sre"
+    ]
+  },
+  {
+    "id": "talk-027",
+    "title": "Pixie: Instant Kubernetes Observability",
+    "abstract": "Pixie gives you scriptable, per-request Kubernetes telemetry with zero manual instrumentation. We show how its eBPF-based protocol tracing works and how to query it like a database.",
+    "speakers": [
+      "Stefan Bauer"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ebpf",
+      "pixie",
+      "observability",
+      "kubernetes",
+      "tracing"
+    ]
+  },
+  {
+    "id": "talk-028",
+    "title": "The Future of eBPF: What's Next After 1.0",
+    "abstract": "eBPF has conquered networking and observability; what's next? We look at arena maps, improved loops, kernel module replacement, and the standardization work shaping the next five years.",
+    "speakers": [
+      "Elena Rodriguez"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ebpf",
+      "roadmap",
+      "kernel",
+      "linux",
+      "community"
+    ]
+  },
+  {
+    "id": "talk-029",
+    "title": "eBPF Offload to SmartNICs",
+    "abstract": "When the kernel isn't fast enough, push eBPF onto the NIC. We cover XDP offload, SmartNIC programming models, and the real-world results from offloading DDoS filtering to hardware.",
+    "speakers": [
+      "Chen Wei",
+      "David Kim"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ebpf",
+      "xdp",
+      "smartnic",
+      "hardware offload",
+      "networking"
+    ]
+  },
+  {
+    "id": "talk-030",
+    "title": "Tracing Microservices with eBPF and OpenTelemetry",
+    "abstract": "eBPF auto-instruments what OpenTelemetry can't reach. We combine the two to get end-to-end traces across legacy and modern services, and discuss when each approach wins.",
+    "speakers": [
+      "Dina Khalil",
+      "Miguel Torres"
+    ],
+    "track": "eBPF & Kernel",
+    "room": "Room 250",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ebpf",
+      "opentelemetry",
+      "tracing",
+      "microservices",
+      "observability"
+    ]
+  },
+  {
+    "id": "talk-031",
+    "title": "Zero Trust in Kubernetes: Beyond the Buzzword",
+    "abstract": "Zero trust is an architecture, not a product. We map the principles of least privilege, continuous verification, and micro-segmentation onto concrete Kubernetes primitives you can deploy today.",
+    "speakers": [
+      "Ben Carter",
+      "Ingrid Larsen"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "zero trust",
+      "kubernetes",
+      "least privilege",
+      "segmentation"
+    ]
+  },
+  {
+    "id": "talk-032",
+    "title": "Supply Chain Security: SBOMs, SLSA, and Sigstore",
+    "abstract": "Your build pipeline is the new attack surface. We explain software bills of materials, the SLSA framework levels, and how Sigstore's keyless signing verifies provenance without a PKI nightmare.",
+    "speakers": [
+      "Sofia Almeida"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "supply chain",
+      "sbom",
+      "slsa",
+      "sigstore"
+    ]
+  },
+  {
+    "id": "talk-033",
+    "title": "Policy as Code: OPA, Kyverno, and Gatekeeper Compared",
+    "abstract": "Three ways to enforce policy on Kubernetes, three very different ergonomics. We compare the policy languages, performance at scale, and the operational burden of each approach.",
+    "speakers": [
+      "Jade Wu",
+      "Stefan Bauer"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "policy as code",
+      "opa",
+      "kyverno",
+      "gatekeeper"
+    ]
+  },
+  {
+    "id": "talk-034",
+    "title": "Secrets Management: Vault, SOPS, and External Secrets",
+    "abstract": "Secrets in git, env vars, and config maps are all liabilities. We compare HashiCorp Vault, SOPS with age, and External Secrets Operator for delivering secrets to workloads safely.",
+    "speakers": [
+      "Dina Khalil",
+      "Dara Okafor"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "secrets",
+      "vault",
+      "sops",
+      "external secrets"
+    ]
+  },
+  {
+    "id": "talk-035",
+    "title": "Runtime Threat Detection with Falco",
+    "abstract": "Static scanning won't catch an attacker already inside. We show how Falco's eBPF probes detect shells, crypto miners, and exfiltration in real time, and how to wire alerts into your incident response.",
+    "speakers": [
+      "Chen Wei",
+      "James Okafor"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "falco",
+      "ebpf",
+      "threat detection",
+      "incident response"
+    ]
+  },
+  {
+    "id": "talk-036",
+    "title": "Container Image Scanning Done Right",
+    "abstract": "Scanning every image in CI sounds great until the scanner adds 20 minutes to every build. We share a layered scanning strategy: base images, CI gates, registry admission, and runtime inventory.",
+    "speakers": [
+      "Dalia Nasser"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "containers",
+      "image scanning",
+      "vulnerabilities",
+      "ci/cd"
+    ]
+  },
+  {
+    "id": "talk-037",
+    "title": "mTLS Everywhere: SPIFFE/SPIRE in Production",
+    "abstract": "Service-to-service encryption and identity are table stakes now. We walk through rolling out SPIFFE/SPIRE for workload identity, rotating certs, and the gotchas that emerge at scale.",
+    "speakers": [
+      "Talia Cohen",
+      "Sam Whitfield"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "security",
+      "mtls",
+      "spiffe",
+      "spire",
+      "identity"
+    ]
+  },
+  {
+    "id": "talk-038",
+    "title": "Kubernetes RBAC: Least Privilege That Works",
+    "abstract": "RBAC policies either block everything or allow everything. We show a practical methodology for role design, testing access with impersonation, and auditing who can actually do what.",
+    "speakers": [
+      "Helena Varga",
+      "Kenji Nakamura"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "rbac",
+      "kubernetes",
+      "access control",
+      "audit"
+    ]
+  },
+  {
+    "id": "talk-039",
+    "title": "Supply Chain Attacks: The XZ Utils Post-Mortem",
+    "abstract": "The XZ Utils backdoor was the wake-up call the industry needed. We dissect how it happened, why it nearly shipped, and the structural changes to open-source maintenance it should force.",
+    "speakers": [
+      "Kwame Mensah",
+      "Miguel Torres"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "security",
+      "supply chain",
+      "xz utils",
+      "open source",
+      "incident"
+    ]
+  },
+  {
+    "id": "talk-040",
+    "title": "eBPF-Powered Security: A Practical Guide",
+    "abstract": "eBPF gives security tools kernel-level visibility without kernel modules. We survey the ecosystem \u2014 Falco, Tetragon, Tracee \u2014 and show how to choose and tune them for your threat model.",
+    "speakers": [
+      "David Kim"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "ebpf",
+      "falco",
+      "tetragon",
+      "tracee"
+    ]
+  },
+  {
+    "id": "talk-041",
+    "title": "Cloud Security Posture Management in 2026",
+    "abstract": "Misconfigured buckets and open security groups remain the top cloud breach causes. We review the CSPM landscape and how to turn thousands of findings into a prioritized, fixable backlog.",
+    "speakers": [
+      "Finn Andersen",
+      "Dara Okafor",
+      "Aiko Tanaka"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "security",
+      "cspm",
+      "cloud",
+      "compliance",
+      "misconfiguration"
+    ]
+  },
+  {
+    "id": "talk-042",
+    "title": "Secrets in CI/CD: Leak Prevention",
+    "abstract": "Every secret eventually ends up in a log line. We cover pre-commit hooks, secret scanning in pipelines, and the remediation workflow that makes a leaked secret a minor annoyance, not a breach.",
+    "speakers": [
+      "Jade Wu",
+      "Farah Khan"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "security",
+      "ci/cd",
+      "secret scanning",
+      "pre-commit",
+      "remediation"
+    ]
+  },
+  {
+    "id": "talk-043",
+    "title": "Identity for Workloads: SPIFFE Deep Dive",
+    "abstract": "How does a pod prove who it is to a database it has never met? We go deep on the SPIFFE spec, the SPIRE server/agent architecture, and federation across clusters and clouds.",
+    "speakers": [
+      "Omar Farouk"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "security",
+      "spiffe",
+      "spire",
+      "identity",
+      "federation"
+    ]
+  },
+  {
+    "id": "talk-044",
+    "title": "Pentesting Kubernetes: An Attacker's View",
+    "abstract": "Red teaming a cluster reveals where defenses actually fail. We walk through a realistic attack chain \u2014 exposed dashboard to cluster-admin \u2014 and the detections that would have stopped it.",
+    "speakers": [
+      "Jade Wu",
+      "Becca Holt",
+      "Kenji Nakamura"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "security",
+      "pentesting",
+      "red team",
+      "attack chain",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "talk-045",
+    "title": "Security Chaos Engineering: Breaking Things to Fix Them",
+    "abstract": "You don't know if your security controls work until you attack yourself. We show how to run safe security chaos experiments that validate detections, response runbooks, and failover.",
+    "speakers": [
+      "Rachel Nguyen",
+      "Tom Becker"
+    ],
+    "track": "Security",
+    "room": "Room 251",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "security",
+      "chaos engineering",
+      "resilience",
+      "testing",
+      "detection"
+    ]
+  },
+  {
+    "id": "talk-046",
+    "title": "OpenTelemetry: The Road to Standardized Observability",
+    "abstract": "OpenTelemetry is now the de facto standard for telemetry. We cover the current state of the spec, what's stable vs experimental, and how to adopt it without boiling the ocean.",
+    "speakers": [
+      "Peter Novak",
+      "James Okafor"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "observability",
+      "opentelemetry",
+      "traces",
+      "metrics",
+      "logs"
+    ]
+  },
+  {
+    "id": "talk-047",
+    "title": "The Three Pillars Are Dead: Metrics, Logs, Traces Converge",
+    "abstract": "Treating metrics, logs, and traces as separate systems is a relic. We explore unified telemetry, exemplars, and the tools that let you jump from a metric spike to the exact log line and trace.",
+    "speakers": [
+      "Quinn O'Rourke",
+      "Tobias Klein",
+      "Ximena Ruiz"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "metrics",
+      "logs",
+      "traces",
+      "telemetry"
+    ]
+  },
+  {
+    "id": "talk-048",
+    "title": "Prometheus at Scale: Cardinality Is the Enemy",
+    "abstract": "Prometheus is easy until your label cardinality explodes. We explain how cardinality kills memory and query performance, and share the design rules and recording rules that keep it healthy.",
+    "speakers": [
+      "Owen Gallagher",
+      "Gabriel Santos"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "observability",
+      "prometheus",
+      "cardinality",
+      "metrics",
+      "performance"
+    ]
+  },
+  {
+    "id": "talk-049",
+    "title": "eBPF-Based Observability: Zero Instrumentation",
+    "abstract": "What if you could get golden signals without touching application code? We show how eBPF produces request-level RED metrics and traces for any workload, including legacy monoliths.",
+    "speakers": [
+      "Zoe Martin"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "ebpf",
+      "zero instrumentation",
+      "golden signals",
+      "traces"
+    ]
+  },
+  {
+    "id": "talk-050",
+    "title": "Distributed Tracing in Microservices: A Practical Guide",
+    "abstract": "Tracing is easy to start and hard to make useful. We cover sampling strategies, context propagation pitfalls, and how to turn trace data into answers during an incident instead of a pretty graph.",
+    "speakers": [
+      "Ben Carter"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "tracing",
+      "microservices",
+      "sampling",
+      "context propagation"
+    ]
+  },
+  {
+    "id": "talk-051",
+    "title": "SLOs That Matter: Error Budgets in Practice",
+    "abstract": "Most SLOs are vanity metrics. We show how to pick service-level indicators users actually feel, set error budgets teams respect, and use burn-rate alerts to balance velocity and reliability.",
+    "speakers": [
+      "Hannah Park"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "slo",
+      "sli",
+      "error budget",
+      "sre"
+    ]
+  },
+  {
+    "id": "talk-052",
+    "title": "Grafana + Mimir: Massive Metric Storage",
+    "abstract": "When a single Prometheus can't hold your metrics, Mimir shards them horizontally. We cover the architecture, long-term retention, and the migration path from a pile of Prometheus servers.",
+    "speakers": [
+      "David Kim",
+      "Andre Silva"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "observability",
+      "grafana",
+      "mimir",
+      "prometheus",
+      "storage"
+    ]
+  },
+  {
+    "id": "talk-053",
+    "title": "Profiling in Production: Continuous Profiling with Parca",
+    "abstract": "CPU and memory profiles from production reveal waste that dashboards hide. We demo continuous profiling with Parca and show how a 15-minute profile session cut a service's CPU by 40%.",
+    "speakers": [
+      "Arjun Mehta",
+      "Erik Johansson"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "profiling",
+      "parca",
+      "performance",
+      "cpu"
+    ]
+  },
+  {
+    "id": "talk-054",
+    "title": "Observability for LLM Applications",
+    "abstract": "LLM apps fail in new and confusing ways. We cover tracing model calls, token usage, latency breakdowns, and evals, plus the OTel GenAI conventions that are standardizing it all.",
+    "speakers": [
+      "Liam O'Brien"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "llm",
+      "ai",
+      "genai",
+      "tracing"
+    ]
+  },
+  {
+    "id": "talk-055",
+    "title": "Alert Fatigue: Building Alerts People Actually Respond To",
+    "abstract": "If every alert wakes someone up, soon none do. We share the rubric for high-signal alerting \u2014 symptom-based, page-worthy, and actionable \u2014 and how to measure and reduce alert noise.",
+    "speakers": [
+      "Marcus Chen",
+      "Dalia Nasser"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "observability",
+      "alerting",
+      "sre",
+      "on-call",
+      "incident response"
+    ]
+  },
+  {
+    "id": "talk-056",
+    "title": "The Cost of Observability: Cutting Your Bill by 70%",
+    "abstract": "Observability can quietly become your largest cloud line item. We break down where the money goes \u2014 ingestion, retention, cardinality \u2014 and the concrete steps that slashed our bill.",
+    "speakers": [
+      "Adrian Lupu"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "cost optimization",
+      "finops",
+      "retention",
+      "sampling"
+    ]
+  },
+  {
+    "id": "talk-057",
+    "title": "Frontend Observability: RUM and Core Web Vitals",
+    "abstract": "Your users experience the frontend, so instrument it. We cover Real User Monitoring, Core Web Vitals, session replay ethics, and connecting a slow button click to the backend trace.",
+    "speakers": [
+      "Lucia Ferrara",
+      "Jonas Weber"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "rum",
+      "frontend",
+      "core web vitals",
+      "user experience"
+    ]
+  },
+  {
+    "id": "talk-058",
+    "title": "Logs Are Data Too: Structured Logging at Scale",
+    "abstract": "Unstructured logs are where information goes to die. We argue for structured logging, show ingestion pipelines that parse once and index well, and demonstrate log-based metrics that replace brittle dashboards.",
+    "speakers": [
+      "Leila Haddad",
+      "Ximena Ruiz"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "observability",
+      "logging",
+      "structured logging",
+      "pipelines",
+      "metrics"
+    ]
+  },
+  {
+    "id": "talk-059",
+    "title": "Dashboards Are Dead, Long Live Notebooks",
+    "abstract": "Static dashboards can't keep up with dynamic systems. We demo investigative workflows with notebooks and query builders that turn on-call engineers into detectives instead of dashboard-watchers.",
+    "speakers": [
+      "Dalia Nasser",
+      "Liam O'Brien"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "observability",
+      "dashboards",
+      "notebooks",
+      "investigation",
+      "sre"
+    ]
+  },
+  {
+    "id": "talk-060",
+    "title": "AI-Powered Root Cause Analysis: Agent0 and Friends",
+    "abstract": "AI agents are starting to triage incidents: correlating traces, logs, and metrics to propose root causes. We demo an agent-driven investigation and discuss where the tech works \u2014 and where it still lies.",
+    "speakers": [
+      "Dara Okafor",
+      "Arjun Mehta",
+      "Nora Eide"
+    ],
+    "track": "Observability",
+    "room": "Room 255",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "observability",
+      "ai",
+      "root cause analysis",
+      "agents",
+      "incident response"
+    ]
+  },
+  {
+    "id": "talk-061",
+    "title": "Kubernetes for LLMs: Scheduling GPU Workloads",
+    "abstract": "GPUs are scarce and expensive, and Kubernetes was not built for them. We cover GPU-aware scheduling, topology, device plugins, and the patterns that keep expensive accelerators busy.",
+    "speakers": [
+      "Ben Carter",
+      "Nadia Hassan"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ai",
+      "kubernetes",
+      "gpu",
+      "llm",
+      "scheduling"
+    ]
+  },
+  {
+    "id": "talk-062",
+    "title": "GPU Sharing and Fractional GPUs in K8s",
+    "abstract": "Not every workload needs a whole A100. We compare time-slicing, MIG, and MPS for sharing GPUs, and measure the throughput and isolation trade-offs of each approach.",
+    "speakers": [
+      "Bianca Rossi",
+      "Emeka Obi"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ai",
+      "gpu",
+      "mig",
+      "mps",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "talk-063",
+    "title": "Serving LLMs at Scale: vLLM, TGI, and Beyond",
+    "abstract": "Serving a 70B model to thousands of users is an infrastructure problem. We benchmark vLLM, Text Generation Inference, and SGLang on throughput, latency, and memory efficiency.",
+    "speakers": [
+      "Sana Iqbal",
+      "Mei Lin",
+      "Jonas Weber"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ai",
+      "llm",
+      "vllm",
+      "serving",
+      "inference"
+    ]
+  },
+  {
+    "id": "talk-064",
+    "title": "Training Large Models on Kubernetes: A Case Study",
+    "abstract": "Training a large model is 30% modeling and 70% keeping a GPU fleet alive. We share a real training run: checkpointing, fault tolerance, and the networking that makes all-reduce tolerable.",
+    "speakers": [
+      "Amara Osei"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ai",
+      "training",
+      "kubernetes",
+      "gpu",
+      "distributed training"
+    ]
+  },
+  {
+    "id": "talk-065",
+    "title": "Vector Databases for RAG: Choosing Wisely",
+    "abstract": "Pinecone, Weaviate, Qdrant, Milvus, pgvector, Elasticsearch \u2014 the field is crowded. We lay out the decision framework: scale, filtering, hybrid search, and operational overhead.",
+    "speakers": [
+      "Dara Okafor",
+      "Ines Costa"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ai",
+      "vector database",
+      "rag",
+      "embeddings",
+      "elasticsearch"
+    ]
+  },
+  {
+    "id": "talk-066",
+    "title": "RAG in Production: Chunking, Embedding, Re-ranking",
+    "abstract": "Retrieval-augmented generation is easy to demo and hard to productionize. We cover chunking strategies, embedding model choice, hybrid retrieval, and the re-rankers that make answers actually good.",
+    "speakers": [
+      "Cesar Vega",
+      "Nora Eide"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ai",
+      "rag",
+      "embeddings",
+      "reranking",
+      "llm"
+    ]
+  },
+  {
+    "id": "talk-067",
+    "title": "MLOps on Kubernetes: Kubeflow and Friends",
+    "abstract": "Kubeflow, MLflow, Ray, and Flyte all want to run your ML on Kubernetes. We compare the platforms and share the architecture that keeps data scientists productive without ops chaos.",
+    "speakers": [
+      "Zoe Martin",
+      "Tobias Klein",
+      "Talia Cohen"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ai",
+      "mlops",
+      "kubeflow",
+      "mlflow",
+      "ray"
+    ]
+  },
+  {
+    "id": "talk-068",
+    "title": "Fine-Tuning Open Models on a Budget",
+    "abstract": "You don't need a million-dollar cluster to fine-tune. We cover LoRA, QLoRA, and parameter-efficient methods, plus the open-weight models that punch above their size for niche tasks.",
+    "speakers": [
+      "Amara Osei",
+      "Julia Fernandez",
+      "Arjun Mehta"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "ai",
+      "fine-tuning",
+      "lora",
+      "open source",
+      "llm"
+    ]
+  },
+  {
+    "id": "talk-069",
+    "title": "Inference Optimization: Quantization and KV Caching",
+    "abstract": "The difference between 2 tokens/sec and 200 is engineering, not magic. We explain quantization formats, KV cache management, and batching strategies that multiply your serving throughput.",
+    "speakers": [
+      "Sana Iqbal"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ai",
+      "quantization",
+      "kv cache",
+      "inference",
+      "optimization"
+    ]
+  },
+  {
+    "id": "talk-070",
+    "title": "Building AI Agents with Tool Use and Memory",
+    "abstract": "Agents that call APIs, query databases, and remember context are the next wave. We build one live, covering tool schemas, retry loops, and the memory architecture that keeps agents coherent.",
+    "speakers": [
+      "Will Park",
+      "Mateo Rossi"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ai",
+      "agents",
+      "llm",
+      "tool use",
+      "memory"
+    ]
+  },
+  {
+    "id": "talk-071",
+    "title": "Model Registries and Artifact Management",
+    "abstract": "Where do models live between training and serving? We cover model registries, versioning, lineage, and the promotion workflow that stops 'which model is in prod?' from being a scary question.",
+    "speakers": [
+      "Zoe Martin",
+      "Yuki Sato"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "ai",
+      "mlops",
+      "model registry",
+      "versioning",
+      "governance"
+    ]
+  },
+  {
+    "id": "talk-072",
+    "title": "Data Pipelines for ML: Feature Stores and More",
+    "abstract": "Model quality is a data problem first. We walk through feature stores, offline/online serving consistency, and the streaming pipelines that keep features fresh without training-serving skew.",
+    "speakers": [
+      "Omar Farouk"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ai",
+      "feature store",
+      "data pipelines",
+      "mlops",
+      "streaming"
+    ]
+  },
+  {
+    "id": "talk-073",
+    "title": "AI Workload Scheduling with Volcano and Kueue",
+    "abstract": "Batch AI jobs don't fit the standard scheduler. We compare Volcano and Kueue for gang scheduling, queueing, and fair sharing, and show how to keep both training and serving happy.",
+    "speakers": [
+      "Peter Novak",
+      "Anika Berg",
+      "Elena Rodriguez"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "ai",
+      "volcano",
+      "kueue",
+      "scheduling",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "talk-074",
+    "title": "Cost-Effective AI: Spot Instances for Training",
+    "abstract": "Spot instances can cut training costs by 70% if you can survive preemption. We share checkpointing patterns, graceful preemption handling, and the math on when spot actually pays off.",
+    "speakers": [
+      "Nora Eide",
+      "Owen Gallagher"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ai",
+      "spot instances",
+      "cost optimization",
+      "training",
+      "checkpointing"
+    ]
+  },
+  {
+    "id": "talk-075",
+    "title": "Evaluating LLMs: Benchmarks, Evals, and Guardrails",
+    "abstract": "How do you know your model got better? We cover benchmark pitfalls, building task-specific evals, and guardrails that catch hallucinations and toxic output before your users do.",
+    "speakers": [
+      "Ben Carter",
+      "Cesar Vega",
+      "Chen Wei"
+    ],
+    "track": "AI Infrastructure",
+    "room": "Ballroom B",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "ai",
+      "llm",
+      "evals",
+      "benchmarks",
+      "guardrails"
+    ]
+  },
+  {
+    "id": "talk-076",
+    "title": "Platform Engineering 101: Building Your First IDP",
+    "abstract": "Internal developer platforms promise paved roads, but where do you start? We lay out a crawl-walk-run plan: golden paths first, self-service second, and the metrics to prove value.",
+    "speakers": [
+      "Cesar Vega",
+      "Isabelle Martin"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "platform engineering",
+      "idp",
+      "golden paths",
+      "self-service",
+      "devops"
+    ]
+  },
+  {
+    "id": "talk-077",
+    "title": "Backstage: The Developer Portal That Scales",
+    "abstract": "Backstage is the Swiss Army knife of developer portals, but only if you tame its plugin sprawl. We share the catalog modeling, scaffolder templates, and plugin governance that make it stick.",
+    "speakers": [
+      "Zoe Martin",
+      "Vera Ivanova"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "backstage",
+      "developer portal",
+      "catalog",
+      "plugins"
+    ]
+  },
+  {
+    "id": "talk-078",
+    "title": "Golden Paths: Opinionated by Design",
+    "abstract": "Developers don't want 50 choices at 2am. We explain how to design golden paths that are opinionated enough to be safe but flexible enough to not drive teams to shadow IT.",
+    "speakers": [
+      "Omar Farouk",
+      "Kwame Mensah",
+      "Isabelle Martin"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "golden paths",
+      "developer experience",
+      "self-service",
+      "standards"
+    ]
+  },
+  {
+    "id": "talk-079",
+    "title": "Internal Developer Platforms: Build vs Buy",
+    "abstract": "Humanitec, Qovery, Port, or roll your own? We compare the build-vs-buy decision with real cost numbers and the hidden maintenance burden of a homegrown platform.",
+    "speakers": [
+      "Miguel Torres",
+      "Arjun Mehta",
+      "Sam Whitfield"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "platform engineering",
+      "idp",
+      "build vs buy",
+      "humanitec",
+      "port"
+    ]
+  },
+  {
+    "id": "talk-080",
+    "title": "The Platform as a Product: Treating Devs as Customers",
+    "abstract": "Platform teams fail when they become ticket queues. We reframe the platform as a product with a roadmap, user research, and success metrics, and show how that changes everything.",
+    "speakers": [
+      "Dalia Nasser",
+      "Sana Iqbal"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "product management",
+      "developer experience",
+      "roadmap",
+      "adoption"
+    ]
+  },
+  {
+    "id": "talk-081",
+    "title": "Self-Service Infrastructure with Terraform",
+    "abstract": "Terraform modules are the API of your cloud. We show how to build reusable, versioned modules and the self-service workflow that lets teams provision safely without opening tickets.",
+    "speakers": [
+      "Dara Okafor",
+      "Cesar Vega"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "terraform",
+      "iac",
+      "self-service",
+      "modules"
+    ]
+  },
+  {
+    "id": "talk-082",
+    "title": "Paved Roads and Guardrails: Empowering Without Restricting",
+    "abstract": "How much freedom is too much? We cover the guardrail patterns \u2014 policies, defaults, budgets \u2014 that keep developers fast while preventing the disasters that made ops teams gate everything.",
+    "speakers": [
+      "Dara Okafor"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "guardrails",
+      "policy",
+      "developer experience",
+      "governance"
+    ]
+  },
+  {
+    "id": "talk-083",
+    "title": "Developer Experience Metrics: DORA and Beyond",
+    "abstract": "Deploy frequency is nice, but is the inner loop fast? We cover DORA, SPACE, and flow metrics, and how to measure developer experience without turning engineers into surveilled metrics.",
+    "speakers": [
+      "Aiko Tanaka",
+      "Petra Horak"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "dora",
+      "metrics",
+      "developer experience",
+      "flow"
+    ]
+  },
+  {
+    "id": "talk-084",
+    "title": "Ephemeral Environments: Preview on Every PR",
+    "abstract": "Full preview environments per pull request used to be a dream. We show how to spin up namespaced, seeded environments on demand, and how they changed our review and QA culture.",
+    "speakers": [
+      "Rachel Nguyen",
+      "Will Park"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "ephemeral environments",
+      "preview",
+      "kubernetes",
+      "ci/cd"
+    ]
+  },
+  {
+    "id": "talk-085",
+    "title": "Cloud Cost Governance for Platform Teams",
+    "abstract": "Cost is now a platform concern, not a finance afterthought. We cover tagging, showback vs chargeback, anomaly detection, and the FinOps rituals that keep the CFO off your back.",
+    "speakers": [
+      "Rita Sousa",
+      "Ximena Ruiz"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "finops",
+      "cost governance",
+      "cloud",
+      "tagging"
+    ]
+  },
+  {
+    "id": "talk-086",
+    "title": "Standardizing CI/CD Across 100 Teams",
+    "abstract": "A hundred teams, a hundred pipelines, zero consistency. We share how we built shared pipeline templates and reusable actions that gave teams speed without a big-bang migration.",
+    "speakers": [
+      "Elena Rodriguez"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "platform engineering",
+      "ci/cd",
+      "pipelines",
+      "standardization",
+      "github actions"
+    ]
+  },
+  {
+    "id": "talk-087",
+    "title": "From DevOps to Platform Engineering: A Migration Story",
+    "abstract": "We didn't build a platform in a quarter; we evolved into one. This is the honest story of moving from a shared DevOps team to productized internal platforms, including the parts that failed.",
+    "speakers": [
+      "Chen Wei",
+      "Ingrid Larsen"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "platform engineering",
+      "devops",
+      "migration",
+      "organizational change",
+      "lessons learned"
+    ]
+  },
+  {
+    "id": "talk-088",
+    "title": "Multi-Tenancy in Internal Platforms",
+    "abstract": "One platform, many tenants, no noisy neighbors. We cover namespace-level tenancy, quotas, and the isolation trade-offs between soft (namespace) and hard (cluster) tenancy.",
+    "speakers": [
+      "David Kim",
+      "Erik Johansson"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "platform engineering",
+      "multi-tenancy",
+      "kubernetes",
+      "quotas",
+      "isolation"
+    ]
+  },
+  {
+    "id": "talk-089",
+    "title": "The Hidden Cost of Abstraction",
+    "abstract": "Every abstraction leaks, and platforms leak most of all. We catalog the debugging pain when things break beneath the platform, and how to design abstractions that fail loud instead of silently.",
+    "speakers": [
+      "Arjun Mehta",
+      "Ivan Petrov"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "platform engineering",
+      "abstraction",
+      "debugging",
+      "operations",
+      "design"
+    ]
+  },
+  {
+    "id": "talk-090",
+    "title": "Platform Teams: Organizational Anti-Patterns",
+    "abstract": "The wrong org structure can kill a great platform. We dissect the anti-patterns \u2014 the gatekeeper team, the invisible team, the fixer team \u2014 and the org designs that actually work.",
+    "speakers": [
+      "Bianca Rossi",
+      "Yuki Sato"
+    ],
+    "track": "Platform Engineering",
+    "room": "Ballroom C",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "platform engineering",
+      "organizations",
+      "team topologies",
+      "anti-patterns",
+      "leadership"
+    ]
+  },
+  {
+    "id": "talk-091",
+    "title": "Service Mesh Showdown: Istio vs Linkerd vs Cilium",
+    "abstract": "Three meshes, three philosophies. We benchmark mTLS overhead, control-plane resource use, and operational complexity, and give a decision guide for when each is the right call.",
+    "speakers": [
+      "Farah Khan",
+      "Noah Stein",
+      "Will Park"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "networking",
+      "service mesh",
+      "istio",
+      "linkerd",
+      "cilium"
+    ]
+  },
+  {
+    "id": "talk-092",
+    "title": "eBPF and the Future of Kubernetes Networking",
+    "abstract": "eBPF is eating the networking stack from kube-proxy to L7 policies. We explain the shift, what it unlocks for throughput and visibility, and the migration path for existing clusters.",
+    "speakers": [
+      "Emeka Obi",
+      "Sam Whitfield"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "networking",
+      "ebpf",
+      "kubernetes",
+      "cilium",
+      "performance"
+    ]
+  },
+  {
+    "id": "talk-093",
+    "title": "Gateway API: The Next Generation of Ingress",
+    "abstract": "Ingress was never enough; Gateway API is the fix. We cover the new resource model, HTTPRoute and GRPCRoute, and why Gateway API is becoming the standard across controllers.",
+    "speakers": [
+      "Grace Liu",
+      "Carlos Delgado"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "networking",
+      "gateway api",
+      "ingress",
+      "kubernetes",
+      "httproute"
+    ]
+  },
+  {
+    "id": "talk-094",
+    "title": "BGP on Kubernetes: MetalLB and Cilium",
+    "abstract": "Sometimes your cluster needs to speak to the network like a router. We cover MetalLB and Cilium BGP modes, load-balancer announcements, and ECMP for on-prem and edge deployments.",
+    "speakers": [
+      "Will Park"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "bgp",
+      "metallb",
+      "cilium",
+      "load balancing"
+    ]
+  },
+  {
+    "id": "talk-095",
+    "title": "DNS in Kubernetes: CoreDNS Deep Dive",
+    "abstract": "Every outage is a DNS outage until proven otherwise. We trace service DNS resolution end to end, cover CoreDNS tuning, and debug the mysterious ndots:5 behavior that slows your apps.",
+    "speakers": [
+      "Ines Costa"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "dns",
+      "coredns",
+      "kubernetes",
+      "debugging"
+    ]
+  },
+  {
+    "id": "talk-096",
+    "title": "Load Balancing at Planet Scale",
+    "abstract": "From L4 to L7 and back again, load balancing gets weird at scale. We cover consistent hashing, direct server return, and the anycast and failover patterns behind global load balancers.",
+    "speakers": [
+      "Ingrid Larsen",
+      "Jonas Weber"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "load balancing",
+      "anycast",
+      "l7",
+      "scale"
+    ]
+  },
+  {
+    "id": "talk-097",
+    "title": "Zero Trust Networking with Cilium",
+    "abstract": "Network policies built on IPs don't survive dynamic workloads. We show how Cilium's identity-based policies, L7 rules, and FQDN filtering deliver real zero-trust networking.",
+    "speakers": [
+      "Andre Silva",
+      "Tom Becker",
+      "Peter Novak"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "cilium",
+      "zero trust",
+      "network policy",
+      "identity"
+    ]
+  },
+  {
+    "id": "talk-098",
+    "title": "Multi-Cluster Networking: Submariner and Beyond",
+    "abstract": "Connecting clusters across clouds is still surprisingly hard. We compare Submariner, Cilium Cluster Mesh, and flat networks, and the service discovery and failover each enables.",
+    "speakers": [
+      "Fatima Zahra",
+      "Jonas Weber"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "multi-cluster",
+      "submariner",
+      "cilium",
+      "hybrid cloud"
+    ]
+  },
+  {
+    "id": "talk-099",
+    "title": "Network Policies That Actually Work",
+    "abstract": "Most network policies are either allow-all or deny-all. We show how to design tiered policies, use policy-as-code to generate them, and test them so they don't silently break services.",
+    "speakers": [
+      "James Okafor",
+      "Julia Fernandez"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "networking",
+      "network policy",
+      "kubernetes",
+      "policy as code",
+      "security"
+    ]
+  },
+  {
+    "id": "talk-100",
+    "title": "QUIC and HTTP/3 for Cloud Native Services",
+    "abstract": "HTTP/3 is here and your mesh may not be ready. We explain QUIC's benefits for latency and mobility, and the hurdles in load balancers, meshes, and observability tooling.",
+    "speakers": [
+      "Petra Horak",
+      "Adrian Lupu"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "quic",
+      "http3",
+      "protocols",
+      "performance"
+    ]
+  },
+  {
+    "id": "talk-101",
+    "title": "Observability of the Network: Flow Logs and Hubble",
+    "abstract": "You can't debug what you can't see. We cover network flow observability with Hubble, eBPF flow logs, and how to answer 'why is this service talking to that IP?' in seconds.",
+    "speakers": [
+      "Isabelle Martin",
+      "Grace Liu"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "networking",
+      "observability",
+      "hubble",
+      "flow logs",
+      "ebpf"
+    ]
+  },
+  {
+    "id": "talk-102",
+    "title": "Edge Networking: Global Anycast and CDNs",
+    "abstract": "Users are everywhere; your origin is not. We cover anycast, geo-DNS, edge compute, and the CDN patterns that keep latency low and availability high across continents.",
+    "speakers": [
+      "Noah Stein"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "networking",
+      "edge",
+      "anycast",
+      "cdn",
+      "latency"
+    ]
+  },
+  {
+    "id": "talk-103",
+    "title": "Encryption Everywhere: WireGuard and IPsec in K8s",
+    "abstract": "Node-to-node traffic is often plaintext. We compare WireGuard and IPsec for pod encryption, their performance costs, and how to enable transparent encryption without breaking the network.",
+    "speakers": [
+      "Lucia Ferrara",
+      "Sofia Almeida"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "encryption",
+      "wireguard",
+      "ipsec",
+      "security"
+    ]
+  },
+  {
+    "id": "talk-104",
+    "title": "Kubernetes Multi-Network: Multus and CNI Chaining",
+    "abstract": "Some workloads need multiple interfaces or SR-IOV performance. We cover Multus, CNI chaining, and the advanced networking use cases that demand more than one pod network.",
+    "speakers": [
+      "Jade Wu",
+      "Grace Liu"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "multus",
+      "cni",
+      "sr-iov",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "talk-105",
+    "title": "Performance Tuning: The Cost of Your Mesh",
+    "abstract": "Sidecars add latency; how much is too much? We measure the overhead of popular meshes and show tuning \u2014 eBPF mode, ambient mesh, and protocol detection \u2014 that recovers lost throughput.",
+    "speakers": [
+      "Gabriel Santos",
+      "Quinn O'Rourke"
+    ],
+    "track": "Networking",
+    "room": "Room 355",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "networking",
+      "service mesh",
+      "performance",
+      "ambient mesh",
+      "latency"
+    ]
+  },
+  {
+    "id": "talk-106",
+    "title": "Serverless Kubernetes: Knative and OpenFaaS",
+    "abstract": "Serverless on Kubernetes gives you scale-to-zero without leaving your cluster. We compare Knative and OpenFaaS, and cover the cold-start and autoscaling behaviors you'll actually see.",
+    "speakers": [
+      "Lucia Ferrara",
+      "Isabelle Martin"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "serverless",
+      "knative",
+      "openfaas",
+      "kubernetes",
+      "autoscaling"
+    ]
+  },
+  {
+    "id": "talk-107",
+    "title": "WebAssembly: The Next Serverless Runtime",
+    "abstract": "Wasm boots in microseconds and runs everywhere. We explain the component model, WASI, and why WebAssembly is poised to become the lingua franca of serverless and edge compute.",
+    "speakers": [
+      "Noah Stein",
+      "Ingrid Larsen",
+      "Mateo Rossi"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "serverless",
+      "webassembly",
+      "wasm",
+      "wasi",
+      "edge"
+    ]
+  },
+  {
+    "id": "talk-108",
+    "title": "FaaS Cold Starts: Optimization Techniques",
+    "abstract": "Cold starts are the original serverless sin. We benchmark language runtimes, snapshot/restore, and keep-warm strategies, and show how to get function latency from seconds to milliseconds.",
+    "speakers": [
+      "Will Park",
+      "Leila Haddad"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "serverless",
+      "cold start",
+      "faas",
+      "performance",
+      "lambda"
+    ]
+  },
+  {
+    "id": "talk-109",
+    "title": "Event-Driven Architectures with Knative Eventing",
+    "abstract": "Loose coupling is the promise of event-driven systems. We build a Knative Eventing topology \u2014 brokers, triggers, sources \u2014 and discuss the delivery guarantees and dead-letter patterns.",
+    "speakers": [
+      "Owen Gallagher"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "serverless",
+      "knative",
+      "event-driven",
+      "eventing",
+      "broker"
+    ]
+  },
+  {
+    "id": "talk-110",
+    "title": "Edge Computing: Running K8s at the Edge",
+    "abstract": "Edge sites have bad networks and no operators. We cover lightweight K8s distributions, GitOps for fleets, and the observability patterns that work when your cluster is in a wind farm.",
+    "speakers": [
+      "Zara Ahmed",
+      "Lina Al-Rashid"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "edge",
+      "kubernetes",
+      "k3s",
+      "gitops",
+      "fleet management"
+    ]
+  },
+  {
+    "id": "talk-111",
+    "title": "WebAssembly on Kubernetes: Spin and WasmEdge",
+    "abstract": "Run Wasm side by side with containers via runwasi and SpinKube. We demo cold start under a millisecond, smaller images, and the security model that makes Wasm a great neighbor.",
+    "speakers": [
+      "Elena Rodriguez",
+      "Anika Berg",
+      "Chen Wei"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "webassembly",
+      "wasm",
+      "kubernetes",
+      "spin",
+      "wasmedge"
+    ]
+  },
+  {
+    "id": "talk-112",
+    "title": "Serverless Data: Streaming with Kafka and Functions",
+    "abstract": "Functions + streams is a powerful combination. We show how to trigger functions from Kafka topics, handle backpressure, and build exactly-once-ish pipelines without a server in sight.",
+    "speakers": [
+      "Tobias Klein",
+      "Petra Horak"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "serverless",
+      "kafka",
+      "streaming",
+      "event-driven",
+      "functions"
+    ]
+  },
+  {
+    "id": "talk-113",
+    "title": "Durable Execution: Temporal and Durable Functions",
+    "abstract": "Long-running workflows crash, retry, and wait for humans. Durable execution frameworks make that survivable. We compare Temporal and cloud durable functions and the saga patterns they enable.",
+    "speakers": [
+      "Carlos Delgado",
+      "Ingrid Larsen"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "serverless",
+      "temporal",
+      "durable execution",
+      "workflows",
+      "sagas"
+    ]
+  },
+  {
+    "id": "talk-114",
+    "title": "The Serverless Database Problem",
+    "abstract": "Connections are the enemy of scale-to-zero. We cover serverless-friendly databases (Neon, PlanetScale, DynamoDB), HTTP-based SQL proxies, and connection pooling for bursty functions.",
+    "speakers": [
+      "Miguel Torres",
+      "Chloe Dubois"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "serverless",
+      "databases",
+      "connection pooling",
+      "neon",
+      "dynamodb"
+    ]
+  },
+  {
+    "id": "talk-115",
+    "title": "IoT and Edge: From Sensors to Insights",
+    "abstract": "A million sensors generate a lot of messy data. We cover the ingestion, buffering, and edge analytics patterns that turn raw telemetry into decisions without drowning your cloud bill.",
+    "speakers": [
+      "Sam Whitfield",
+      "Julia Fernandez"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "edge",
+      "iot",
+      "ingestion",
+      "analytics",
+      "mqtt"
+    ]
+  },
+  {
+    "id": "talk-116",
+    "title": "Cloudflare Workers vs Serverless Containers",
+    "abstract": "Two serverless worlds: isolate-based Workers and container-based FaaS. We compare cold starts, limits, and developer experience, and where each fits in a modern stack.",
+    "speakers": [
+      "Anika Berg",
+      "Elena Rodriguez",
+      "Helena Varga"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "serverless",
+      "cloudflare workers",
+      "containers",
+      "edge",
+      "comparison"
+    ]
+  },
+  {
+    "id": "talk-117",
+    "title": "WebAssembly Components: The WASI Revolution",
+    "abstract": "The component model makes Wasm composable across languages. We explain WIT interfaces, component linking, and what it means to write a library once and use it from any language.",
+    "speakers": [
+      "Grace Liu",
+      "Noah Stein"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "webassembly",
+      "wasm",
+      "wasi",
+      "component model",
+      "wit"
+    ]
+  },
+  {
+    "id": "talk-118",
+    "title": "Cost Optimization for Serverless: Stop Over-Provisioning",
+    "abstract": "Serverless pricing rewards the attentive and punishes the lazy. We cover right-sizing memory, the cost of idle warm functions, and the monitoring that catches runaway invocations.",
+    "speakers": [
+      "Dalia Nasser",
+      "Tom Becker"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "serverless",
+      "cost optimization",
+      "finops",
+      "aws lambda",
+      "monitoring"
+    ]
+  },
+  {
+    "id": "talk-119",
+    "title": "Real-Time Apps at the Edge with WebSockets",
+    "abstract": "Real-time features push state to the edge. We cover WebSocket infrastructure, fan-out with Durable Objects, and the latency and scale patterns for chat, multiplayer, and live dashboards.",
+    "speakers": [
+      "David Kim",
+      "Lina Al-Rashid"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "edge",
+      "websockets",
+      "real-time",
+      "durable objects",
+      "latency"
+    ]
+  },
+  {
+    "id": "talk-120",
+    "title": "Portable Serverless: Write Once, Run Anywhere",
+    "abstract": "Vendor lock-in is the dirty secret of serverless. We cover the open frameworks \u2014 Knative, OpenFaaS, Spin \u2014 and the abstractions that let you move functions between clouds without rewriting.",
+    "speakers": [
+      "Omar Farouk",
+      "Nadia Hassan"
+    ],
+    "track": "Serverless & Edge",
+    "room": "Room 155",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "serverless",
+      "portability",
+      "knative",
+      "openfaas",
+      "spin"
+    ]
+  },
+  {
+    "id": "talk-121",
+    "title": "The Inner Loop: Fast Feedback for Cloud Native Devs",
+    "abstract": "The gap between 'code saved' and 'see it running' defines developer happiness. We measure inner-loop latency and share the tooling and caching that bring it from minutes to seconds.",
+    "speakers": [
+      "Dara Okafor",
+      "Elena Rodriguez"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "developer experience",
+      "inner loop",
+      "productivity",
+      "dev tools",
+      "feedback"
+    ]
+  },
+  {
+    "id": "talk-122",
+    "title": "Remote Development: Dev Containers and Cloud IDEs",
+    "abstract": "Your laptop is a bottleneck. We cover dev containers, GitHub Codespaces, and remote Kubernetes development, and the reproducible environments that make 'works on my machine' extinct.",
+    "speakers": [
+      "Cesar Vega",
+      "Carlos Delgado",
+      "James Okafor"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "developer experience",
+      "dev containers",
+      "codespaces",
+      "remote development",
+      "tooling"
+    ]
+  },
+  {
+    "id": "talk-123",
+    "title": "Tilt, Skaffold, and the Art of Local K8s",
+    "abstract": "Developing against Kubernetes shouldn't mean waiting for image pushes. We compare Tilt and Skaffold, and show live-reload workflows that make local cluster development feel instant.",
+    "speakers": [
+      "Ines Costa",
+      "Mei Lin"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "developer experience",
+      "tilt",
+      "skaffold",
+      "kubernetes",
+      "local dev"
+    ]
+  },
+  {
+    "id": "talk-124",
+    "title": "Testing in Production: Feature Flags and Canaries",
+    "abstract": "Your staging environment lies to you. We make the case for testing in production with feature flags, canary releases, and the observability that makes it safe instead of terrifying.",
+    "speakers": [
+      "Miguel Torres"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "developer experience",
+      "feature flags",
+      "canary",
+      "testing",
+      "observability"
+    ]
+  },
+  {
+    "id": "talk-125",
+    "title": "The Developer Portal as a Superpower",
+    "abstract": "A good portal answers questions before they're asked. We show how a well-built developer portal cuts onboarding time and support load, and the content that actually gets used.",
+    "speakers": [
+      "Chen Wei",
+      "Sam Whitfield"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "developer experience",
+      "developer portal",
+      "backstage",
+      "onboarding",
+      "documentation"
+    ]
+  },
+  {
+    "id": "talk-126",
+    "title": "Making Onboarding Not Suck",
+    "abstract": "Day-one productivity is a myth for most teams. We share the onboarding playbook \u2014 instant dev environments, golden-path tutorials, and a buddy system \u2014 that gets new hires shipping in days.",
+    "speakers": [
+      "Yuki Sato",
+      "Ingrid Larsen"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "developer experience",
+      "onboarding",
+      "developer productivity",
+      "culture",
+      "documentation"
+    ]
+  },
+  {
+    "id": "talk-127",
+    "title": "CLI Design for Cloud Native Tools",
+    "abstract": "A CLI is a product with an API and a UX. We cover flag design, output formats, and the human factors that separate kubectl-caliber tools from the forgotten ones.",
+    "speakers": [
+      "Finn Andersen"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "developer experience",
+      "cli",
+      "ux",
+      "design",
+      "tooling"
+    ]
+  },
+  {
+    "id": "talk-128",
+    "title": "Contract Testing: Pact and API Compatibility",
+    "abstract": "Microservices break each other through silent API drift. We cover consumer-driven contract testing with Pact, and how it catches breaking changes before they reach production.",
+    "speakers": [
+      "Nora Eide",
+      "Ravi Patel",
+      "Sana Iqbal"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "developer experience",
+      "contract testing",
+      "pact",
+      "api",
+      "microservices"
+    ]
+  },
+  {
+    "id": "talk-129",
+    "title": "Progressive Delivery: Canary, Blue-Green, Argo Rollouts",
+    "abstract": "Ship every change safely with progressive delivery. We compare blue-green and canary strategies, and demo Argo Rollouts with automatic analysis and rollback.",
+    "speakers": [
+      "Cesar Vega",
+      "Helena Varga"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "developer experience",
+      "progressive delivery",
+      "argo rollouts",
+      "canary",
+      "blue-green"
+    ]
+  },
+  {
+    "id": "talk-130",
+    "title": "Observability-Driven Development",
+    "abstract": "What if you wrote code with its telemetry already in mind? We show how thinking about traces and metrics during design produces debuggable systems and fewer 3am pages.",
+    "speakers": [
+      "Becca Holt",
+      "Quinn O'Rourke"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "developer experience",
+      "observability",
+      "tracing",
+      "design",
+      "sre"
+    ]
+  },
+  {
+    "id": "talk-131",
+    "title": "AI Pair Programming at Scale",
+    "abstract": "Copilots are everywhere, but are teams actually faster? We share real adoption data, the workflow patterns that work, and the review practices that keep AI-generated code safe.",
+    "speakers": [
+      "Jonas Weber",
+      "Will Park",
+      "Ximena Ruiz"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "developer experience",
+      "ai",
+      "copilot",
+      "pair programming",
+      "productivity"
+    ]
+  },
+  {
+    "id": "talk-132",
+    "title": "Monorepos vs Polyrepos: The Eternal Debate",
+    "abstract": "One repo or many? We present the real trade-offs in CI time, dependency management, and ownership, and the tooling \u2014 Bazel, Nx, Turborepo \u2014 that makes either choice work.",
+    "speakers": [
+      "Aiko Tanaka",
+      "David Kim"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "developer experience",
+      "monorepo",
+      "polyrepo",
+      "bazel",
+      "nx"
+    ]
+  },
+  {
+    "id": "talk-133",
+    "title": "From Bug Report to Fix: Shortening the Loop",
+    "abstract": "The distance between a user's bug and a deployed fix is a competitive advantage. We map the loop, find the bottlenecks, and share the tooling that compresses days into hours.",
+    "speakers": [
+      "Owen Gallagher",
+      "Lucia Ferrara",
+      "Mateo Rossi"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "developer experience",
+      "feedback loops",
+      "incident response",
+      "deployment",
+      "productivity"
+    ]
+  },
+  {
+    "id": "talk-134",
+    "title": "Local Kubernetes Clusters: kind, minikube, k3d",
+    "abstract": "You don't need a cloud to develop for Kubernetes. We compare kind, minikube, k3d, and Colima, and show how to configure them for fast iteration and realistic networking.",
+    "speakers": [
+      "Lucia Ferrara",
+      "Zoe Martin"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "developer experience",
+      "kind",
+      "minikube",
+      "k3d",
+      "local dev"
+    ]
+  },
+  {
+    "id": "talk-135",
+    "title": "The Psychology of Developer Productivity",
+    "abstract": "Flow state, context switching, and meetings \u2014 productivity is human before it is technical. We cover the research and the practical changes that protect engineers' deep work.",
+    "speakers": [
+      "Kwame Mensah",
+      "Stefan Bauer"
+    ],
+    "track": "Developer Experience",
+    "room": "Room 253",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Beginner",
+    "tags": [
+      "developer experience",
+      "productivity",
+      "flow",
+      "culture",
+      "psychology"
+    ]
+  },
+  {
+    "id": "talk-136",
+    "title": "Kafka at Scale: Lessons from a Trillion Messages",
+    "abstract": "Running Kafka at huge scale teaches hard lessons. We cover partition strategy, retention, and the consumer-group tuning that keeps a trillion-message pipeline from melting down.",
+    "speakers": [
+      "Adrian Lupu"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-09T09:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "kafka",
+      "streaming",
+      "scale",
+      "partitioning",
+      "performance"
+    ]
+  },
+  {
+    "id": "talk-137",
+    "title": "Stream Processing with Flink on Kubernetes",
+    "abstract": "Flink on Kubernetes is powerful and finicky. We cover job submission, checkpointing to object storage, and autoscaling a Flink cluster that keeps state consistent under load.",
+    "speakers": [
+      "Sofia Almeida",
+      "Lucia Ferrara"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-09T10:15:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "flink",
+      "streaming",
+      "kubernetes",
+      "checkpointing",
+      "state"
+    ]
+  },
+  {
+    "id": "talk-138",
+    "title": "Event Sourcing and CQRS in Cloud Native Systems",
+    "abstract": "Event sourcing gives you an audit log for free but complicates everything else. We cover the CQRS split, projections, and when event sourcing is worth it \u2014 and when it's not.",
+    "speakers": [
+      "Nora Eide",
+      "Omar Farouk",
+      "Vera Ivanova"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-09T11:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "event sourcing",
+      "cqrs",
+      "architecture",
+      "streaming",
+      "projections"
+    ]
+  },
+  {
+    "id": "talk-139",
+    "title": "Data Mesh: Governance Meets Autonomy",
+    "abstract": "Centralized data teams don't scale; data mesh decentralizes ownership. We explain the four principles, the platform that supports them, and the governance that keeps the mesh from becoming a mess.",
+    "speakers": [
+      "Carlos Delgado",
+      "Fatima Zahra",
+      "Kwame Mensah"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-09T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "data mesh",
+      "governance",
+      "data platform",
+      "domain ownership",
+      "architecture"
+    ]
+  },
+  {
+    "id": "talk-140",
+    "title": "Change Data Capture with Debezium",
+    "abstract": "Your database is a stream you're not reading. We cover Debezium, transaction logs, and the CDC pipelines that sync data to warehouses and caches without touching application code.",
+    "speakers": [
+      "Sam Whitfield",
+      "Ines Costa"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-09T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "cdc",
+      "debezium",
+      "streaming",
+      "databases",
+      "etl"
+    ]
+  },
+  {
+    "id": "talk-141",
+    "title": "Real-Time Analytics with ClickHouse",
+    "abstract": "ClickHouse queries billions of rows in milliseconds. We cover the columnar design, the materialized views that keep dashboards fast, and when to reach for ClickHouse vs a warehouse.",
+    "speakers": [
+      "Dalia Nasser",
+      "Sana Iqbal"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-09T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "clickhouse",
+      "analytics",
+      "olap",
+      "columnar",
+      "real-time"
+    ]
+  },
+  {
+    "id": "talk-142",
+    "title": "Kafka vs Redpanda vs Pulsar: A Benchmark",
+    "abstract": "The streaming space has options now. We benchmark Kafka, Redpanda, and Pulsar on throughput, latency, and operations, and give a decision guide for each.",
+    "speakers": [
+      "Kwame Mensah"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-09T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "kafka",
+      "redpanda",
+      "pulsar",
+      "benchmarks",
+      "streaming"
+    ]
+  },
+  {
+    "id": "talk-143",
+    "title": "Schema Management and the Confluent Schema Registry",
+    "abstract": "Schemas are the contract of your data plane. We cover Avro/Protobuf/JSON Schema trade-offs, compatibility modes, and the registry patterns that prevent breaking consumers.",
+    "speakers": [
+      "Umar Syed"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-09T18:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "schema registry",
+      "avro",
+      "protobuf",
+      "kafka",
+      "compatibility"
+    ]
+  },
+  {
+    "id": "talk-144",
+    "title": "Data Lakehouse on Kubernetes: Iceberg and Friends",
+    "abstract": "The lakehouse merges warehouse performance with lake flexibility. We cover Apache Iceberg tables on object storage, Spark/Flink engines, and running it all on Kubernetes.",
+    "speakers": [
+      "Dalia Nasser",
+      "Ravi Patel"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-10T09:00:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "data lakehouse",
+      "iceberg",
+      "spark",
+      "kubernetes",
+      "object storage"
+    ]
+  },
+  {
+    "id": "talk-145",
+    "title": "Streaming ETL: From Kafka to Warehouse",
+    "abstract": "Moving data from Kafka to a warehouse is easy until it's not. We cover exactly-once delivery, schema evolution, and the late-data handling that keeps your warehouse trustworthy.",
+    "speakers": [
+      "Chen Wei",
+      "Miguel Torres",
+      "Finn Andersen"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-10T10:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "etl",
+      "kafka",
+      "warehouse",
+      "streaming",
+      "exactly-once"
+    ]
+  },
+  {
+    "id": "talk-146",
+    "title": "Exactly-Once Semantics: A Practical Guide",
+    "abstract": "Exactly-once is a lie, but a useful one. We explain what the guarantees really mean across Kafka, Flink, and sinks, and the idempotency patterns that make them achievable.",
+    "speakers": [
+      "Hannah Park",
+      "Cesar Vega",
+      "Kwame Mensah"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-10T11:30:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "exactly-once",
+      "kafka",
+      "flink",
+      "idempotency",
+      "streaming"
+    ]
+  },
+  {
+    "id": "talk-147",
+    "title": "Time-Series Databases: InfluxDB, Timescale, Mimir",
+    "abstract": "Metrics, events, and sensor data need specialized storage. We compare time-series databases on ingestion, compression, and query patterns, and when Postgres (Timescale) is enough.",
+    "speakers": [
+      "Lina Al-Rashid",
+      "Peter Novak",
+      "Kenji Nakamura"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-10T13:00:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "time-series",
+      "influxdb",
+      "timescale",
+      "mimir",
+      "metrics"
+    ]
+  },
+  {
+    "id": "talk-148",
+    "title": "Event-Driven Microservices: Patterns and Pitfalls",
+    "abstract": "Events decouple services but introduce eventual consistency. We cover the transactional outbox, retries with idempotent consumers, and the ordering pitfalls that bite distributed systems.",
+    "speakers": [
+      "Priya Sharma",
+      "Dalia Nasser"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-10T14:15:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "event-driven",
+      "microservices",
+      "outbox",
+      "eventual consistency",
+      "kafka"
+    ]
+  },
+  {
+    "id": "talk-149",
+    "title": "Data Quality in Streaming Pipelines",
+    "abstract": "Garbage in, garbage out, faster than ever. We cover schema validation, anomaly detection, and data contracts that catch bad data at the edge before it poisons downstream systems.",
+    "speakers": [
+      "Kwame Mensah",
+      "Yuki Sato"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-10T15:30:00-07:00",
+    "level": "Intermediate",
+    "tags": [
+      "data quality",
+      "streaming",
+      "data contracts",
+      "validation",
+      "anomaly detection"
+    ]
+  },
+  {
+    "id": "talk-150",
+    "title": "Vector Search at Scale: Beyond RAG",
+    "abstract": "Vector search is everywhere now, but scale changes everything. We cover ANN indexes, hybrid BM25+vector retrieval, and the serving architecture behind low-latency semantic search.",
+    "speakers": [
+      "Farah Khan",
+      "Leila Haddad",
+      "Ximena Ruiz"
+    ],
+    "track": "Data & Streaming",
+    "room": "The Loft",
+    "start_time": "2026-11-10T16:45:00-07:00",
+    "level": "Advanced",
+    "tags": [
+      "vector search",
+      "embeddings",
+      "ann",
+      "hybrid search",
+      "elasticsearch"
+    ]
+  }
+]

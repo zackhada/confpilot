@@ -1,0 +1,8 @@
+# Root kustomization — convenience entrypoint so you can run:
+#   kubectl apply -k deploy/
+# Everything lives under base/; overlays/oom-fix demonstrates the embed-worker fix.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - base/

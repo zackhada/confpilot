@@ -1,0 +1,2 @@
+elasticsearch>=8.15,<9
+sentence-transformers>=2.6

@@ -1,0 +1,76 @@
+# CI workflow for ConfPilot.
+#
+# This file lives at deploy/ci.yml in the repo skeleton. Copy it into your
+# repository at:
+#
+#     .github/workflows/ci.yml
+#
+# It runs, on every push / pull request:
+#   1. ruff lint + format check (app/ and deploy/)
+#   2. pytest (app tests)
+#   3. docker build of the API image (deploy/Dockerfile, context = repo root)
+#
+# Ruff/pytest run against the repo-root app/ directory.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: lint + test + build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: app/requirements.txt
+
+      - name: Install dev tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff pytest
+
+      - name: Install app dependencies
+        run: pip install -r app/requirements.txt
+
+      # --- 1. ruff ---------------------------------------------------------
+      - name: Lint (ruff check)
+        run: ruff check app/ deploy/
+
+      - name: Format check (ruff format --check)
+        run: ruff format --check app/ deploy/
+
+      # --- 2. pytest --------------------------------------------------------
+      # NOTE: the app agent owns the test suite. If app/tests is empty, pytest
+      # exits non-zero with "no tests ran" — add tests under app/tests/.
+      - name: Test (pytest)
+        run: pytest app/ -q
+
+      # --- 3. docker build --------------------------------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image (deploy/Dockerfile, context = repo root)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          tags: confpilot-api:latest
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

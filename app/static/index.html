@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ConfPilot — accessible AI conference companion</title>
+  <meta name="description" content="Search talks, ask questions, find people, and check room crowd levels — accessibly." />
+  <link rel="stylesheet" href="/static/styles.css" />
+
+  <!--
+    Dash0 RUM snippet placeholder
+    Paste the generated Dash0 browser Real User Monitoring <script> here
+    (e.g. the bootstrap + config block emitted by the Dash0 UI).
+  -->
+  <script id="dash0-rum" data-dash0-rum="placeholder">
+    // window.dash0Rum && window.dash0Rum.init({ /* Dash0 config */ });
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <h1>ConfPilot</h1>
+    <p class="tagline">Your accessible conference companion.</p>
+
+    <nav class="prefs" aria-label="Display preferences">
+      <button id="toggle-contrast" type="button" aria-pressed="false">
+        High contrast: <span data-state="off">off</span>
+      </button>
+      <button id="toggle-plain" type="button" aria-pressed="false">
+        Plain language: <span data-state="off">off</span>
+      </button>
+      <button id="toggle-bandwidth" type="button" aria-pressed="false">
+        Low bandwidth: <span data-state="off">off</span>
+      </button>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <nav aria-label="ConfPilot tools">
+      <div role="tablist" aria-label="Tools" class="tabs">
+        <button role="tab" id="tab-search" aria-controls="panel-search" aria-selected="true">Search talks</button>
+        <button role="tab" id="tab-ask" aria-controls="panel-ask" aria-selected="false" tabindex="-1">Ask</button>
+        <button role="tab" id="tab-match" aria-controls="panel-match" aria-selected="false" tabindex="-1">Match</button>
+        <button role="tab" id="tab-rooms" aria-controls="panel-rooms" aria-selected="false" tabindex="-1">Rooms</button>
+        <button role="tab" id="tab-chaos" aria-controls="panel-chaos" aria-selected="false" tabindex="-1">Chaos</button>
+      </div>
+    </nav>
+
+    <main id="main" tabindex="-1">
+      <!-- SEARCH -->
+      <section role="tabpanel" id="panel-search" aria-labelledby="tab-search" hidden>
+        <h2>Search talks</h2>
+        <p class="hint">Find a talk by topic. Try <em>“something on eBPF and security”</em>.</p>
+        <form id="search-form" class="tool-form">
+          <label for="search-q">Search query</label>
+          <input id="search-q" name="q" type="search" placeholder="e.g. eBPF and security" autocomplete="off" required />
+          <button type="submit">Search</button>
+        </form>
+        <div id="search-results" class="results" aria-live="polite" aria-busy="false"></div>
+      </section>
+
+      <!-- ASK -->
+      <section role="tabpanel" id="panel-ask" aria-labelledby="tab-ask" hidden>
+        <h2>Ask ConfPilot</h2>
+        <p class="hint">Ask a question about the conference program. Answers are grounded in talk abstracts.</p>
+        <form id="ask-form" class="tool-form">
+          <label for="ask-q">Your question</label>
+          <textarea id="ask-q" name="question" rows="3" required placeholder="Which talks cover observability?"></textarea>
+          <button type="submit">Ask</button>
+        </form>
+        <div id="ask-results" class="results" aria-live="polite" aria-busy="false"></div>
+      </section>
+
+      <!-- MATCH -->
+      <section role="tabpanel" id="panel-match" aria-labelledby="tab-match" hidden>
+        <h2>Hallway matchmaker</h2>
+        <p class="hint">Enter your interests to find people with similar ones.</p>
+        <form id="match-form" class="tool-form">
+          <label for="match-interests">Your interests (comma separated)</label>
+          <input id="match-interests" type="text" placeholder="ebpf, security, kubernetes" required />
+          <button type="submit">Find people</button>
+        </form>
+        <div id="match-results" class="results" aria-live="polite" aria-busy="false"></div>
+      </section>
+
+      <!-- ROOMS -->
+      <section role="tabpanel" id="panel-rooms" aria-labelledby="tab-rooms" hidden>
+        <h2>Room crowd levels</h2>
+        <p class="hint">Check how busy rooms are, including the sensory-friendly quiet room.</p>
+        <button id="rooms-refresh" type="button">Refresh crowd levels</button>
+        <ul id="rooms-list" class="room-list" aria-live="polite"></ul>
+      </section>
+
+      <!-- CHAOS -->
+      <section role="tabpanel" id="panel-chaos" aria-labelledby="tab-chaos" hidden>
+        <h2>Chaos (demo)</h2>
+        <p class="hint">Inject latency or errors to exercise the observability setup. <strong>Use carefully.</strong></p>
+        <div class="chaos-controls">
+          <label for="chaos-latency">Latency (ms)</label>
+          <input id="chaos-latency" type="number" min="0" max="60000" step="50" value="500" />
+          <label for="chaos-error">Error rate (0–1)</label>
+          <input id="chaos-error" type="number" min="0" max="1" step="0.05" value="0.2" />
+          <button id="chaos-enable" type="button" aria-pressed="false">Enable chaos</button>
+        </div>
+        <p id="chaos-status" class="status" aria-live="polite"></p>
+      </section>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <p>ConfPilot · hybrid search &amp; RAG on Elasticsearch · OpenTelemetry to Dash0 · accessible by design.</p>
+    <p class="plain-only" hidden>Simple words mode is on.</p>
+  </footer>
+
+  <div id="status" class="sr-only" role="status" aria-live="polite"></div>
+
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

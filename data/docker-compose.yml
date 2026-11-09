@@ -1,0 +1,37 @@
+# Local single-node Elasticsearch 8.x for development (security disabled).
+#
+# Start:   docker compose up -d
+# Health:  curl http://localhost:9200
+# Stop:    docker compose down          (keeps data volume)
+# Wipe:    docker compose down -v
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.1
+    container_name: cnh-elasticsearch
+    environment:
+      - discovery.type=single-node
+      # Security is OFF for local dev (matches ES_URL without auth).
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=basic
+      # Roles include ml so ELSER / E5 inference endpoints can be deployed if
+      # you pass `--create-inference` to ingest.py.
+      - node.roles=master,data,ingest,ml
+      - xpack.ml.enabled=true
+      # Bump to -Xmx2g if you deploy E5/ELSER models (the fallback path is
+      # happy with 1g).
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 40s
+
+volumes:
+  esdata:

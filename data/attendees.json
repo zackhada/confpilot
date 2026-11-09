@@ -1,0 +1,767 @@
+[
+  {
+    "id": "attendee-001",
+    "name": "Paxton Shaw",
+    "role": "Security Engineer",
+    "company": "Uinta Analytics",
+    "interests": [
+      "ebpf",
+      "event-driven",
+      "falco",
+      "fine-tuning",
+      "policy as code",
+      "webassembly"
+    ]
+  },
+  {
+    "id": "attendee-002",
+    "name": "Elliot Price",
+    "role": "Security Engineer",
+    "company": "Wasatch Cloud",
+    "interests": [
+      "edge",
+      "opentelemetry",
+      "security"
+    ]
+  },
+  {
+    "id": "attendee-003",
+    "name": "Finley Kim",
+    "role": "Solutions Architect",
+    "company": "Provo Pipeline",
+    "interests": [
+      "cilium",
+      "edge",
+      "gpu",
+      "istio",
+      "kubernetes",
+      "opentelemetry"
+    ]
+  },
+  {
+    "id": "attendee-004",
+    "name": "Greer Jackson",
+    "role": "Student",
+    "company": "Deseret Digital",
+    "interests": [
+      "ai",
+      "backstage",
+      "clickhouse",
+      "flink",
+      "gpu",
+      "kafka"
+    ]
+  },
+  {
+    "id": "attendee-005",
+    "name": "Riley Thompson",
+    "role": "Backend Engineer",
+    "company": "Alta Cloud",
+    "interests": [
+      "ai",
+      "argo cd",
+      "fine-tuning",
+      "kafka",
+      "policy as code"
+    ]
+  },
+  {
+    "id": "attendee-006",
+    "name": "Blaire Evans",
+    "role": "Developer Advocate",
+    "company": "Snowbird Software",
+    "interests": [
+      "cost optimization",
+      "event-driven",
+      "security"
+    ]
+  },
+  {
+    "id": "attendee-007",
+    "name": "Devon Gill",
+    "role": "DevOps Engineer",
+    "company": "Uinta Analytics",
+    "interests": [
+      "ai",
+      "backstage",
+      "clickhouse",
+      "mlops",
+      "zero trust"
+    ]
+  },
+  {
+    "id": "attendee-008",
+    "name": "Drew Jenkins",
+    "role": "Site Reliability Engineer",
+    "company": "Provo Pipeline",
+    "interests": [
+      "ai",
+      "falco",
+      "gpu",
+      "mlops",
+      "observability"
+    ]
+  },
+  {
+    "id": "attendee-009",
+    "name": "Tatum Bell",
+    "role": "Product Manager",
+    "company": "Sundance Systems",
+    "interests": [
+      "ebpf",
+      "edge",
+      "gpu",
+      "llm",
+      "opentelemetry"
+    ]
+  },
+  {
+    "id": "attendee-010",
+    "name": "Bo Chen",
+    "role": "Developer Advocate",
+    "company": "Alta Cloud",
+    "interests": [
+      "ci/cd",
+      "distributed tracing",
+      "gpu",
+      "multi-cluster",
+      "secrets management",
+      "serverless"
+    ]
+  },
+  {
+    "id": "attendee-011",
+    "name": "Kendall Stone",
+    "role": "Data Scientist",
+    "company": "Draper Dev",
+    "interests": [
+      "chaos engineering",
+      "event-driven",
+      "falco",
+      "llm",
+      "rag"
+    ]
+  },
+  {
+    "id": "attendee-012",
+    "name": "Chris Patel",
+    "role": "CTO",
+    "company": "Layton Labs",
+    "interests": [
+      "data mesh",
+      "falco",
+      "llm",
+      "rag"
+    ]
+  },
+  {
+    "id": "attendee-013",
+    "name": "Ren Tanaka",
+    "role": "Software Engineer",
+    "company": "Murray Microservices",
+    "interests": [
+      "devops",
+      "docker",
+      "ebpf",
+      "fine-tuning",
+      "multi-cluster",
+      "streaming"
+    ]
+  },
+  {
+    "id": "attendee-014",
+    "name": "Morgan Lee",
+    "role": "Cloud Architect",
+    "company": "Timpanogos Tech",
+    "interests": [
+      "containers",
+      "data mesh",
+      "docker",
+      "gitops",
+      "service mesh",
+      "supply chain"
+    ]
+  },
+  {
+    "id": "attendee-015",
+    "name": "Remi Zhao",
+    "role": "CTO",
+    "company": "Ogden Ops",
+    "interests": [
+      "cilium",
+      "policy as code",
+      "rag"
+    ]
+  },
+  {
+    "id": "attendee-016",
+    "name": "Ezra Holt",
+    "role": "SRE",
+    "company": "Snowbird Software",
+    "interests": [
+      "developer experience",
+      "event-driven",
+      "kafka",
+      "rag",
+      "security",
+      "terraform"
+    ]
+  },
+  {
+    "id": "attendee-017",
+    "name": "Otis Reed",
+    "role": "Infrastructure Engineer",
+    "company": "SaltStack Labs",
+    "interests": [
+      "docker",
+      "gitops",
+      "gpu"
+    ]
+  },
+  {
+    "id": "attendee-018",
+    "name": "Colby Frost",
+    "role": "ML Engineer",
+    "company": "Sundance Systems",
+    "interests": [
+      "argo cd",
+      "data mesh",
+      "networking",
+      "supply chain",
+      "webassembly"
+    ]
+  },
+  {
+    "id": "attendee-019",
+    "name": "Winter Diaz",
+    "role": "Student",
+    "company": "Wasatch Cloud",
+    "interests": [
+      "cost optimization",
+      "developer experience",
+      "ebpf",
+      "gitops",
+      "prometheus",
+      "sre"
+    ]
+  },
+  {
+    "id": "attendee-020",
+    "name": "Oakley Ward",
+    "role": "ML Engineer",
+    "company": "Bonneville Systems",
+    "interests": [
+      "cilium",
+      "istio",
+      "kubernetes",
+      "networking",
+      "secrets management",
+      "streaming"
+    ]
+  },
+  {
+    "id": "attendee-021",
+    "name": "Sawyer Irwin",
+    "role": "Backend Engineer",
+    "company": "Layton Labs",
+    "interests": [
+      "ai",
+      "cilium",
+      "ebpf",
+      "edge",
+      "prometheus",
+      "supply chain"
+    ]
+  },
+  {
+    "id": "attendee-022",
+    "name": "Ira Lane",
+    "role": "Site Reliability Engineer",
+    "company": "Ogden Ops",
+    "interests": [
+      "cost optimization",
+      "fine-tuning",
+      "kubernetes",
+      "networking",
+      "policy as code",
+      "vector databases"
+    ]
+  },
+  {
+    "id": "attendee-023",
+    "name": "Marlow Park",
+    "role": "Data Scientist",
+    "company": "Sundance Systems",
+    "interests": [
+      "ai",
+      "ebpf",
+      "event-driven",
+      "security",
+      "vector databases",
+      "webassembly"
+    ]
+  },
+  {
+    "id": "attendee-024",
+    "name": "Wren Yates",
+    "role": "Product Manager",
+    "company": "SaltStack Labs",
+    "interests": [
+      "falco",
+      "serverless",
+      "service mesh",
+      "streaming"
+    ]
+  },
+  {
+    "id": "attendee-025",
+    "name": "Quinn Martinez",
+    "role": "Site Reliability Engineer",
+    "company": "Park City Platform",
+    "interests": [
+      "ci/cd",
+      "distributed tracing",
+      "event-driven",
+      "flink",
+      "llm",
+      "terraform"
+    ]
+  },
+  {
+    "id": "attendee-026",
+    "name": "Taylor Brooks",
+    "role": "CTO",
+    "company": "Murray Microservices",
+    "interests": [
+      "chaos engineering",
+      "ci/cd",
+      "mlops"
+    ]
+  },
+  {
+    "id": "attendee-027",
+    "name": "Parker Hall",
+    "role": "Engineering Manager",
+    "company": "Zion Data",
+    "interests": [
+      "devops",
+      "ebpf",
+      "kubernetes",
+      "llm",
+      "rag",
+      "streaming"
+    ]
+  },
+  {
+    "id": "attendee-028",
+    "name": "Zion Ahmed",
+    "role": "Solutions Architect",
+    "company": "Park City Platform",
+    "interests": [
+      "falco",
+      "fine-tuning",
+      "sre",
+      "webassembly"
+    ]
+  },
+  {
+    "id": "attendee-029",
+    "name": "Val Carter",
+    "role": "Cloud Architect",
+    "company": "Zion Data",
+    "interests": [
+      "distributed tracing",
+      "edge",
+      "llm"
+    ]
+  },
+  {
+    "id": "attendee-030",
+    "name": "Vince Xu",
+    "role": "Staff Engineer",
+    "company": "Uinta Analytics",
+    "interests": [
+      "cilium",
+      "data mesh",
+      "kafka",
+      "kubernetes",
+      "serverless",
+      "service mesh"
+    ]
+  },
+  {
+    "id": "attendee-031",
+    "name": "Frankie Quinn",
+    "role": "Product Manager",
+    "company": "Alta Cloud",
+    "interests": [
+      "backstage",
+      "chaos engineering",
+      "gpu",
+      "networking",
+      "security"
+    ]
+  },
+  {
+    "id": "attendee-032",
+    "name": "Shay Ueda",
+    "role": "Engineering Manager",
+    "company": "Sundance Systems",
+    "interests": [
+      "backstage",
+      "gpu",
+      "sre"
+    ]
+  },
+  {
+    "id": "attendee-033",
+    "name": "Hayden Foster",
+    "role": "Data Engineer",
+    "company": "Alta Cloud",
+    "interests": [
+      "developer experience",
+      "ebpf",
+      "observability",
+      "opentelemetry"
+    ]
+  },
+  {
+    "id": "attendee-034",
+    "name": "Jordan Ellis",
+    "role": "SRE",
+    "company": "Sundance Systems",
+    "interests": [
+      "edge",
+      "gitops",
+      "kafka",
+      "llm"
+    ]
+  },
+  {
+    "id": "attendee-035",
+    "name": "Micah Underwood",
+    "role": "Product Manager",
+    "company": "Uinta Analytics",
+    "interests": [
+      "backstage",
+      "chaos engineering",
+      "cilium",
+      "event-driven",
+      "fine-tuning",
+      "kubernetes"
+    ]
+  },
+  {
+    "id": "attendee-036",
+    "name": "Lennon Ortiz",
+    "role": "Backend Engineer",
+    "company": "Timpanogos Tech",
+    "interests": [
+      "ci/cd",
+      "devops",
+      "ebpf"
+    ]
+  },
+  {
+    "id": "attendee-037",
+    "name": "Logan Tate",
+    "role": "ML Engineer",
+    "company": "Draper Dev",
+    "interests": [
+      "argo cd",
+      "distributed tracing",
+      "fine-tuning",
+      "policy as code",
+      "sre",
+      "supply chain"
+    ]
+  },
+  {
+    "id": "attendee-038",
+    "name": "Uma Wolf",
+    "role": "Site Reliability Engineer",
+    "company": "Draper Dev",
+    "interests": [
+      "chaos engineering",
+      "data mesh",
+      "falco",
+      "observability",
+      "webassembly"
+    ]
+  },
+  {
+    "id": "attendee-039",
+    "name": "Keaton Nash",
+    "role": "Solutions Architect",
+    "company": "Ogden Ops",
+    "interests": [
+      "containers",
+      "cost optimization",
+      "edge",
+      "secrets management"
+    ]
+  },
+  {
+    "id": "attendee-040",
+    "name": "Jules Mason",
+    "role": "Infrastructure Engineer",
+    "company": "Timpanogos Tech",
+    "interests": [
+      "ai",
+      "argo cd",
+      "clickhouse",
+      "cost optimization",
+      "kubernetes",
+      "vector databases"
+    ]
+  },
+  {
+    "id": "attendee-041",
+    "name": "Cameron Moss",
+    "role": "Site Reliability Engineer",
+    "company": "Zion Data",
+    "interests": [
+      "ai",
+      "developer experience",
+      "devops",
+      "policy as code",
+      "prometheus",
+      "streaming"
+    ]
+  },
+  {
+    "id": "attendee-042",
+    "name": "Hollis King",
+    "role": "Cloud Architect",
+    "company": "Wasatch Cloud",
+    "interests": [
+      "backstage",
+      "cost optimization",
+      "supply chain"
+    ]
+  },
+  {
+    "id": "attendee-043",
+    "name": "Dakota Nunez",
+    "role": "Engineering Manager",
+    "company": "Zion Data",
+    "interests": [
+      "containers",
+      "policy as code",
+      "streaming",
+      "terraform"
+    ]
+  },
+  {
+    "id": "attendee-044",
+    "name": "Skyler Adams",
+    "role": "Student",
+    "company": "Zion Data",
+    "interests": [
+      "ci/cd",
+      "docker",
+      "event-driven",
+      "falco"
+    ]
+  },
+  {
+    "id": "attendee-045",
+    "name": "Teagan Vance",
+    "role": "Student",
+    "company": "Provo Pipeline",
+    "interests": [
+      "gpu",
+      "prometheus",
+      "service mesh",
+      "vector databases",
+      "webassembly"
+    ]
+  },
+  {
+    "id": "attendee-046",
+    "name": "Noor Qadir",
+    "role": "ML Engineer",
+    "company": "Alta Cloud",
+    "interests": [
+      "cilium",
+      "cost optimization",
+      "ebpf",
+      "service mesh",
+      "webassembly"
+    ]
+  },
+  {
+    "id": "attendee-047",
+    "name": "Ari Bloom",
+    "role": "Infrastructure Engineer",
+    "company": "SaltStack Labs",
+    "interests": [
+      "falco",
+      "flink",
+      "opentelemetry",
+      "platform engineering",
+      "service mesh",
+      "streaming"
+    ]
+  },
+  {
+    "id": "attendee-048",
+    "name": "Emerson Gray",
+    "role": "CTO",
+    "company": "Layton Labs",
+    "interests": [
+      "fine-tuning",
+      "observability",
+      "sre"
+    ]
+  },
+  {
+    "id": "attendee-049",
+    "name": "Casey Nguyen",
+    "role": "Principal Engineer",
+    "company": "Murray Microservices",
+    "interests": [
+      "cilium",
+      "cost optimization",
+      "event-driven",
+      "llm",
+      "serverless",
+      "terraform"
+    ]
+  },
+  {
+    "id": "attendee-050",
+    "name": "Perry Young",
+    "role": "CTO",
+    "company": "Layton Labs",
+    "interests": [
+      "ai",
+      "ci/cd",
+      "multi-cluster",
+      "platform engineering"
+    ]
+  },
+  {
+    "id": "attendee-051",
+    "name": "Alex Johnson",
+    "role": "Platform Engineer",
+    "company": "Provo Pipeline",
+    "interests": [
+      "docker",
+      "gitops",
+      "rag"
+    ]
+  },
+  {
+    "id": "attendee-052",
+    "name": "Cleo Davies",
+    "role": "Site Reliability Engineer",
+    "company": "Bonneville Systems",
+    "interests": [
+      "ai",
+      "distributed tracing",
+      "fine-tuning"
+    ]
+  },
+  {
+    "id": "attendee-053",
+    "name": "Harper Reid",
+    "role": "Security Engineer",
+    "company": "Canyon Dev Co",
+    "interests": [
+      "cilium",
+      "fine-tuning",
+      "istio",
+      "streaming"
+    ]
+  },
+  {
+    "id": "attendee-054",
+    "name": "Nico Vasquez",
+    "role": "Backend Engineer",
+    "company": "Deseret Digital",
+    "interests": [
+      "backstage",
+      "gitops",
+      "policy as code",
+      "rag",
+      "supply chain",
+      "terraform"
+    ]
+  },
+  {
+    "id": "attendee-055",
+    "name": "Avery Clark",
+    "role": "Engineering Manager",
+    "company": "Park City Platform",
+    "interests": [
+      "argo cd",
+      "ebpf",
+      "falco",
+      "networking",
+      "platform engineering"
+    ]
+  },
+  {
+    "id": "attendee-056",
+    "name": "Fallon Irwin",
+    "role": "Cloud Architect",
+    "company": "Zion Data",
+    "interests": [
+      "argo cd",
+      "cost optimization",
+      "docker",
+      "observability"
+    ]
+  },
+  {
+    "id": "attendee-057",
+    "name": "Reese Lambert",
+    "role": "Solutions Architect",
+    "company": "Provo Pipeline",
+    "interests": [
+      "edge",
+      "event-driven",
+      "terraform"
+    ]
+  },
+  {
+    "id": "attendee-058",
+    "name": "Sasha Ali",
+    "role": "Product Manager",
+    "company": "Murray Microservices",
+    "interests": [
+      "argo cd",
+      "devops",
+      "docker",
+      "edge",
+      "secrets management",
+      "sre"
+    ]
+  },
+  {
+    "id": "attendee-059",
+    "name": "Jamie Rivera",
+    "role": "Product Manager",
+    "company": "Snowbird Software",
+    "interests": [
+      "clickhouse",
+      "cost optimization",
+      "gitops",
+      "istio",
+      "kubernetes",
+      "terraform"
+    ]
+  },
+  {
+    "id": "attendee-060",
+    "name": "Rowan Baker",
+    "role": "Platform Engineer",
+    "company": "RedRock Software",
+    "interests": [
+      "data mesh",
+      "edge",
+      "gitops"
+    ]
+  }
+]
