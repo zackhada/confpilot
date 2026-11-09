@@ -1,5 +1,5 @@
 import type { Lang } from '@contracts'
-import { Check } from 'lucide-react'
+import { Check, SlidersHorizontal } from 'lucide-react'
 import { RadioGroup } from 'radix-ui'
 import { useId, useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
@@ -10,7 +10,8 @@ import { ThemeToggle } from '@/shell/ThemeToggle'
 
 interface JoinProps {
   initialRoom: string | null
-  onJoin: (profile: Profile, room: string) => void
+  /** `tune` is true when the person chose the optional "Tune it to me" flow. */
+  onJoin: (profile: Profile, room: string, tune: boolean) => void
 }
 
 const FIELD =
@@ -35,12 +36,16 @@ export function Join({ initialRoom, onJoin }: JoinProps) {
     setLang(next.lang)
   }
 
-  const submit = (event: FormEvent): void => {
-    event.preventDefault()
+  const join = (tune: boolean): void => {
     const code = parseRoomCode(room)
     if (!code) return setError('Enter the room code from the stage screen, like slc1.')
     if (name.trim() === '') return setError('Enter the name other people will see.')
-    onJoin({ name: name.trim().slice(0, 40), persona, lang }, code)
+    onJoin({ name: name.trim().slice(0, 40), persona, lang }, code, tune)
+  }
+
+  const submit = (event: FormEvent): void => {
+    event.preventDefault()
+    join(false)
   }
 
   return (
@@ -130,12 +135,16 @@ export function Join({ initialRoom, onJoin }: JoinProps) {
           </select>
         </div>
 
-        <div className="mt-auto pt-6 pb-5">
+        <div className="mt-auto pt-6 pb-3">
           <p id={ids.error} role="alert" className="mb-3 min-h-6 font-semibold text-danger">
             {error}
           </p>
           <Button type="submit" variant="primary" size="lg" className="w-full">
             Join the room
+          </Button>
+          <Button variant="ghost" className="mt-1 w-full" onClick={() => join(true)}>
+            <SlidersHorizontal aria-hidden="true" />
+            Tune it to me first
           </Button>
         </div>
       </form>

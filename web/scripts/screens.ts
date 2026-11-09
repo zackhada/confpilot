@@ -68,7 +68,7 @@ async function afterTalkShots(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Start reviewing' }).click()
   await page.waitForTimeout(300)
   await shot(page, 'cards-375-dark')
-  await page.getByRole('button', { name: 'Show the answer' }).click()
+  await page.getByRole('button', { name: 'Show the answer', exact: true }).click()
   await page.waitForTimeout(600)
   await shot(page, 'cards-375-dark-answer')
 
@@ -77,6 +77,29 @@ async function afterTalkShots(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'What did Zack say about RAG?' }).click()
   await page.getByText(/\d moments?$/).waitFor()
   await shot(page, 'ask-375-dark')
+}
+
+/** The optional "Tune it to me" flow: talk, adaptive check, map. */
+async function probeShots(browser: Browser): Promise<void> {
+  const page = await openPhone(browser, { room: 'shots-probe', persona: 'Clayton' })
+  await page.getByRole('button', { name: 'Tune it to me first' }).click()
+  await page.getByRole('textbox').fill(
+    'I work at Radar on the platform team. We run Kubernetes clusters for customers, I am an SRE and I am on call most weeks.',
+  )
+  await shot(page, 'probe-375-dark-talk')
+  await page.getByRole('button', { name: 'Continue' }).click()
+  await page.getByText('Question 1 of 9').waitFor({ timeout: 15_000 })
+  await shot(page, 'probe-375-dark-check')
+  const answers = ['I could explain it', 'I’ve heard it', 'New to me', 'I could explain it']
+  for (let i = 0; i < 12; i += 1) {
+    if (await page.getByRole('heading', { name: 'Your map' }).isVisible()) break
+    await page.getByRole('button', { name: answers[i % answers.length] }).click()
+    await page.waitForTimeout(120)
+  }
+  await page.getByRole('heading', { name: 'Your map' }).waitFor()
+  await page.waitForTimeout(1500)
+  await shot(page, 'probe-375-dark-map')
+  await page.context().close()
 }
 
 async function phoneShots(browser: Browser): Promise<void> {
@@ -121,6 +144,7 @@ await mkdir(OUT, { recursive: true })
 const browser = await chromium.launch()
 try {
   if (ONLY === 'all' || ONLY === 'phone') await phoneShots(browser)
+  if (ONLY === 'all' || ONLY === 'probe') await probeShots(browser)
   if (ONLY === 'all' || ONLY === 'stage') await stageShots(browser)
 } finally {
   await browser.close()

@@ -59,8 +59,8 @@ export function MicNotice() {
     >
       <p className="min-w-0 flex-1 font-semibold text-ink">{notice.text}</p>
       {notice.retry && (
-        <Button className="shrink-0" onClick={() => void startListening()}>
-          Try again
+        <Button className="shrink-0" onClick={() => useMic.setState({ state: 'off' })}>
+          Dismiss
         </Button>
       )}
     </div>

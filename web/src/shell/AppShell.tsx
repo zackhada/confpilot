@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Outlet, useSearchParams } from 'react-router'
 import { parseRoomCode } from '@/room/identity'
+import { ProbeFlow } from '@/probe/ProbeFlow'
 import { personaById } from '@/room/personas'
 import { useProfile } from '@/room/profile'
 import { joinRoom, leaveRoom } from '@/room/session'
@@ -15,6 +16,8 @@ export function AppShell() {
   const room = parseRoomCode(params.get('room'))
   const profile = useProfile((s) => s.profile)
   const join = useProfile((s) => s.join)
+  const tuning = useProfile((s) => s.tuning)
+  const doneTuning = useProfile((s) => s.doneTuning)
 
   // The room session outlives tab changes, so captions and cards keep flowing in the
   // background while someone looks at Recap or Ask.
@@ -37,13 +40,15 @@ export function AppShell() {
     return (
       <Join
         initialRoom={room}
-        onJoin={(next, code) => {
-          join(next)
+        onJoin={(next, code, tune) => {
+          join(next, tune)
           setParams({ room: code }, { replace: true })
         }}
       />
     )
   }
+
+  if (tuning) return <ProbeFlow onDone={doneTuning} />
 
   return (
     <div className="mx-auto flex h-dvh w-full max-w-xl flex-col bg-hall">

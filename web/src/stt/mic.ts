@@ -1,6 +1,6 @@
 // Microphone to speech-to-text. Audio goes from the phone straight to Deepgram as 16 kHz
 // 16-bit PCM and never touches our servers; the API only hands out a short-lived token.
-import type { TokenRequest, TokenResponse } from '@contracts'
+import type { TokenRequest, TokenResponse, TranscriptEvent } from '@contracts'
 import { create } from 'zustand'
 import { apiFetch } from '@/room/auth'
 import { publishTranscript, serverNow } from '@/room/session'
@@ -26,9 +26,13 @@ const MAX_RECONNECTS = 6
 
 class SttUnavailableError extends Error {}
 
+/** Where transcripts go. Live sends them to the room; the onboarding probe keeps them local. */
+export type TranscriptSink = (event: TranscriptEvent) => void
+
 interface MicSession {
   userId: string
   name: string
+  sink: TranscriptSink
   context: AudioContext
   stream: MediaStream | null
   downsample: Downsampler | null
@@ -86,7 +90,7 @@ function onResult(current: MicSession, data: unknown): void {
   if (typeof data !== 'string' || !current.assemble) return
   try {
     const event = current.assemble(JSON.parse(data))
-    if (event) publishTranscript(event)
+    if (event) current.sink(event)
   } catch {
     // A message that is not JSON is not a transcript; skip it.
   }
@@ -171,7 +175,7 @@ function micSupported(): boolean {
 }
 
 /** Call from a tap: browsers only start audio from a user gesture. */
-export async function startListening(): Promise<void> {
+export async function startListening(sink: TranscriptSink = publishTranscript): Promise<void> {
   if (session) return
   if (!micSupported()) return setState('unsupported')
   // No identity yet means the room is not connected, so there is nowhere to send captions.
@@ -180,6 +184,7 @@ export async function startListening(): Promise<void> {
   const current: MicSession = {
     userId: me.user_id,
     name: me.name,
+    sink,
     context: new AudioContext(),
     stream: null,
     downsample: null,
