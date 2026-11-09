@@ -72,6 +72,51 @@ describe('createMatcher', () => {
     expect(match('the service behind the ingress'.split(' ')).map((m) => m.term_id)).toEqual(['service']);
   });
 
+  describe('ambiguous terms without a context list', () => {
+    const ids = (text: string, terms: Term[]): string[] => createMatcher(terms)(text.split(' ')).map((m) => m.term_id);
+    const agent = makeTerm('agent', { category: 'ai', ambiguous: true, say: null });
+    const rag = makeTerm('rag', { category: 'ai' });
+    const pod = makeTerm('pod', { category: 'cloud' });
+
+    it('match when a non-ambiguous term of the same category is within five words', () => {
+      expect(ids('rag is what the new agent uses', [agent, rag])).toEqual(['rag', 'agent']);
+      expect(ids('the agent we built today does rag', [agent, rag])).toEqual(['agent', 'rag']);
+    });
+
+    it('do not match when that term is more than five words away', () => {
+      expect(ids('rag is what the smart new agent uses', [agent, rag])).toEqual(['rag']);
+      expect(ids('the agent we built last year does rag', [agent, rag])).toEqual(['rag']);
+    });
+
+    it('do not match on their own or next to a term of another category', () => {
+      expect(ids('my travel agent called', [agent, rag, pod])).toEqual([]);
+      expect(ids('the agent restarted the pod', [agent, rag, pod])).toEqual(['pod']);
+    });
+
+    it('are not context for each other', () => {
+      const token = makeTerm('token', { category: 'ai', ambiguous: true });
+      expect(ids('the agent used a token', [agent, token])).toEqual([]);
+      expect(ids('the agent used a token for rag', [agent, token, rag])).toEqual(['agent', 'token', 'rag']);
+    });
+
+    it('treat an empty context list as no list', () => {
+      const empty = makeTerm('agent', { category: 'ai', ambiguous: true, context: [] });
+      expect(ids('the rag agent', [empty, rag])).toEqual(['rag', 'agent']);
+    });
+
+    it('let a shorter term through when a longer ambiguous phrase is rejected', () => {
+      const managed = makeTerm('managed-service', { term: 'managed service', category: 'business', ambiguous: true });
+      const service = makeTerm('k8s-service', { term: 'Service (Kubernetes)', aliases: ['Service'], category: 'cloud', ambiguous: true });
+      const kubernetes = makeTerm('kubernetes', { category: 'cloud' });
+      expect(ids('a managed service on kubernetes', [managed, service, kubernetes])).toEqual(['k8s-service', 'kubernetes']);
+    });
+  });
+
+  it('ignores a bracketed qualifier in the display form', () => {
+    const deployment = createMatcher([makeTerm('k8s-deployment', { term: 'Deployment (Kubernetes)' })]);
+    expect(deployment('roll out the deployment'.split(' '))).toEqual([{ term_id: 'k8s-deployment', first_word: 3, last_word: 3 }]);
+  });
+
   it('returns matches in spoken order, including repeats', () => {
     const ids = match('pods and vectors and more pods'.split(' ')).map((m) => m.term_id);
     expect(ids).toEqual(['pod', 'vector', 'pod']);
