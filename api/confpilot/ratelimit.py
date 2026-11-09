@@ -1,9 +1,9 @@
 """A small in-memory sliding-window rate limit. One replica, so one process sees everything.
 
-The client address comes from ``request.client``. Behind a load balancer, run uvicorn with
-``--proxy-headers --forwarded-allow-ips <the balancer>`` so that it is the real client and
-not the balancer; this module never reads X-Forwarded-For itself, because any client can
-set that header.
+The client address prefers Cloudflare's ``CF-Connecting-IP`` header, which is overwritten by
+Cloudflare because all traffic arrives through its tunnel, then falls back to
+``request.client``. This module never reads X-Forwarded-For itself, because any client can set
+that header.
 """
 
 import math
@@ -39,7 +39,9 @@ class RateLimiter:
 def enforce_rate_limit(request: Request, scope: str, user_id: str | None = None) -> None:
     """Raise 429 when this client address, or this user, is over the limit for ``scope``."""
     limiter: RateLimiter = request.app.state.rate_limiter
-    address = request.client.host if request.client else "unknown"
+    address = request.headers.get("cf-connecting-ip") or (
+        request.client.host if request.client else "unknown"
+    )
     keys = [f"{scope}:ip:{address}"]
     if user_id is not None:
         keys.append(f"{scope}:user:{user_id}")

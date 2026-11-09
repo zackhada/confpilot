@@ -102,6 +102,29 @@ def test_post_session_is_rate_limited_per_client(make_settings) -> None:
     assert 1 <= int(blocked.headers["retry-after"]) <= 60
 
 
+def test_post_session_uses_cloudflare_ip_and_ignores_forwarded_for(make_settings) -> None:
+    with TestClient(create_app(make_settings(rate_limit_per_minute=3))) as client:
+        statuses = [
+            client.post(
+                "/api/session",
+                json={"name": "Ana"},
+                headers={
+                    "cf-connecting-ip": "192.0.2.1",
+                    "x-forwarded-for": f"198.51.100.{index}",
+                },
+            ).status_code
+            for index in range(1, 5)
+        ]
+        another_client = client.post(
+            "/api/session",
+            json={"name": "Ana"},
+            headers={"cf-connecting-ip": "192.0.2.2"},
+        )
+
+    assert statuses == [200, 200, 200, 429]
+    assert another_client.status_code == 200
+
+
 def test_rate_limiter_is_a_sliding_window_per_key() -> None:
     limiter = RateLimiter(limit=2, window_s=60)
 
