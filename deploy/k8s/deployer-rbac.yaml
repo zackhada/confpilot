@@ -1,7 +1,10 @@
-# Identity for GitHub Actions (the KUBE_CONFIG repo secret). It can change the confpilot
-# Deployment and watch the rollout, and nothing else: no Secrets, no exec, no other
-# namespace. Build its kubeconfig with deploy/make-deployer-kubeconfig.ps1.
-# Revoke it at any time with: kubectl -n confpilot delete secret deployer-token
+# Identity for GitHub Actions (the KUBE_CONFIG secret). RBAC lets it patch the confpilot
+# Deployment and watch the rollout: no Secrets, no exec, no other namespace. A patch can
+# still change anything in the pod spec, so deploy/cluster/deployer-admission-policy.yaml
+# narrows it to "change the app image to one from our registry"; apply that too.
+# The token is long-lived. Revoke it at any time with:
+#   kubectl -n confpilot delete secret deployer-token
+# Build the kubeconfig with deploy/make-deployer-kubeconfig.ps1.
 apiVersion: v1
 kind: ServiceAccount
 metadata:

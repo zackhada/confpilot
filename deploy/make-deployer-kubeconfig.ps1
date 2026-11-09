@@ -1,14 +1,15 @@
 <#
 .SYNOPSIS
-  Writes a kubeconfig for the `deployer` ServiceAccount, for the KUBE_CONFIG repo secret.
+  Writes a kubeconfig for the `deployer` ServiceAccount, for the KUBE_CONFIG secret of the
+  `production` GitHub environment.
 .DESCRIPTION
   Run with an admin kubectl context on the confpilot cluster, after
   `kubectl apply -k deploy/k8s` has created deploy/k8s/deployer-rbac.yaml.
-  The file holds a credential: it is written outside the repo by default, never printed,
-  and should be deleted once the secret is set.
+  The file holds a long-lived credential: it is written outside the repo by default, never
+  printed, and should be deleted once the secret is set.
 .EXAMPLE
   deploy/make-deployer-kubeconfig.ps1
-  Get-Content -Raw $env:TEMP\confpilot-deployer.kubeconfig | gh secret set KUBE_CONFIG --repo zackhada/confpilot
+  Get-Content -Raw $env:TEMP\confpilot-deployer.kubeconfig | gh secret set KUBE_CONFIG --env production --repo zackhada/confpilot
 #>
 [CmdletBinding()]
 param(
@@ -58,5 +59,5 @@ $canReadSecrets = kubectl --kubeconfig $OutFile auth can-i get secrets
 Write-Host "Wrote $OutFile"
 Write-Host "  can patch deployment/confpilot: $canPatch (expected yes)"
 Write-Host "  can read secrets:               $canReadSecrets (expected no)"
-Write-Host 'Next (repo admin): store the file content as the KUBE_CONFIG repo secret, then delete the file.'
-Write-Host "  Get-Content -Raw '$OutFile' | gh secret set KUBE_CONFIG --repo zackhada/confpilot"
+Write-Host 'Next (repo admin): store the file content as the KUBE_CONFIG secret of the production environment, then delete the file.'
+Write-Host "  Get-Content -Raw '$OutFile' | gh secret set KUBE_CONFIG --env production --repo zackhada/confpilot"

@@ -1,0 +1,150 @@
+# Guard rail for the CI credential (the `deployer` ServiceAccount behind KUBE_CONFIG).
+#
+# RBAC can only say "may patch the confpilot Deployment", and a patch can change anything
+# in the pod spec: command, env, volumes, service account. This policy narrows it to what
+# the Deploy workflow does. An update made by the deployer is rejected unless
+#   - the only thing that changed in `spec` is the image of the `app` container, and
+#   - that image is ghcr.io/zackhada/confpilot:<tag> or ghcr.io/zackhada/confpilot@sha256:<digest>.
+# Humans with admin access are not affected: the policy matches the deployer only.
+#
+# Cluster-scoped, so it is NOT part of deploy/k8s. A cluster admin applies it once:
+#   kubectl apply -f deploy/cluster/deployer-admission-policy.yaml
+#
+# The comparisons list every field of DeploymentSpec, PodSpec and Container in Kubernetes
+# 1.34 except the image. `a.?field == b.?field` is true when both are unset or both are
+# equal. A field added by a later Kubernetes version is not compared until it is added
+# here; regenerate the lists from `kubectl get --raw /openapi/v3/api/v1` after an upgrade.
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: confpilot-deployer-image-only
+  labels:
+    app.kubernetes.io/name: deployer
+    app.kubernetes.io/component: ci
+    app.kubernetes.io/part-of: confpilot
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["UPDATE"]
+        resources: ["deployments"]
+  matchConditions:
+    - name: made-by-the-deployer
+      expression: request.userInfo.username == "system:serviceaccount:confpilot:deployer"
+  variables:
+    - name: newPod
+      expression: object.spec.template.spec
+    - name: oldPod
+      expression: oldObject.spec.template.spec
+  validations:
+    - expression: >-
+        object.spec.?minReadySeconds == oldObject.spec.?minReadySeconds &&
+        object.spec.?paused == oldObject.spec.?paused &&
+        object.spec.?progressDeadlineSeconds == oldObject.spec.?progressDeadlineSeconds &&
+        object.spec.?replicas == oldObject.spec.?replicas &&
+        object.spec.?revisionHistoryLimit == oldObject.spec.?revisionHistoryLimit &&
+        object.spec.?selector == oldObject.spec.?selector &&
+        object.spec.?strategy == oldObject.spec.?strategy &&
+        object.spec.template.?metadata == oldObject.spec.template.?metadata
+      message: The deployer may only change the image of the app container; a Deployment-level field or the pod template metadata changed.
+      reason: Forbidden
+    - expression: >-
+        variables.newPod.?activeDeadlineSeconds == variables.oldPod.?activeDeadlineSeconds &&
+        variables.newPod.?affinity == variables.oldPod.?affinity &&
+        variables.newPod.?automountServiceAccountToken == variables.oldPod.?automountServiceAccountToken &&
+        variables.newPod.?dnsConfig == variables.oldPod.?dnsConfig &&
+        variables.newPod.?dnsPolicy == variables.oldPod.?dnsPolicy &&
+        variables.newPod.?enableServiceLinks == variables.oldPod.?enableServiceLinks &&
+        variables.newPod.?ephemeralContainers == variables.oldPod.?ephemeralContainers &&
+        variables.newPod.?hostAliases == variables.oldPod.?hostAliases &&
+        variables.newPod.?hostIPC == variables.oldPod.?hostIPC &&
+        variables.newPod.?hostNetwork == variables.oldPod.?hostNetwork &&
+        variables.newPod.?hostPID == variables.oldPod.?hostPID &&
+        variables.newPod.?hostUsers == variables.oldPod.?hostUsers &&
+        variables.newPod.?hostname == variables.oldPod.?hostname &&
+        variables.newPod.?hostnameOverride == variables.oldPod.?hostnameOverride &&
+        variables.newPod.?imagePullSecrets == variables.oldPod.?imagePullSecrets &&
+        variables.newPod.?initContainers == variables.oldPod.?initContainers &&
+        variables.newPod.?nodeName == variables.oldPod.?nodeName &&
+        variables.newPod.?nodeSelector == variables.oldPod.?nodeSelector &&
+        variables.newPod.?os == variables.oldPod.?os &&
+        variables.newPod.?overhead == variables.oldPod.?overhead &&
+        variables.newPod.?preemptionPolicy == variables.oldPod.?preemptionPolicy &&
+        variables.newPod.?priority == variables.oldPod.?priority &&
+        variables.newPod.?priorityClassName == variables.oldPod.?priorityClassName &&
+        variables.newPod.?readinessGates == variables.oldPod.?readinessGates &&
+        variables.newPod.?resourceClaims == variables.oldPod.?resourceClaims &&
+        variables.newPod.?resources == variables.oldPod.?resources &&
+        variables.newPod.?restartPolicy == variables.oldPod.?restartPolicy &&
+        variables.newPod.?runtimeClassName == variables.oldPod.?runtimeClassName &&
+        variables.newPod.?schedulerName == variables.oldPod.?schedulerName &&
+        variables.newPod.?schedulingGates == variables.oldPod.?schedulingGates &&
+        variables.newPod.?securityContext == variables.oldPod.?securityContext &&
+        variables.newPod.?serviceAccount == variables.oldPod.?serviceAccount &&
+        variables.newPod.?serviceAccountName == variables.oldPod.?serviceAccountName &&
+        variables.newPod.?setHostnameAsFQDN == variables.oldPod.?setHostnameAsFQDN &&
+        variables.newPod.?shareProcessNamespace == variables.oldPod.?shareProcessNamespace &&
+        variables.newPod.?subdomain == variables.oldPod.?subdomain &&
+        variables.newPod.?terminationGracePeriodSeconds == variables.oldPod.?terminationGracePeriodSeconds &&
+        variables.newPod.?tolerations == variables.oldPod.?tolerations &&
+        variables.newPod.?topologySpreadConstraints == variables.oldPod.?topologySpreadConstraints &&
+        variables.newPod.?volumes == variables.oldPod.?volumes
+      message: The deployer may only change the image of the app container; a pod-level field changed.
+      reason: Forbidden
+    # Same set of containers. Every container but `app` is identical; `app` is identical
+    # in every field but `image`.
+    - expression: >-
+        variables.newPod.containers.size() == variables.oldPod.containers.size() &&
+        variables.newPod.containers.all(c, variables.oldPod.containers.exists_one(o,
+          o.name == c.name && (c.name != "app" ? c == o : (
+            c.?args == o.?args &&
+            c.?command == o.?command &&
+            c.?env == o.?env &&
+            c.?envFrom == o.?envFrom &&
+            c.?imagePullPolicy == o.?imagePullPolicy &&
+            c.?lifecycle == o.?lifecycle &&
+            c.?livenessProbe == o.?livenessProbe &&
+            c.?ports == o.?ports &&
+            c.?readinessProbe == o.?readinessProbe &&
+            c.?resizePolicy == o.?resizePolicy &&
+            c.?resources == o.?resources &&
+            c.?restartPolicy == o.?restartPolicy &&
+            c.?restartPolicyRules == o.?restartPolicyRules &&
+            c.?securityContext == o.?securityContext &&
+            c.?startupProbe == o.?startupProbe &&
+            c.?stdin == o.?stdin &&
+            c.?stdinOnce == o.?stdinOnce &&
+            c.?terminationMessagePath == o.?terminationMessagePath &&
+            c.?terminationMessagePolicy == o.?terminationMessagePolicy &&
+            c.?tty == o.?tty &&
+            c.?volumeDevices == o.?volumeDevices &&
+            c.?volumeMounts == o.?volumeMounts &&
+            c.?workingDir == o.?workingDir
+          ))
+        ))
+      message: The deployer may only change the image of the app container; a container was added, removed or changed in another field.
+      reason: Forbidden
+    - expression: >-
+        variables.newPod.containers.all(c, c.name != "app" ||
+          c.image.startsWith("ghcr.io/zackhada/confpilot:") ||
+          c.image.startsWith("ghcr.io/zackhada/confpilot@sha256:"))
+      message: The deployer may only set an image from ghcr.io/zackhada/confpilot.
+      reason: Forbidden
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: confpilot-deployer-image-only
+  labels:
+    app.kubernetes.io/name: deployer
+    app.kubernetes.io/component: ci
+    app.kubernetes.io/part-of: confpilot
+spec:
+  policyName: confpilot-deployer-image-only
+  validationActions: ["Deny"]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: confpilot

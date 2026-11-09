@@ -43,6 +43,14 @@ jobs:
               -strict -summary -kubernetes-version "$KUBERNETES_VERSION" - < rendered.yaml
             echo "::endgroup::"
           done
+          # Cluster-scoped manifests that an admin applies by hand, outside kustomize.
+          if compgen -G "deploy/cluster/*.yaml" > /dev/null; then
+            echo "::group::deploy/cluster"
+            cat deploy/cluster/*.yaml > rendered.yaml
+            docker run --rm --interactive "$KUBECONFORM_IMAGE" \
+              -strict -summary -kubernetes-version "$KUBERNETES_VERSION" - < rendered.yaml
+            echo "::endgroup::"
+          fi
 
       # The placeholder image prints its environment to anyone who asks, and the tunnel
       # makes it public. Its pod spec must stay free of config and secrets.
