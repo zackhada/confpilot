@@ -63,7 +63,10 @@ export function buildPlan({ gapIds, current, goal, categoryOf, sessions = SESSIO
     .filter((planned) => planned.covers.length > 0)
     .sort((a, b) => b.covers.length - a.covers.length)
 
-  const category = goal - current >= BOOK_GAP ? weakestCategory(gapIds, categoryOf) : null
+  // Only categories that have a book compete, so idiom or conference terms never hide one.
+  const bookCategories = new Set(books.map((b) => b.category))
+  const bookGaps = gapIds.filter((id) => bookCategories.has(categoryOf(id) ?? ''))
+  const category = goal - current >= BOOK_GAP ? weakestCategory(bookGaps, categoryOf) : null
   const book = category ? (books.find((b) => b.category === category) ?? null) : null
 
   return { sessions: ranked.slice(0, count), book }

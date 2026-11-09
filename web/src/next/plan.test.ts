@@ -10,6 +10,9 @@ const categories: Record<string, string> = {
   kubernetes: 'cloud',
   pod: 'cloud',
   slo: 'ops',
+  'circle-back': 'idiom',
+  'take-offline': 'idiom',
+  keynote: 'conference',
 }
 const categoryOf = (id: string): string | undefined => categories[id]
 
@@ -53,8 +56,13 @@ describe('buildPlan', () => {
   })
 
   it('keeps catalog order on ties, so the plan is stable', () => {
-    const plan = buildPlan({ gapIds: ['mcp'], current: 2, goal: 9, categoryOf })
-    expect(plan.sessions.map((s) => s.session.id)).toEqual(['agents-mcp'])
+    const plan = buildPlan({ gapIds: ['llm'], current: 2, goal: 9, categoryOf })
+    expect(plan.sessions.map((s) => s.session.id)).toEqual(['rag-zero', 'agents-mcp'])
+  })
+
+  it('still recommends a book when most unknown terms are in a category without one', () => {
+    const plan = buildPlan({ gapIds: ['circle-back', 'take-offline', 'keynote', 'rag'], current: 3, goal: 8, categoryOf })
+    expect(plan.book?.id).toBe('ai-engineering')
   })
 })
 
