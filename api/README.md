@@ -35,7 +35,7 @@ uv run ruff format --check .
 | `GET /api/search?q=&room=&user_id=&limit=` | `SearchResponse`; `highlight` is HTML-escaped with `<mark>` |
 | `POST /api/token` | `TokenResponse`; 503 if `DEEPGRAM_API_KEY` is unset, 502 if Deepgram fails |
 | `POST /api/probe` | `ProbeResponse`; uses the LLM when configured, otherwise a heuristic |
-| `WS /ws/rooms/{room}?user_id=&name=&role=` | `ClientEvent` in, `ServerEvent` out |
+| `WS /ws/rooms/{room}?session=&name=&role=` | `ClientEvent` in, `ServerEvent` out |
 
 `room`, `user_id` and `term_id` must match `^[A-Za-z0-9_-]{1,64}$`.
 
@@ -60,8 +60,9 @@ every connection, including reconnects. Send 16 kHz mono 16-bit PCM as binary fr
 - `card.shown` is relayed to everyone else with `user` set, and recorded in the histogram
   `confpilot.card.word_to_card_ms` (attributes `confpilot.card.tier`, `confpilot.room`) when it
   is between 0 and 60 000 ms.
-- Bad input gets an `error` event (`bad_event`, `forbidden`, `store_unavailable`, `internal`);
-  the socket stays open. Bad join parameters get `bad_request`, then close code 1008.
+- Bad input gets an `error` event (`unauthorized`, `bad_event`, `forbidden`, `store_unavailable`, `internal`).
+  The socket stays open except for an unauthorized session, which closes with code 1008. Bad join
+  parameters get `bad_request`, then close code 1008.
 - The server resends `room.state` every 20 s as a heartbeat, on top of uvicorn's ping frames.
 
 ## Configuration
@@ -79,7 +80,7 @@ read. Blank values count as unset.
 | `LLM_API_KEY`, `LLM_BASE_URL`, `LLM_MODEL` | unset, `https://api.openai.com/v1`, `gpt-4o-mini` | OpenAI-compatible chat completions for `/api/probe` |
 | `PROBE_TIMEOUT_S` | `6` | Time box for the probe's LLM call |
 | `WS_HEARTBEAT_S` | `20` | Interval of the `room.state` heartbeat |
-| `CORS_ORIGINS` | unset | Comma-separated origins, only for a web dev server on another origin |
+| `ALLOWED_ORIGINS` | unset | Comma-separated extra origins (CORS and the room WebSocket Origin check); the API's own host is always allowed |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS`, `OTEL_SERVICE_NAME` | unset | Standard OpenTelemetry variables. Traces, metrics and logs go out over OTLP/HTTP. With no endpoint set, telemetry is a no-op. |
 
 ## Swapping in Elasticsearch

@@ -79,6 +79,16 @@ def test_time_ping_gets_a_pong_in_server_time(room) -> None:
     assert before - 5 <= pong["server_ts"] <= time.time() * 1000 + 5
 
 
+def test_non_finite_time_ping_gets_an_error_and_socket_stays_open(room) -> None:
+    ana, _ = room
+
+    ana.send_text('{"type":"time.ping","t0":1e400}')
+
+    error = ana.receive_json()
+    assert (error["type"], error["code"]) == ("error", "bad_event")
+    assert ping(ana)["type"] == "time.pong"
+
+
 def test_transcript_is_relayed_to_everyone_else_with_the_speaker(room, spans) -> None:
     ana, ben = room
 
@@ -160,6 +170,26 @@ def test_knowledge_set_updates_the_store(client: TestClient, room) -> None:
 
     record = client.app.state.store._knowledge["u-ana"]["rag"]
     assert (record.status, record.source) == ("known", "tap")
+
+
+def test_knowledge_set_records_store_failure_on_span(
+    client: TestClient, room, spans, monkeypatch
+) -> None:
+    ana, _ = room
+
+    async def fail_put_knowledge(user_id, term_id, patch):
+        raise RuntimeError("storage unavailable")
+
+    monkeypatch.setattr(client.app.state.store, "put_knowledge", fail_put_knowledge)
+    ana.send_json({"type": "knowledge.set", "term_id": "rag", "status": "known"})
+
+    error = ana.receive_json()
+    assert (error["type"], error["code"]) == ("error", "store_unavailable")
+    span = next(s for s in spans.get_finished_spans() if s.name == "knowledge.set")
+    assert span.status.status_code.name == "ERROR"
+    exception = next(event for event in span.events if event.name == "exception")
+    assert exception.attributes["exception.type"] == "RuntimeError"
+    assert exception.attributes["exception.message"] == "storage unavailable"
 
 
 @pytest.mark.parametrize(
