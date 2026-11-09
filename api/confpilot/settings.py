@@ -25,6 +25,11 @@ class Settings(BaseSettings):
 
     ws_heartbeat_s: float = 20.0
 
+    # Unset: the in-memory store (gone on restart, word-overlap search only).
+    es_url: str | None = None
+    es_api_key: SecretStr | None = None
+    es_index_prefix: str = "confpilot-"  # the indices es/ bootstrap created
+
     session_secret: SecretStr | None = None  # unset: a random key per process
     session_ttl_s: int = 12 * 60 * 60
     allowed_origins: str = ""  # comma-separated extra origins; the API's own host is always allowed

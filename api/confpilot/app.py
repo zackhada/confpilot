@@ -18,7 +18,8 @@ from confpilot.rooms import Hub
 from confpilot.routes import glossary, health, knowledge, probe, session, token, ws
 from confpilot.settings import Settings
 from confpilot.static import add_static_routes
-from confpilot.store import MemoryStore, Store
+from confpilot.store import Store
+from confpilot.store_es import store_from_settings
 from confpilot.telemetry import setup_telemetry
 from confpilot.utterances import RecentFinals
 
@@ -27,6 +28,9 @@ from confpilot.utterances import RecentFinals
 async def _lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
     await close_http_client(app)
+    close = getattr(app.state.store, "close", None)  # ElasticStore holds a connection pool
+    if close is not None:
+        await close()
 
 
 def create_app(
@@ -43,7 +47,7 @@ def create_app(
     app.state.settings = settings
     app.state.glossary = load_glossary(settings.glossary_path)
     app.state.matcher = Matcher(app.state.glossary.terms)
-    app.state.store = store or MemoryStore()
+    app.state.store = store or store_from_settings(settings)
     app.state.hub = Hub()
     app.state.recent_finals = RecentFinals()
     app.state.http_transport = http_transport  # used by confpilot.http.http_client
