@@ -1,0 +1,56 @@
+name: Deploy check
+# Runs on pull requests that touch the image or anything that goes into it, so main never
+# holds a Dockerfile that does not build. The image is built and started, never pushed.
+on:
+  pull_request:
+    paths:
+      - "deploy/**"
+      - "api/**"
+      - "web/**"
+      - "es/**"
+      - "contracts/**"
+      - "content/glossary.json"
+      - ".github/workflows/deploy-check.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  image:
+    name: Image build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/Dockerfile
+          platforms: linux/amd64
+          push: false
+          load: true
+          tags: confpilot:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Start the image the way the cluster does and probe /healthz
+        run: |
+          docker run --detach --name app --read-only --tmpfs /tmp --cap-drop ALL \
+            --security-opt no-new-privileges --publish 8000:8000 confpilot:ci
+          for _ in $(seq 1 30); do
+            if curl --fail --silent --show-error http://localhost:8000/healthz; then
+              echo
+              test "$(docker exec app id -u)" = "10001"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::/healthz did not answer within 30 seconds"
+          docker logs app
+          exit 1

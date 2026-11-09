@@ -4,7 +4,9 @@
 *
 !api/
 !web/
+!es/
 !contracts/
+!content/glossary.json
 
 **/.env
 **/.env.*
@@ -18,3 +20,4 @@
 **/.ruff_cache
 **/.mypy_cache
 api/tests
+es/tests
