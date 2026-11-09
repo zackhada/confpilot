@@ -36,6 +36,7 @@ let retryTimer: ReturnType<typeof setTimeout> | null = null
 let joinToken = 0
 let failures = 0
 let renewed = false
+let lastStatus: SocketStatus | null = null
 
 /** The current time in server milliseconds. Every timestamp on the wire uses this. */
 export function serverNow(): number {
@@ -94,13 +95,15 @@ function handleEvent(event: ServerEvent, options: JoinOptions, token: number): v
 
 function handleStatus(status: SocketStatus, options: JoinOptions, token: number): void {
   if (token !== joinToken) return
+  const repeated = status === lastStatus
+  lastStatus = status
   useRoom.getState().patch({ status })
   if (status === 'open') {
     failures = 0
     renewed = false
     sendPing()
   }
-  if (status === 'reconnecting') {
+  if (status === 'reconnecting' && !repeated) {
     // A browser cannot see a 401 on a WebSocket handshake. After repeated failures, ask the
     // API over HTTP; a plain network drop must not cost the phone its identity.
     failures += 1
@@ -156,6 +159,7 @@ export function joinRoom(options: JoinOptions): void {
   const token = joinToken
   failures = 0
   renewed = false
+  lastStatus = null
   resetKnowledge()
   const known = storedSession(options.name)
   useRoom.getState().reset({

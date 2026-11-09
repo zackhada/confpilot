@@ -203,17 +203,23 @@ export async function startListening(sink: TranscriptSink = publishTranscript): 
       audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
     })
   } catch (error) {
+    if (current.stopped) return
     const refused = error instanceof DOMException && ['NotAllowedError', 'SecurityError'].includes(error.name)
     stopListening()
     return setState(refused ? 'denied' : 'error')
   }
-  if (current.stopped) return
+  if (current.stopped) {
+    current.stream.getTracks().forEach((track) => track.stop())
+    return
+  }
   try {
     await wireAudio(current, current.stream)
     await connect(current)
+    if (current.stopped) return
     document.addEventListener('visibilitychange', onVisible)
     void holdWakeLock(current)
   } catch (error) {
+    if (current.stopped) return
     stopListening()
     setState(error instanceof SttUnavailableError ? 'unavailable' : 'error')
   }
