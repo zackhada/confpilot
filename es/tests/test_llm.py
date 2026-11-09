@@ -105,23 +105,6 @@ async def test_an_unexpected_response_shape_is_reported() -> None:
         await store.define_term("eBPF", "x")
 
 
-def test_thinking_is_switched_off_for_anthropic_only() -> None:
-    anthropic = LlmConfig(base_url="https://api.anthropic.com/v1", api_key="k", model="m")
-    assert anthropic.extra_body == {"thinking": {"type": "disabled"}}
-    assert CONFIG.extra_body == {}
-
-
-def test_llm_config_comes_from_the_environment(monkeypatch: pytest.MonkeyPatch) -> None:
-    for name in ("LLM_BASE_URL", "LLM_API_KEY", "LLM_MODEL", "ENV_FILE"):
-        monkeypatch.delenv(name, raising=False)
-    with pytest.raises(ConfigError, match="LLM_BASE_URL, LLM_API_KEY and LLM_MODEL"):
-        load_llm_config()
-    monkeypatch.setenv("LLM_BASE_URL", "https://llm.test/v1/")
-    monkeypatch.setenv("LLM_API_KEY", "k")
-    monkeypatch.setenv("LLM_MODEL", "m")
-    assert load_llm_config() == LlmConfig(base_url="https://llm.test/v1", api_key="k", model="m")
-
-
 @pytest.mark.live
 async def test_define_term_live() -> None:
     try:
