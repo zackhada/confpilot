@@ -36,6 +36,9 @@ class ElasticStore:
             session_id=utterance.room,  # one session per room, as in confpilot_es.sessions
         )
 
+    async def percolate(self, text: str) -> list[str]:
+        return await self.es.percolate(text)
+
     async def term_counts(self, room: str) -> dict[str, int]:
         return await self.es.term_counts(room)
 
