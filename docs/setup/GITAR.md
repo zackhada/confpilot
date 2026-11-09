@@ -13,7 +13,7 @@
 2. **Install the GitHub App from inside Gitar** (Settings → Configuration → Connect GitHub), not from GitHub Marketplace while signed out — that leaves it installed but unconnected.
 3. Grant it access to `zackhada/confpilot`.
 4. Settings → Configuration → Behavior: turn on **auto-apply** and **retry unrelated CI failures**.
-   - **UNVERIFIED:** Sonar's marketing says auto-apply is a Pro/Enterprise feature. Test `gitar auto-apply:on` on the first PR to confirm the trial allows it.
+   - Confirmed by the hackathon resources page: the free 14-day Gitar Pro trial includes auto-apply and custom rules.
 5. Open a tiny test PR and confirm Gitar comments.
 
 ## Already in this repo

@@ -1,5 +1,7 @@
 # Setup — all track products
 
+> **Read [../HACKATHON.md](../HACKATHON.md) first** — rules, judging criteria, schedule. Note rule 1: main coding must begin after the hackathon starts.
+
 Do these **before 11:00 AM on Nov 9** (building starts then; submissions close 5:30 PM MT).
 Facts below were checked against each vendor's live docs on 2026-11-09. Anything not confirmed is marked **UNVERIFIED**.
 
