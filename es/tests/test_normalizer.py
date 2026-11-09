@@ -8,6 +8,8 @@ from confpilot_es.normalizer import normalize, variants
     [
         ("and R.R.F. to rank the results", "and rrf to rank the results"),
         ("and r r f to rank the results", "and rrf to rank the results"),
+        ("a R R F term", "a rrf term"),
+        ("I R R F term", "i rrf term"),
         ("it uses BM 25 for that", "it uses bm25 for that"),
         ("it uses bm twenty five for that", "it uses bm25 for that"),
         ("It uses BM25 for keyword matches", "it uses bm25 for keyword matches"),

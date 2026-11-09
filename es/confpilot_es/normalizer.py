@@ -54,6 +54,8 @@ def _join_spelled_letters(tokens: list[str]) -> list[str]:
         if len(token) == 1:
             run.append(token)
             continue
+        if len(run) > 2 and run[0] in {"a", "i"}:
+            out.append(run.pop(0))
         if run:
             out.append("".join(run))
             run = []
