@@ -1,7 +1,7 @@
-// The on-device matcher against the real glossary and the demo conversation.
+// The on-device matcher against the shared glossary fixture and demo conversation.
 import { describe, expect, it } from 'vitest';
 import type { Glossary } from '../../../../contracts/types';
-import glossaryJson from '../../../../content/glossary.json';
+import glossaryJson from '../../../../contracts/fixtures/glossary.sample.json';
 import talkTrack from '../../../../content/stt-fixtures/talk_track.txt?raw';
 import { createMatcher } from './matcher';
 
@@ -13,9 +13,9 @@ const wordsOf = (text: string): string[] => text.trim().split(/\s+/);
 const idsIn = (text: string): string[] => match(wordsOf(text)).map((m) => m.term_id);
 const sentences = talkTrack.trim().split(/(?<=[.?!])\s+/);
 
-describe('matcher on content/glossary.json and the demo talk track', () => {
-  it('loads the 200-term glossary, including terms with no pronunciation hint', () => {
-    expect(glossary.terms).toHaveLength(200);
+describe('matcher on the shared glossary fixture and demo talk track', () => {
+  it('loads the shared glossary fixture, including terms with no pronunciation hint', () => {
+    expect(glossary.terms).toHaveLength(19);
     expect(glossary.terms.some((t) => t.say === null)).toBe(true);
     expect(sentences.length).toBeGreaterThan(5);
   });
@@ -32,13 +32,13 @@ describe('matcher on content/glossary.json and the demo talk track', () => {
 
   it('does not read "search service" as a Kubernetes Service', () => {
     expect(talkTrack).toContain('search service');
-    expect(sentences.flatMap(idsIn)).not.toContain('k8s-service');
-    expect(idsIn(talkTrack)).not.toContain('k8s-service');
-    expect(idsIn('we have some internal search service use cases')).not.toContain('k8s-service');
+    expect(sentences.flatMap(idsIn)).not.toContain('service');
+    expect(idsIn(talkTrack)).not.toContain('service');
+    expect(idsIn('we have some internal search service use cases')).not.toContain('service');
   });
 
   it('still finds a Kubernetes Service next to cloud terms', () => {
-    expect(idsIn('expose it with a Kubernetes service')).toEqual(['kubernetes', 'k8s-service']);
+    expect(idsIn('expose it with a Kubernetes service')).toEqual(['kubernetes', 'service']);
   });
 
   it('finds the agent beside the knowledge base, but not on its own', () => {
@@ -46,7 +46,7 @@ describe('matcher on content/glossary.json and the demo talk track', () => {
     expect(idsIn('my travel agent booked the flights')).toEqual([]);
   });
 
-  it('matches 30 words of the talk against the real glossary in well under 1 ms', () => {
+  it('matches 30 words of the talk against the shared fixture in well under 1 ms', () => {
     const utterance = wordsOf(talkTrack).slice(0, 30);
     expect(utterance).toHaveLength(30);
     for (let i = 0; i < 200; i += 1) match(utterance);
