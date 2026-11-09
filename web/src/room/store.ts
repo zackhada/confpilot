@@ -12,12 +12,14 @@ import type {
 } from '@contracts'
 import { create } from 'zustand'
 import {
-  EMPTY_CARD_STACK,
+  initialCardStack,
+  MAX_FULL_CARDS,
   reduceCards,
   shouldShowCard,
   type CardStackState,
   type LiveCard,
 } from '@/lib/cards'
+import { wordToCardMs } from '@/lib/latency'
 import type { Match } from '@/lib/match/matcher'
 import type { SocketStatus } from './socket'
 
@@ -51,7 +53,6 @@ export interface RoomData {
   heard: Record<string, number>
   /** `${utterance_id}:${term_id}` pairs already counted, so interims do not double count. */
   seenPairs: Record<string, true>
-  shownTermIds: string[]
   utterances: Utterance[]
   stack: CardStackState
   latencies: number[]
@@ -73,9 +74,8 @@ export const INITIAL_ROOM_DATA: RoomData = {
   saved: [],
   heard: {},
   seenPairs: {},
-  shownTermIds: [],
   utterances: [],
-  stack: EMPTY_CARD_STACK,
+  stack: initialCardStack,
   latencies: [],
   shownByUser: {},
   notice: null,
@@ -87,10 +87,29 @@ export function wordsOf(event: TranscriptEvent): Word[] {
   return event.text.trim().split(/\s+/).map((w) => ({ w, start_ms: 0, end_ms: 0 }))
 }
 
-function showCard(state: RoomData, card: LiveCard): Pick<RoomData, 'stack' | 'shownTermIds'> {
+export function allCards(stack: CardStackState): LiveCard[] {
+  return [...stack.full, ...stack.chips]
+}
+
+/** Word-to-card time for a card, or null until its first paint has been stamped. */
+export function cardLatencyMs(card: LiveCard): number | null {
+  return card.rendered_at === null ? null : wordToCardMs(card.spoken_at, card.rendered_at)
+}
+
+function dismissTerm(stack: CardStackState, termId: string): CardStackState {
+  return allCards(stack)
+    .filter((card) => card.term_id === termId)
+    .reduce((next, card) => reduceCards(next, { type: 'dismiss', card_id: card.card_id }), stack)
+}
+
+/** Move a chip back to the front of the full cards; the oldest full card takes its place. */
+function reopen(stack: CardStackState, card: LiveCard): CardStackState {
+  const full = [card, ...stack.full]
+  const chips = stack.chips.filter((c) => c.card_id !== card.card_id)
   return {
-    stack: reduceCards(state.stack, { type: 'show', card }),
-    shownTermIds: [...state.shownTermIds, card.term_id],
+    ...stack,
+    full: full.slice(0, MAX_FULL_CARDS),
+    chips: [...full.slice(MAX_FULL_CARDS), ...chips],
   }
 }
 
@@ -121,8 +140,9 @@ export function reduceTranscript(state: RoomData, event: TranscriptEvent, matche
       seenPairs: { ...next.seenPairs, [pair]: true },
       heard: { ...next.heard, [match.term_id]: (next.heard[match.term_id] ?? 0) + 1 },
     }
-    if (next.role !== 'speaker') continue
-    if (!shouldShowCard(match.term_id, next.knowledge, new Set(next.shownTermIds))) continue
+    // No card for a word this person said themselves: they already use it.
+    if (next.role !== 'speaker' || utterance.speaker.user_id === next.me?.user_id) continue
+    if (!shouldShowCard(match.term_id, next.knowledge, next.stack.shownTermIds)) continue
     const card: LiveCard = {
       card_id: pair,
       term_id: match.term_id,
@@ -130,9 +150,8 @@ export function reduceTranscript(state: RoomData, event: TranscriptEvent, matche
       utterance_id: event.utterance_id,
       spoken_at: event.started_at + (words[match.last_word]?.end_ms ?? 0),
       rendered_at: null,
-      word_to_card_ms: null,
     }
-    next = { ...next, ...showCard(next, card) }
+    next = { ...next, stack: reduceCards(next.stack, { type: 'add', card }) }
   }
   return next
 }
@@ -142,7 +161,7 @@ export function reduceServerCard(state: RoomData, event: ServerCardEvent): RoomD
   const terms = state.terms[event.term.id] ? state.terms : { ...state.terms, [event.term.id]: event.term }
   const withTerm: RoomData = { ...state, terms }
   if (state.role !== 'speaker') return withTerm
-  if (!shouldShowCard(event.term.id, state.knowledge, new Set(state.shownTermIds))) return withTerm
+  if (!shouldShowCard(event.term.id, state.knowledge, state.stack.shownTermIds)) return withTerm
   const card: LiveCard = {
     card_id: `${event.utterance_id}:${event.term.id}`,
     term_id: event.term.id,
@@ -150,9 +169,8 @@ export function reduceServerCard(state: RoomData, event: ServerCardEvent): RoomD
     utterance_id: event.utterance_id,
     spoken_at: event.spoken_at,
     rendered_at: null,
-    word_to_card_ms: null,
   }
-  return { ...withTerm, ...showCard(withTerm, card) }
+  return { ...withTerm, stack: reduceCards(withTerm.stack, { type: 'add', card }) }
 }
 
 export function reduceCardShown(state: RoomData, event: CardShownEvent): RoomData {
@@ -172,7 +190,7 @@ interface RoomActions {
   applyTranscript: (event: TranscriptEvent, matches: Match[]) => void
   applyServerCard: (event: ServerCardEvent) => void
   applyCardShown: (event: CardShownEvent) => void
-  markPainted: (cardId: string, renderedAt: number, wordToCardMs: number) => void
+  markPainted: (cardId: string, renderedAt: number) => void
   setKnowledge: (termId: string, status: KnowledgeStatus) => void
   toggleSaved: (termId: string) => boolean
   /** Bring a chip back as a full card. Its latency stamp is kept. */
@@ -186,20 +204,19 @@ export const useRoom = create<RoomData & RoomActions>((set, get) => ({
   applyTranscript: (event, matches) => set((s) => reduceTranscript(s, event, matches)),
   applyServerCard: (event) => set((s) => reduceServerCard(s, event)),
   applyCardShown: (event) => set((s) => reduceCardShown(s, event)),
-  markPainted: (cardId, renderedAt, wordToCardMs) =>
-    set((s) => ({
-      stack: reduceCards(s.stack, {
-        type: 'painted',
-        card_id: cardId,
-        rendered_at: renderedAt,
-        word_to_card_ms: wordToCardMs,
-      }),
-      latencies: [...s.latencies, wordToCardMs].slice(-MAX_LATENCIES),
-    })),
+  markPainted: (cardId, renderedAt) =>
+    set((s) => {
+      const card = allCards(s.stack).find((c) => c.card_id === cardId)
+      if (!card || card.rendered_at !== null) return s
+      return {
+        stack: reduceCards(s.stack, { type: 'rendered', card_id: cardId, rendered_at: renderedAt }),
+        latencies: [...s.latencies, wordToCardMs(card.spoken_at, renderedAt)].slice(-MAX_LATENCIES),
+      }
+    }),
   setKnowledge: (termId, status) =>
     set((s) => ({
       knowledge: { ...s.knowledge, [termId]: status },
-      stack: status === 'known' ? reduceCards(s.stack, { type: 'dismiss', term_id: termId }) : s.stack,
+      stack: status === 'known' ? dismissTerm(s.stack, termId) : s.stack,
     })),
   toggleSaved: (termId) => {
     const wasSaved = get().saved.includes(termId)
@@ -212,7 +229,6 @@ export const useRoom = create<RoomData & RoomActions>((set, get) => ({
     set((s) => {
       const card = s.stack.chips.find((c) => c.card_id === cardId)
       if (!card) return s
-      const without = reduceCards(s.stack, { type: 'dismiss', term_id: card.term_id })
-      return { stack: reduceCards(without, { type: 'show', card }) }
+      return { stack: reopen(s.stack, card) }
     }),
 }))

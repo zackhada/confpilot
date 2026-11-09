@@ -12,20 +12,24 @@ export interface Persona {
   lang: Lang | null
 }
 
+// Categories any working engineer already has: general tech, business talk, idioms.
+const EVERYDAY = ['tech', 'business', 'conference', 'idiom'] as const
+
+// Category names cover both content/glossary.json and the older sample fixture.
 // Demo personas from the plan. Ana is fictional: a frontend developer at her first KubeCon.
 export const PERSONAS: readonly Persona[] = [
   {
     id: 'clayton',
     name: 'Clayton',
     knows: 'Infrastructure. Knows SRE and Kubernetes terms.',
-    knownCategories: ['operations', 'cloud-native'],
+    knownCategories: [...EVERYDAY, 'ops', 'cloud', 'operations', 'cloud-native'],
     lang: null,
   },
   {
     id: 'zack',
     name: 'Zack',
     knows: 'Search. Knows search and AI terms.',
-    knownCategories: ['search', 'ai'],
+    knownCategories: [...EVERYDAY, 'data', 'ai', 'search'],
     lang: null,
   },
   {

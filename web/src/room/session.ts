@@ -8,7 +8,7 @@ import { cachedGlossary, indexTerms, loadGlossary } from './glossary'
 import { loadKnowledge, loadSaved, storeKnowledge, storeSaved } from './identity'
 import { seedKnowledge, type Persona } from './personas'
 import { createRoomSocket, type RoomSocket } from './socket'
-import { useRoom, wordsOf } from './store'
+import { allCards, useRoom, wordsOf } from './store'
 
 const TIME_SYNC_INTERVAL_MS = 30_000
 
@@ -134,11 +134,11 @@ export function leaveRoom(): void {
 /** Call right after a card's first paint. Stamps rendered_at and reports card.shown. */
 export function cardPainted(cardId: string): void {
   const room = useRoom.getState()
-  const card = [...room.stack.full, ...room.stack.chips].find((c) => c.card_id === cardId)
+  const card = allCards(room.stack).find((c) => c.card_id === cardId)
   if (!card || card.rendered_at !== null) return
   const renderedAt = clock.now()
   const ms = wordToCardMs(card.spoken_at, renderedAt)
-  room.markPainted(cardId, renderedAt, ms)
+  room.markPainted(cardId, renderedAt)
   socket?.send({
     type: 'card.shown',
     card_id: card.card_id,

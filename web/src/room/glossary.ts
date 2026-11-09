@@ -10,7 +10,7 @@ function isTerm(value: unknown): value is Term {
     typeof v.id === 'string' &&
     typeof v.term === 'string' &&
     typeof v.simple_def === 'string' &&
-    typeof v.say === 'string' &&
+    (typeof v.say === 'string' || v.say === null) &&
     typeof v.category === 'string' &&
     Array.isArray(v.aliases) &&
     Array.isArray(v.prereqs)

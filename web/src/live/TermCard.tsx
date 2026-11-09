@@ -6,7 +6,9 @@ import { cn } from '@/shared/cn'
 import { LatencyBadge } from './LatencyBadge'
 
 export interface TermCardProps {
-  card: Pick<LiveCard, 'card_id' | 'term_id' | 'tier' | 'word_to_card_ms'>
+  card: Pick<LiveCard, 'card_id' | 'term_id' | 'tier'>
+  /** Word-to-card time; null until the first paint has been stamped. */
+  latencyMs: number | null
   /** Undefined when a card arrives for a term this device has no definition for yet. */
   term: Term | undefined
   /** The lit card is the open one: full definition, native line and labelled buttons. */
@@ -49,7 +51,7 @@ function BuildsOn({ term, terms, knowledge }: Pick<TermCardProps, 'terms' | 'kno
 
 /** One jargon card. Lit: the open card under the reading light. Settled: compact, in the hall. */
 export function TermCard(props: TermCardProps) {
-  const { card, term, lit, lang, saved = false, onOpen, onKnow, onSave } = props
+  const { card, term, lit, lang, latencyMs, saved = false, onOpen, onKnow, onSave } = props
   const name = term?.term ?? card.term_id
   const headingId = `card-${card.card_id}`
   const native = lang ? term?.translations?.[lang] : undefined
@@ -71,7 +73,7 @@ export function TermCard(props: TermCardProps) {
         >
           <span className="flex items-baseline gap-2.5">
             <span id={headingId} className="truncate font-display text-xl leading-tight">{name}</span>
-            <LatencyBadge ms={card.word_to_card_ms} className="font-medium text-ink-soft" />
+            <LatencyBadge ms={latencyMs} className="font-medium text-ink-soft" />
           </span>
           <span className="mt-0.5 line-clamp-2 text-[0.9375rem] leading-snug text-ink-soft [@media(max-height:700px)]:line-clamp-1">
             {term?.simple_def ?? 'Definition on its way.'}
@@ -101,14 +103,14 @@ export function TermCard(props: TermCardProps) {
           <h2 id={headingId} className="font-display text-(length:--text-headword) leading-[1.05] break-words">
             {name}
           </h2>
-          {term && (
+          {term?.say && (
             <p className="mt-1 text-(length:--text-note) text-lit-soft">
               say <span className="font-bold tracking-wide text-lit-ink">{term.say}</span>
             </p>
           )}
         </div>
         <div className="flex shrink-0 flex-col items-end gap-1 pt-1">
-          <LatencyBadge ms={card.word_to_card_ms} className="text-lit-soft" />
+          <LatencyBadge ms={latencyMs} className="text-lit-soft" />
           {card.tier === 3 && (
             <span className="inline-flex items-center gap-1 text-(length:--text-note) font-semibold text-lit-fresh">
               <Sparkles className="size-3.5" aria-hidden="true" />

@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useState } from 'react'
 import type { LiveCard } from '@/lib/cards'
 import { cardPainted, markKnown, reopenCard, toggleSave } from '@/room/session'
-import { useRoom } from '@/room/store'
+import { cardLatencyMs, useRoom } from '@/room/store'
 import { TermCard } from './TermCard'
 import { usePaintStamp } from './usePaintStamp'
 
@@ -31,6 +31,7 @@ function StackedCard({ card, lit, onOpen }: StackedCardProps) {
     <motion.li layout="position" initial={ENTER} animate={REST} exit={LEAVE} transition={SPRING}>
       <TermCard
         card={card}
+        latencyMs={cardLatencyMs(card)}
         term={term}
         lit={lit}
         lang={lang}
