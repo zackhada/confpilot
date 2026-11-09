@@ -6,7 +6,8 @@ import { wordToCardMs } from '@/lib/latency'
 import { createMatcher, type Match } from '@/lib/match/matcher'
 import { ensureSession, sessionRejected, storedSession } from './auth'
 import { cachedGlossary, indexTerms, loadGlossary } from './glossary'
-import { loadKnowledge, loadSaved, storeKnowledge, storeSaved } from './identity'
+import { loadSaved, storeSaved } from './identity'
+import { loadServerKnowledge, recordStatus, resetKnowledge, setSeedKnowledge } from './knowledge'
 import { seedKnowledge, type Persona } from './personas'
 import { createRoomSocket, type RoomSocket, type SocketStatus } from './socket'
 import { allCards, useRoom, wordsOf } from './store'
@@ -48,13 +49,8 @@ function roomUrl(options: JoinOptions, session: string): string {
 
 function applyTerms(terms: readonly Term[], persona: Persona | undefined): void {
   matcher = createMatcher([...terms])
-  const seeded = persona ? seedKnowledge(persona, terms) : {}
-  // Taps made on this phone win over the persona's starting point.
-  useRoom.getState().patch({
-    terms: indexTerms(terms),
-    knowledge: { ...seeded, ...loadKnowledge() },
-    glossaryError: null,
-  })
+  useRoom.getState().patch({ terms: indexTerms(terms), glossaryError: null })
+  setSeedKnowledge(persona ? seedKnowledge(persona, terms) : {})
 }
 
 function sendPing(): void {
@@ -118,7 +114,9 @@ async function openSocket(options: JoinOptions, token: number, fresh: boolean): 
   try {
     const session = await ensureSession(options.name, fresh)
     if (token !== joinToken) return
-    useRoom.getState().patch({ me: { user_id: session.user_id, name: options.name } })
+    const me = { user_id: session.user_id, name: options.name }
+    useRoom.getState().patch({ me })
+    if (options.role === 'speaker') void loadServerKnowledge(me, () => token === joinToken)
     socket = createRoomSocket({
       url: roomUrl(options, session.session),
       onEvent: (event) => handleEvent(event, options, token),
@@ -157,6 +155,7 @@ export function joinRoom(options: JoinOptions): void {
   const token = joinToken
   failures = 0
   renewed = false
+  resetKnowledge()
   const known = storedSession(options.name)
   useRoom.getState().reset({
     status: 'connecting',
@@ -207,9 +206,7 @@ export function cardPainted(cardId: string): void {
 
 /** "I know this": the card leaves and the term never gets a card again. */
 export function markKnown(termId: string): void {
-  const room = useRoom.getState()
-  room.setKnowledge(termId, 'known')
-  storeKnowledge(useRoom.getState().knowledge)
+  recordStatus(termId, 'known', 'tap')
   socket?.send({ type: 'knowledge.set', term_id: termId, status: 'known' })
 }
 
@@ -219,8 +216,7 @@ export function toggleSave(termId: string): void {
   const nowSaved = room.toggleSaved(termId)
   storeSaved(useRoom.getState().saved)
   if (!nowSaved) return
-  room.setKnowledge(termId, 'learning')
-  storeKnowledge(useRoom.getState().knowledge)
+  recordStatus(termId, 'learning', 'tap')
   socket?.send({ type: 'knowledge.set', term_id: termId, status: 'learning' })
 }
 

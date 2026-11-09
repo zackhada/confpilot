@@ -1,5 +1,6 @@
 import type {
   CardShownEvent,
+  Knowledge,
   KnowledgeStatus,
   Lang,
   Role,
@@ -50,6 +51,8 @@ export interface RoomData {
   terms: Record<string, Term>
   glossaryError: string | null
   knowledge: Record<string, KnowledgeStatus>
+  /** Full SM-2 records, from the API and from flashcard reviews on this phone. */
+  records: Record<string, Knowledge>
   saved: string[]
   /** How many times each term was heard this session. */
   heard: Record<string, number>
@@ -73,6 +76,7 @@ export const INITIAL_ROOM_DATA: RoomData = {
   terms: {},
   glossaryError: null,
   knowledge: {},
+  records: {},
   saved: [],
   heard: {},
   seenPairs: {},
@@ -200,6 +204,7 @@ interface RoomActions {
   applyCardShown: (event: CardShownEvent) => void
   markPainted: (cardId: string, renderedAt: number) => void
   setKnowledge: (termId: string, status: KnowledgeStatus) => void
+  setRecord: (record: Knowledge) => void
   toggleSaved: (termId: string) => boolean
   /** Bring a chip back as a full card. Its latency stamp is kept. */
   reopenCard: (cardId: string) => void
@@ -226,6 +231,7 @@ export const useRoom = create<RoomData & RoomActions>((set, get) => ({
       knowledge: { ...s.knowledge, [termId]: status },
       stack: status === 'known' ? dismissTerm(s.stack, termId) : s.stack,
     })),
+  setRecord: (record) => set((s) => ({ records: { ...s.records, [record.term_id]: record } })),
   toggleSaved: (termId) => {
     const wasSaved = get().saved.includes(termId)
     set((s) => ({

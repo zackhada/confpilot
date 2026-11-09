@@ -9,6 +9,7 @@ import type {
   Speaker,
   TranscriptEvent,
 } from '../../contracts/types.ts'
+import type { Moment } from './api.ts'
 import { buildTimeline, type ScriptSpeaker, type TimedUtterance } from './script.ts'
 
 export interface Member extends Speaker {
@@ -38,6 +39,11 @@ export class MockRoom {
   private timers: NodeJS.Timeout[] = []
   private startTimer: NodeJS.Timeout | null = null
   private replayRun = 0
+  /** Final sentences said in this room, for the mock search. */
+  readonly moments: Moment[] = []
+  /** How many phones were shown each term, for the mock recap. */
+  readonly heard = new Map<string, number>()
+  private readonly shown = new Map<string, string[]>()
 
   constructor(code: string, loop: boolean) {
     this.code = code
@@ -80,12 +86,15 @@ export class MockRoom {
         send(socket, { type: 'time.pong', t0: event.t0, server_ts: Date.now() })
         return
       case 'transcript':
+        this.remember({ ...event, speaker: { user_id: member.user_id, name: member.name } })
         this.relay(
           { ...event, speaker: { user_id: member.user_id, name: member.name } },
           (_other, otherSocket) => otherSocket !== socket,
         )
         return
       case 'card.shown':
+        this.shown.set(member.user_id, [...this.shownTo(member.user_id), event.term_id])
+        this.heard.set(event.term_id, (this.heard.get(event.term_id) ?? 0) + 1)
         this.relay(
           { ...event, user: { user_id: member.user_id, name: member.name } },
           (other) => other.role === 'viewer',
@@ -94,6 +103,21 @@ export class MockRoom {
       case 'knowledge.set':
         return
     }
+  }
+
+  /** Term ids this user's phone reported through card.shown, oldest first. */
+  shownTo(userId: string): string[] {
+    return this.shown.get(userId) ?? []
+  }
+
+  private remember(event: TranscriptEvent): void {
+    if (!event.is_final || !event.speaker) return
+    this.moments.push({
+      utterance_id: event.utterance_id,
+      speaker: event.speaker,
+      spoken_at: event.started_at,
+      text: event.text,
+    })
   }
 
   /** Resend room.state; clients treat 45 s of silence as a dead socket. */
@@ -165,6 +189,7 @@ export class MockRoom {
           speaker: this.speakerFor(utterance.speaker),
         }
         // There is no microphone in mock mode, so the speaker's own phone gets its lines too.
+        this.remember(event)
         this.relay(event, () => true)
       }
       this.timers.push(setTimeout(fire, Math.max(0, startedAt + frame.at_ms - Date.now())))

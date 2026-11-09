@@ -15,7 +15,8 @@ import { readFile } from 'node:fs/promises'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
 import { fileURLToPath } from 'node:url'
 import { WebSocketServer } from 'ws'
-import type { Health, Role } from '../../contracts/types.ts'
+import type { Health, KnowledgePatch, Role, Term } from '../../contracts/types.ts'
+import { KnowledgeStore, probeFor, recapFor, searchMoments } from './api.ts'
 import { MockRoom } from './room.ts'
 
 const PORT = Number(process.env.PORT ?? 8000)
@@ -32,6 +33,8 @@ const glossaryPath = process.env.GLOSSARY_PATH ?? (existsSync(realGlossary) ? re
 const rooms = new Map<string, MockRoom>()
 /** session string -> user id. Lost on restart, which exercises the client's renew path. */
 const sessions = new Map<string, string>()
+const knowledge = new KnowledgeStore()
+const PROBE_DELAY_MS = 1200
 
 function roomFor(code: string): MockRoom {
   const key = code.toLowerCase()
@@ -73,10 +76,58 @@ async function handleHttp(req: IncomingMessage, res: ServerResponse): Promise<vo
     roomFor(url.searchParams.get('room') ?? 'demo').restartReplay()
     return sendJson(res, 202, { status: 'restarting' })
   }
-  if (req.method === 'GET' && /^\/api\/users\/[^/]+\/knowledge$/.test(url.pathname)) {
-    return sendJson(res, 200, { items: [] })
+  return handleData(req, res, url, route)
+}
+
+async function readBody(req: IncomingMessage): Promise<Record<string, unknown>> {
+  let raw = ''
+  for await (const chunk of req) raw += String(chunk)
+  try {
+    const parsed: unknown = JSON.parse(raw || '{}')
+    return typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : {}
+  } catch {
+    return {}
+  }
+}
+
+/** Knowledge, recap, search and probe. All of them need a session the mock issued. */
+async function handleData(req: IncomingMessage, res: ServerResponse, url: URL, route: string): Promise<void> {
+  const bearer = (req.headers.authorization ?? '').replace(/^Bearer /, '')
+  const userId = sessions.get(bearer)
+  if (!userId) return sendJson(res, 401, { code: 'unauthorized', message: 'Unknown session.' })
+
+  const knowledgePath = /^\/api\/users\/[^/]+\/knowledge(?:\/([^/]+))?$/.exec(url.pathname)
+  if (knowledgePath && req.method === 'GET') return sendJson(res, 200, { items: knowledge.list(userId) })
+  if (knowledgePath?.[1] && req.method === 'PUT') {
+    const patch = (await readBody(req)) as KnowledgePatch
+    return sendJson(res, 200, knowledge.put(userId, decodeURIComponent(knowledgePath[1]), patch))
+  }
+  const recapPath = /^\/api\/rooms\/([^/]+)\/recap$/.exec(url.pathname)
+  if (recapPath?.[1] && req.method === 'GET') {
+    const room = roomFor(recapPath[1])
+    return sendJson(res, 200, recapFor(room.code, room.shownTo(userId), room.heard))
+  }
+  if (route === 'GET /api/search') {
+    const room = roomFor(url.searchParams.get('room') ?? 'demo')
+    const limit = Number(url.searchParams.get('limit') ?? 8)
+    const hits = searchMoments(url.searchParams.get('q') ?? '', room.moments, await glossaryTerms(), limit)
+    return sendJson(res, 200, { hits })
+  }
+  if (route === 'POST /api/probe') {
+    const body = await readBody(req)
+    // The real endpoint waits on an LLM; a short pause lets the progress state be seen.
+    await new Promise((resolve) => setTimeout(resolve, PROBE_DELAY_MS))
+    return sendJson(res, 200, probeFor(String(body.transcript ?? ''), await glossaryTerms()))
   }
   sendJson(res, 404, { code: 'not_found', message: `No mock route for ${route}.` })
+}
+
+let cachedTerms: Term[] | null = null
+async function glossaryTerms(): Promise<Term[]> {
+  if (cachedTerms) return cachedTerms
+  const parsed = JSON.parse(await readFile(glossaryPath, 'utf8')) as { terms: Term[] }
+  cachedTerms = parsed.terms
+  return cachedTerms
 }
 
 const server = createServer((req, res) => {
