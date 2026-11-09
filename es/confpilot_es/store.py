@@ -4,11 +4,13 @@ from __future__ import annotations
 
 from confpilot_es.config import DEFAULT_PREFIX, EsConfig, create_client
 from confpilot_es.glossary import GlossaryMixin
+from confpilot_es.knowledge import KnowledgeMixin
 from confpilot_es.percolate import PercolateMixin
 from confpilot_es.search import SearchMixin
+from confpilot_es.sessions import SessionMixin
 
 
-class EsStore(GlossaryMixin, PercolateMixin, SearchMixin):
+class EsStore(GlossaryMixin, PercolateMixin, SearchMixin, KnowledgeMixin, SessionMixin):
     @classmethod
     def from_env(cls, prefix: str = DEFAULT_PREFIX, refresh: bool = False, config: EsConfig | None = None) -> EsStore:
         """Build a store from ES_URL and ES_API_KEY (or the file named by ENV_FILE)."""

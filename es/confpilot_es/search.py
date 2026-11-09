@@ -59,16 +59,20 @@ class SearchMixin(StoreBase):
         word_to_card_ms: float | None = None,
         session_id: str | None = None,
     ) -> None:
-        """Store one final utterance. Re-indexing the same `utterance_id` replaces it.
+        """Store one final utterance, keyed by (room, speaker, utterance_id).
+
+        The same speaker sending the same `utterance_id` again replaces it; another speaker
+        using that id is a different utterance, so nobody can overwrite someone else's words.
 
         `spoken_at` is epoch milliseconds in server time. `text` is also embedded into
         `semantic_text` by Elasticsearch at index time.
         """
+        who = Speaker.model_validate(speaker)
         document = {
             "utterance_id": utterance_id,
             "room": room,
             "session_id": session_id,
-            "speaker": Speaker.model_validate(speaker).model_dump(),
+            "speaker": who.model_dump(),
             "spoken_at": spoken_at,
             "text": text,
             "term_ids": list(term_ids),
@@ -76,7 +80,10 @@ class SearchMixin(StoreBase):
         }
         with es_span("es.index", operation="index_utterance", room=room, term_count=len(document["term_ids"])):
             await self.client.index(
-                index=self.index("utterances"), id=utterance_id, document=document, refresh=self.refresh
+                index=self.index("utterances"),
+                id=f"{room}:{who.user_id}:{utterance_id}",
+                document=document,
+                refresh=self.refresh,
             )
 
     async def search(self, q: str, room: str, size: int = DEFAULT_SEARCH_SIZE) -> list[SearchHit]:
