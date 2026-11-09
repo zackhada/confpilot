@@ -1,15 +1,18 @@
-// STUB written by the UI slice so the app compiles and runs. The pure-logic owner replaces
-// this file; keep the exported signatures identical.
+// Latency badge maths: contracts/README.md section 2.
+// word_to_card_ms = rendered_at - spoken_at, both in server-time epoch milliseconds.
 
-/** Milliseconds from the end of the spoken word to the painted card. Never negative. */
+const P95_QUANTILE = 0.95;
+
+/** Milliseconds from the end of the spoken word to the painted card; never negative. */
 export function wordToCardMs(spokenAt: number, renderedAt: number): number {
-  return Math.max(0, Math.round(renderedAt - spokenAt))
+  const elapsed = renderedAt - spokenAt;
+  return Number.isFinite(elapsed) ? Math.max(0, Math.round(elapsed)) : 0;
 }
 
-/** 95th percentile by the nearest-rank method. Returns 0 for an empty list. */
+/** 95th percentile by the nearest-rank method; 0 for an empty list. */
 export function p95(values: number[]): number {
-  if (values.length === 0) return 0
-  const sorted = [...values].sort((a, b) => a - b)
-  const rank = Math.ceil(0.95 * sorted.length)
-  return sorted[Math.max(0, rank - 1)] ?? 0
+  const sorted = values.filter(Number.isFinite).sort((a, b) => a - b);
+  if (sorted.length === 0) return 0;
+  const rank = Math.ceil(P95_QUANTILE * sorted.length);
+  return sorted[Math.max(0, rank - 1)] as number;
 }

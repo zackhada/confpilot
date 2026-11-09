@@ -1,25 +1,36 @@
-// STUB written by the UI slice so the app compiles and runs. The pure-logic owner replaces
-// this file; keep the exported signature identical.
+// Clock sync: contracts/README.md section 3. Phones do not share a clock, so every
+// timestamp on the wire is server time. Feed each time.ping / time.pong pair to sample().
 
 export interface Clock {
-  /** Record one time.ping/time.pong round trip (t0, t1 on the client clock). */
-  sample(t0: number, t1: number, serverTs: number): void
-  /** The current time in server milliseconds. */
-  now(): number
-  /** Server time minus client time, in milliseconds. */
-  offset(): number
+  /** t0: local ms when time.ping was sent. t1: local ms when time.pong arrived. */
+  sample(t0: number, t1: number, serverTs: number): void;
+  /** Current time in server-time epoch milliseconds. */
+  now(): number;
+  /** Milliseconds to add to local time to get server time. 0 until the first sample. */
+  offset(): number;
 }
 
-export function createClock(): Clock {
-  let best: { rtt: number; offset: number } | null = null
+export type TimeSource = () => number;
+
+interface BestSample {
+  readonly roundTripMs: number;
+  readonly offsetMs: number;
+}
+
+export function createClock(localNow: TimeSource = Date.now): Clock {
+  let best: BestSample | null = null;
+
   return {
-    sample(t0, t1, serverTs) {
-      const rtt = t1 - t0
-      if (rtt < 0) return
-      // The round trip with the least delay gives the most trustworthy offset.
-      if (!best || rtt <= best.rtt) best = { rtt, offset: serverTs - (t0 + t1) / 2 }
+    sample(t0: number, t1: number, serverTs: number): void {
+      const roundTripMs = t1 - t0;
+      const valid = Number.isFinite(roundTripMs) && Number.isFinite(serverTs) && roundTripMs >= 0;
+      if (!valid) return;
+      // The shortest round trip has the least network jitter, so its midpoint is the best guess.
+      if (best === null || roundTripMs <= best.roundTripMs) {
+        best = { roundTripMs, offsetMs: serverTs - (t0 + t1) / 2 };
+      }
     },
-    now: () => Date.now() + (best?.offset ?? 0),
-    offset: () => best?.offset ?? 0,
-  }
+    now: (): number => localNow() + (best?.offsetMs ?? 0),
+    offset: (): number => best?.offsetMs ?? 0,
+  };
 }
