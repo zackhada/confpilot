@@ -158,8 +158,9 @@ The promise is that 95% of cards appear within 800 ms of the word being spoken, 
   [api/confpilot/routes/ws.py](api/confpilot/routes/ws.py)
 - Elasticsearch spans (`es.percolate`, `es.search`, ...): [es/confpilot_es/telemetry.py](es/confpilot_es/telemetry.py)
 - Browser RUM: [web/src/telemetry/dash0.ts](web/src/telemetry/dash0.ts)
-- Dashboard "confpilot-word-to-card" and an SLO of 95% of cards within 800 ms, configured in Dash0
-- Measurements: [docs/PERF.md](docs/PERF.md). Setup: [docs/setup/DASH0.md](docs/setup/DASH0.md)
+- Dashboard "confpilot-word-to-card" and an SLO of 95% of cards within 800 ms, configured in
+  Dash0 (screenshots and measurements in [docs/PERF.md](docs/PERF.md))
+- Setup: [docs/setup/DASH0.md](docs/setup/DASH0.md)
 
 ### Radar: operating the cluster
 

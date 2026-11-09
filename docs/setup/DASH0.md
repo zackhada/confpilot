@@ -26,7 +26,7 @@ OTEL_SERVICE_NAME=confpilot-api
 On Kubernetes the pod reads the endpoint and service name from the `app-config` ConfigMap and the headers from the `app-credentials` Secret, and exports straight to Dash0 (see [`deploy/README.md`](../../deploy/README.md)).
 Frontend RUM: [`web/src/telemetry/dash0.ts`](../../web/src/telemetry/dash0.ts) uses the Dash0 web SDK. Set `VITE_DASH0_RUM_TOKEN` and `VITE_DASH0_RUM_ENDPOINT` at build time; with either unset, browser monitoring is off.
 
-The key signal is the `confpilot.card.word_to_card_ms` histogram, recorded under the `card.push` span in [`api/confpilot/routes/ws.py`](../../api/confpilot/routes/ws.py). The dashboard "confpilot-word-to-card" and the SLO (95% of cards within 800 ms) are configured in Dash0.
+The key signal is the `confpilot.card.word_to_card_ms` histogram, recorded under the `card.push` span in [`api/confpilot/routes/ws.py`](../../api/confpilot/routes/ws.py). The dashboard "confpilot-word-to-card" and SLO of 95% of cards within 800 ms are configured in Dash0; screenshots and measurements are in [`PERF.md`](../PERF.md).
 
 ## MCP — let your coding agent read live telemetry
 Endpoint format: `https://api.<region>.<cloud>.dash0.com/mcp` → ours: `https://api.us-west-2.aws.dash0.com/mcp`
