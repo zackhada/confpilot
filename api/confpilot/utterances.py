@@ -5,13 +5,21 @@ only, and nothing already stored is ever deleted or replaced, so no value a clie
 (such as ``started_at``) can remove another speaker's words.
 """
 
+import logging
 from collections import Counter, deque
-from collections.abc import Sequence
+from collections.abc import Callable, Collection, Sequence
+
+from opentelemetry.trace import Status, StatusCode
 
 from confpilot.matching import Matcher, normalize
 from confpilot.models import TranscriptEvent, Utterance
 from confpilot.store import Store
 from confpilot.telemetry import tracer
+
+_log = logging.getLogger(__name__)
+
+# Called with the term ids the percolator found that the phone's matcher could not have.
+OnServerTerms = Callable[[list[str]], None]
 
 DUPLICATE_WINDOW_S = 3.0  # server clock, between the two arrivals
 DUPLICATE_OVERLAP = 0.8
@@ -78,23 +86,66 @@ async def store_final_or_release(
     event: TranscriptEvent,
     words: Sequence[str],
     admitted_at: float,
+    known_ids: Collection[str],
+    on_server_terms: OnServerTerms | None = None,
 ) -> None:
     """Store an admitted final. If storing fails, release its admission, so that the other
     phone's copy of the same sentence can still be stored, then let the failure be logged."""
     try:
-        await store_final(store, matcher, room, event)
+        await store_final(store, matcher, room, event, known_ids, on_server_terms)
     except Exception:
         if event.speaker is not None:
             recent.forget(room, event.speaker.user_id, words, admitted_at)
         raise
 
 
-async def store_final(store: Store, matcher: Matcher, room: str, event: TranscriptEvent) -> None:
-    """Run the matcher and save the utterance with its term ids. ``event.speaker`` is set."""
+async def percolate_extra(
+    store: Store, text: str, phone_term_ids: Sequence[str], known_ids: Collection[str]
+) -> list[str]:
+    """Tier 2: terms the Elasticsearch percolator finds that the phone's matcher did not.
+
+    A failing percolator costs only the tier 2 cards, never the stored utterance.
+    """
+    with tracer.start_as_current_span("utterance.percolate") as span:
+        try:
+            found = await store.percolate(text)
+        except Exception as exc:
+            span.record_exception(exc)
+            span.set_status(Status(StatusCode.ERROR, "percolate failed"))
+            _log.warning("percolate failed, storing without tier 2 terms", exc_info=True)
+            return []
+        already = set(phone_term_ids)
+        extra = [
+            term_id
+            for term_id in dict.fromkeys(found)
+            if term_id not in already and term_id in known_ids
+        ]
+        span.set_attribute("confpilot.percolate.found", len(found))
+        span.set_attribute("confpilot.percolate.extra", len(extra))
+        return extra
+
+
+async def store_final(
+    store: Store,
+    matcher: Matcher,
+    room: str,
+    event: TranscriptEvent,
+    known_ids: Collection[str],
+    on_server_terms: OnServerTerms | None = None,
+) -> None:
+    """Match (phone rules, then the percolator) and save the utterance with its term ids.
+
+    ``event.speaker`` is set. Percolator-only terms go to ``on_server_terms`` before the write,
+    so their cards never wait on storage.
+    """
     if event.speaker is None:
         raise ValueError("store_final needs the relayed event, with the speaker set")
     matches = matcher.match(transcript_words(event))
     term_ids = list(dict.fromkeys(match.term_id for match in matches))
+    extra = await percolate_extra(store, event.text, term_ids, known_ids)
+    if extra and on_server_terms is not None:
+        on_server_terms(extra)
+    term_ids = term_ids + extra
     attributes = {
         "confpilot.room": room,
         "confpilot.utterance.id": event.utterance_id,

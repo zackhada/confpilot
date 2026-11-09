@@ -48,6 +48,7 @@ def create_app(
     app.state.settings = settings
     app.state.glossary = load_glossary(settings.glossary_path)
     app.state.matcher = Matcher(app.state.glossary.terms)
+    app.state.terms_by_id = {term.id: term for term in app.state.glossary.terms}
     app.state.store = store or store_from_settings(settings)
     app.state.hub = Hub()
     app.state.recent_finals = RecentFinals()

@@ -3,7 +3,7 @@
 import asyncio
 import logging
 import time
-from collections.abc import Coroutine
+from collections.abc import Callable, Coroutine
 
 from fastapi import APIRouter, WebSocket
 from opentelemetry.trace import Status, StatusCode
@@ -20,6 +20,7 @@ from confpilot.models import (
     Member,
     Role,
     SafeId,
+    ServerCardEvent,
     TimePing,
     TimePong,
     TranscriptEvent,
@@ -85,6 +86,35 @@ async def _heartbeat(hub: Hub, connection: Connection, every_s: float) -> None:
         connection.send(hub.state(connection.room))
 
 
+def server_card_sender(
+    state: State, connection: Connection, event: TranscriptEvent
+) -> Callable[[list[str]], None]:
+    """Send tier 2 cards to everyone in the room except the speaker, who used the words.
+
+    ``spoken_at`` is the end of the final: the percolator sees whole finals, so that is the
+    earliest moment the server could have known, and the card's latency is measured from it.
+    """
+    ended_at = event.started_at + max((word.end_ms for word in event.words), default=0)
+
+    def send(term_ids: list[str]) -> None:
+        hub: Hub = state.hub
+        terms = [state.terms_by_id[t] for t in term_ids if t in state.terms_by_id]
+        attributes = {
+            "confpilot.room": connection.room,
+            "confpilot.utterance.id": event.utterance_id,
+            "confpilot.card.tier": 2,
+            "confpilot.card.count": len(terms),
+        }
+        with tracer.start_as_current_span("card.server", attributes=attributes):
+            for term in terms:
+                card = ServerCardEvent(
+                    tier=2, term=term, utterance_id=event.utterance_id, spoken_at=ended_at
+                )
+                hub.broadcast(connection.room, card, exclude=connection)
+
+    return send
+
+
 def handle_transcript(state: State, connection: Connection, event: TranscriptEvent) -> None:
     hub: Hub = state.hub
     attributes = {
@@ -119,6 +149,8 @@ def handle_transcript(state: State, connection: Connection, event: TranscriptEve
             relayed,
             words,
             admitted_at,
+            state.terms_by_id.keys(),
+            server_card_sender(state, connection, event),
         )
         if not spawn(storing, "store_final"):
             state.recent_finals.forget(

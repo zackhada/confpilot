@@ -219,3 +219,14 @@ def test_the_app_closes_the_store_on_shutdown(
     with TestClient(app) as client:
         assert client.get("/healthz").status_code == 200
     assert fake.closed
+
+
+async def test_percolate_delegates_to_the_es_store() -> None:
+    from confpilot.store_es import ElasticStore
+
+    class FakeEs:
+        async def percolate(self, text: str) -> list[str]:
+            return ["rag"] if "RAG" in text else []
+
+    store = ElasticStore(FakeEs())  # type: ignore[arg-type]
+    assert await store.percolate("we use RAG") == ["rag"]
