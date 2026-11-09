@@ -6,6 +6,8 @@ import logging
 from collections.abc import Iterable, Mapping
 from typing import Any
 
+from opentelemetry import trace
+
 from confpilot_es.base import INDEX_NAMES, StoreBase, load_index_body
 from confpilot_es.models import Glossary, Term
 from confpilot_es.queries import percolator_doc, term_doc
@@ -49,9 +51,14 @@ class GlossaryMixin(StoreBase):
             operations.append({"index": {"_index": self.index("term-queries"), "_id": term.id}})
             operations.append(percolator_doc(term))
         if operations:
-            with es_span("es.index", operation="upsert_terms", term_count=len(parsed)):
+            with es_span("es.index", operation="upsert_terms", term_count=len(parsed)) as span:
                 response = await self.client.bulk(operations=operations, refresh=True)
-            _raise_on_bulk_errors(response)
+                try:
+                    _raise_on_bulk_errors(response)
+                except EsStoreError as exc:
+                    span.record_exception(exc)
+                    span.set_status(trace.Status(trace.StatusCode.ERROR, str(exc)))
+                    raise
         if version is not None:
             with es_span("es.indices.put_mapping", glossary_version=version):
                 await self.client.indices.put_mapping(index=self.index("terms"), meta={"glossary_version": version})
