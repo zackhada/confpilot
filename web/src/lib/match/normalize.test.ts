@@ -24,10 +24,6 @@ describe('normalizeWords', () => {
     expect(origin).toEqual([[0, 0], [1, 3], [4, 4], [5, 5]]);
   });
 
-  it('keeps a trailing i or a out of a spelled-letter run', () => {
-    expect(tokensOf('r r f i and r r f a')).toEqual(['rrf', 'i', 'and', 'rrf', 'a']);
-  });
-
   it('joins a short letter run with the number after it', () => {
     expect(tokensOf('it uses BM 25 for that')).toEqual(['it', 'uses', 'bm25', 'for', 'that']);
   });

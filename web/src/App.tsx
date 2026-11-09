@@ -1,17 +1,32 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router'
-import { ComingSoon } from '@/screens/ComingSoon'
+import { LiveScreen } from '@/live/LiveScreen'
+import { Ask } from '@/screens/Ask'
+import { Cards } from '@/screens/Cards'
+import { Recap } from '@/screens/Recap'
 import { AppShell } from '@/shell/AppShell'
+
+// The projector view (and its QR code library) stays out of the phone bundle.
+const StageView = lazy(() => import('@/stage/StageView').then((m) => ({ default: m.StageView })))
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<AppShell />}>
-          <Route index element={<ComingSoon title="Live">Captions start here.</ComingSoon>} />
-          <Route path="recap" element={<ComingSoon title="Recap">Your recap appears after a talk.</ComingSoon>} />
-          <Route path="cards" element={<ComingSoon title="Cards">Saved terms become flashcards.</ComingSoon>} />
-          <Route path="ask" element={<ComingSoon title="Ask">Search what you heard.</ComingSoon>} />
+          <Route index element={<LiveScreen />} />
+          <Route path="recap" element={<Recap />} />
+          <Route path="cards" element={<Cards />} />
+          <Route path="ask" element={<Ask />} />
         </Route>
+        <Route
+          path="stage"
+          element={
+            <Suspense fallback={null}>
+              <StageView />
+            </Suspense>
+          }
+        />
       </Routes>
     </BrowserRouter>
   )

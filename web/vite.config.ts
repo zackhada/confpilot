@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
 
 const API_TARGET = process.env.CONFPILOT_API ?? 'http://localhost:8000'
+const here = (path: string): string => fileURLToPath(new URL(path, import.meta.url))
 
 export default defineConfig({
   plugins: [
@@ -14,8 +15,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'ConfPilot',
-        short_name: 'ConfPilot',
+        name: 'Nautilus',
+        short_name: 'Nautilus',
         description: 'Live captions that explain the jargon you do not know yet.',
         lang: 'en',
         start_url: '/',
@@ -65,8 +66,8 @@ export default defineConfig({
   },
   server: {
     host: true,
-    // Tests read shared fixtures from the repo's contracts/ and content/ folders.
-    fs: { allow: ['.', '../contracts', '../content'] },
+    // Tests import the shared glossary and fixtures, which live outside web/.
+    fs: { allow: [here('.'), here('../content'), here('../contracts')] },
     proxy: {
       '/api': { target: API_TARGET, changeOrigin: true },
       '/ws': { target: API_TARGET, ws: true, changeOrigin: true },
