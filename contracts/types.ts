@@ -53,6 +53,18 @@ export interface Knowledge {
 
 export interface Health { status: "ok"; version: string }
 
+// ---------- Sessions ----------
+// There is no login, but identity is not client-claimed: the server issues the user id.
+//
+// POST /api/session  body: SessionRequest -> SessionResponse   (no Authorization needed)
+// 429 when one client address asks too often; Retry-After says how many seconds to wait.
+export interface SessionRequest { name: string } // display name, 80 characters or fewer
+export interface SessionResponse {
+  user_id: string; // UUID chosen by the server
+  session: string; // opaque signed string; treat it like a password
+  expires_at: number; // epoch ms in server time; a session lasts 12 hours
+}
+
 // POST /api/token
 export interface TokenRequest { user_id: string }
 export interface TokenResponse {

@@ -25,6 +25,13 @@ class Settings(BaseSettings):
 
     ws_heartbeat_s: float = 20.0
 
+    session_secret: SecretStr | None = None  # unset: a random key per process
+    session_ttl_s: int = 12 * 60 * 60
+    rate_limit_per_minute: int = 20  # per client address (and per user where a route says so)
+    client_ip_header: str = (
+        ""  # header an edge overwrites with the client address; see ratelimit.py
+    )
+
     @field_validator("*", mode="before")
     @classmethod
     def _blank_is_unset(cls, value: object, info) -> object:
