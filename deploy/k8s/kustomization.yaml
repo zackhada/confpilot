@@ -5,9 +5,17 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - namespace.yaml
-  - configmap.yaml
   - deployment.yaml
   - service.yaml
+configMapGenerator:
+  - name: app-config
+    namespace: confpilot
+    literals:
+      - OTEL_SERVICE_NAME=confpilot-api
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=confpilot,deployment.environment.name=hackathon
+      - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - OTEL_EXPORTER_OTLP_ENDPOINT=https://ingress.us-west-2.aws.dash0.com:4318
+      - ALLOWED_ORIGINS=
 images:
   - name: ghcr.io/zackhada/confpilot
     newTag: main
