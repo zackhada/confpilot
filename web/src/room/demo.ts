@@ -10,6 +10,8 @@ import { clearIdentity, saveProfile, storeKnowledge, storeSaved } from './identi
 
 const DAY_MS = 86_400_000
 
+export let demoSeeding: Promise<void> = Promise.resolve()
+
 const KNOWN = [
   // Everyday tech, business and conference talk.
   'api', 'sdk', 'cloud', 'server', 'database', 'latency', 'throughput', 'frontend', 'backend',
@@ -84,5 +86,5 @@ export async function applyDemoLink(): Promise<void> {
     return
   }
   seedReturning()
-  void pushReviews()
+  demoSeeding = pushReviews()
 }

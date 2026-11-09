@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { applyDemoLink } from './demo'
 import { loadKnowledge, loadProfile, loadSaved } from './identity'
+import { loadServerKnowledge } from './knowledge'
 
 let puts: string[] = []
 
@@ -54,6 +55,36 @@ describe('applyDemoLink', () => {
       expect(puts.some((p) => p.endsWith('/api/users/priya-1/knowledge/kubernetes'))).toBe(true)
     })
     expect(window.location.search).toBe('?room=slc1')
+  })
+
+  it('waits for returning demo reviews before fetching server knowledge', async () => {
+    const releaseWrites: Array<() => void> = []
+    let knowledgeReads = 0
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const path = String(input)
+        if (path === '/api/session') {
+          return Promise.resolve(Response.json({ user_id: 'priya-1', session: 's1', expires_at: Date.now() + 3_600_000 }))
+        }
+        if (init?.method === 'PUT') {
+          return new Promise((resolve) => {
+            releaseWrites.push(() => resolve(Response.json({})))
+          })
+        }
+        knowledgeReads += 1
+        return Promise.resolve(Response.json({ items: [] }))
+      }),
+    )
+    visit('?room=slc1&demo=returning')
+    await applyDemoLink()
+
+    const loading = loadServerKnowledge({ user_id: 'priya-1', name: 'Priya' }, () => true)
+    await vi.waitFor(() => expect(releaseWrites).toHaveLength(7))
+    expect(knowledgeReads).toBe(0)
+    releaseWrites.forEach((release) => release())
+    await loading
+    expect(knowledgeReads).toBe(1)
   })
 
   it('seeds Priya locally without waiting for server writes', async () => {

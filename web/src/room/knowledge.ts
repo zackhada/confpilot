@@ -7,6 +7,7 @@
 import type { Knowledge, KnowledgePatch, KnowledgeStatus, Speaker } from '@contracts'
 import { fetchKnowledge, putKnowledge } from './api'
 import { loadKnowledge, storeKnowledge } from './identity'
+import { demoSeeding } from './demo'
 import { useRoom } from './store'
 
 type Statuses = Record<string, KnowledgeStatus>
@@ -33,6 +34,7 @@ export function setSeedKnowledge(statuses: Statuses): void {
 
 /** Load what the API has for this user. A failure leaves the seed and local layers in charge. */
 export async function loadServerKnowledge(me: Speaker, isCurrent: () => boolean): Promise<void> {
+  await demoSeeding
   try {
     const items = await fetchKnowledge(me.name, me.user_id)
     if (!isCurrent()) return
