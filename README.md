@@ -85,10 +85,13 @@ All screenshots are in [web/docs/screens/](web/docs/screens/).
 | Path | What | Owner |
 | --- | --- | --- |
 | `contracts/` | API and event shapes every part agrees on, plus shared matcher fixtures | all (change by PR) |
-| `api/`, `es/` | FastAPI service and Elasticsearch layer | Zack |
+| `api/`, `es/` | FastAPI service (token, session, probe, room WebSocket hub, knowledge, recap, search) and the Elasticsearch layer `confpilot_es` (mappings, bootstrap, percolator, hybrid search, recap) | Zack |
 | `web/` | Phone app (PWA), stage view, mock server, screenshots | Tanner |
-| `deploy/` | Dockerfile, EKS config, Kustomize manifests, rollout scripts, runbook | Clayton |
-| `content/`, `.gitar/`, `docs/` | Glossary, review rules, docs | Skyler |
+| `deploy/` | Dockerfile, EKS config, Kustomize manifests, rollout scripts, deploy runbook | Clayton |
+| `content/`, `.gitar/`, `docs/` | The 200-term glossary and its validator, Gitar rules, plan and setup guides | Skyler |
+| `.github/workflows/` | CI for each part, deploy on merge, Gitar labelling | shared |
+| `bin/` | Helper scripts for delegating tasks to coding subagents | shared |
+| `recordings/` | Two short clips of our own rehearsal | shared |
 | `reference/` | Pre-kickoff scaffold, not part of the submission | nobody |
 
 ## Run it locally
