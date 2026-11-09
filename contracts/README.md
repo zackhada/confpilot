@@ -53,14 +53,19 @@ A room is a short code in the URL (`/?room=slc1`). The stage view (`/stage?room=
 as a `viewer` and shows a QR code for the room.
 
 Both phones may hear both voices, so the same sentence can arrive as two utterances from two
-speakers. Speakers get a mic toggle, and duplicates are handled in three places:
+speakers. Speakers get a mic toggle, and duplicates are handled like this:
 
-- **Relay is never delayed.** The API relays every interim and final as it arrives.
-- **Captions:** two utterances are duplicates when their `started_at` values are within three
-  seconds and at least 80% of the normalized words of the shorter one appear in the other.
-  The one with the earlier `started_at` wins (ties go to the lower `user_id`). Phones hide the
-  loser, and the API applies the same test to finals before storing, so a sentence is stored
-  and percolated once.
+- **Relay is never delayed.** The API relays every interim and final as it arrives, including
+  a final that it then decides not to store.
+- **Duplicate test:** two finals are duplicates when both have at least four normalized words
+  and the words they have in common (counting repeats) are at least 80% of the LONGER one's
+  word count. A one-word final can therefore never match a long one.
+- **Storage:** the winner is decided by the order in which finals ARRIVE at the server. The
+  first final to arrive is stored. A later final from a different speaker is dropped if it
+  arrives within three seconds (server clock) and is a duplicate. Nothing already stored is
+  ever deleted or replaced, so no value a client sends, such as `started_at`, can remove
+  another speaker's words.
+- **Captions:** phones hide a later-arriving duplicate caption using the same test.
 - **Cards:** a phone shows a term at most once per session, whatever utterance it came from.
   A duplicate utterance therefore never produces a second card or a second `card.shown`.
 
