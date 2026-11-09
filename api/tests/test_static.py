@@ -39,6 +39,7 @@ def test_static_never_shadows_reserved_prefixes(static_client: TestClient, path:
 
 def test_static_keeps_healthz(static_client: TestClient) -> None:
     assert static_client.get("/healthz").json()["status"] == "ok"
+    assert static_client.head("/healthz").status_code == 200
 
 
 @pytest.mark.parametrize(
