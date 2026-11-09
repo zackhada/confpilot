@@ -3,6 +3,7 @@
 # RBAC can only say "may patch the confpilot Deployment", and a patch can change anything
 # in the pod spec: command, env, volumes, service account. This policy narrows it to what
 # the Deploy workflow does. An update made by the deployer is rejected unless
+#   - Deployment metadata is unchanged,
 #   - the only thing that changed in `spec` is the image of the `app` container, and
 #   - that image is ghcr.io/zackhada/confpilot:<tag> or ghcr.io/zackhada/confpilot@sha256:<digest>.
 # Humans with admin access are not affected: the policy matches the deployer only.
@@ -39,6 +40,13 @@ spec:
     - name: oldPod
       expression: oldObject.spec.template.spec
   validations:
+    - expression: >-
+        object.metadata.?ownerReferences == oldObject.metadata.?ownerReferences &&
+        object.metadata.?finalizers == oldObject.metadata.?finalizers &&
+        object.metadata.?labels == oldObject.metadata.?labels &&
+        object.metadata.?annotations == oldObject.metadata.?annotations
+      message: The deployer may only change the image of the app container; Deployment metadata changed.
+      reason: Forbidden
     - expression: >-
         object.spec.?minReadySeconds == oldObject.spec.?minReadySeconds &&
         object.spec.?paused == oldObject.spec.?paused &&
