@@ -1,0 +1,27 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "confpilot_fold": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "asciifolding"]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "term_id": { "type": "keyword" },
+      "term": { "type": "keyword" },
+      "phrases": { "type": "keyword" },
+      "category": { "type": "keyword" },
+      "ambiguous": { "type": "boolean" },
+      "context": { "type": "keyword" },
+      "source": { "type": "keyword" },
+      "query": { "type": "percolator" },
+      "text": { "type": "text", "analyzer": "confpilot_fold" }
+    }
+  }
+}

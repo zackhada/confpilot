@@ -1,0 +1,29 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "id": { "type": "keyword" },
+      "term": { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
+      "aliases": { "type": "text", "fields": { "keyword": { "type": "keyword" } } },
+      "say": { "type": "keyword", "index": false },
+      "category": { "type": "keyword" },
+      "level": { "type": "byte" },
+      "simple_def": { "type": "text" },
+      "long_def": { "type": "text" },
+      "example": { "type": "text" },
+      "prereqs": { "type": "keyword" },
+      "translations": {
+        "properties": {
+          "es": { "type": "text", "analyzer": "spanish" },
+          "pt": { "type": "text", "analyzer": "portuguese" },
+          "hi": { "type": "text", "analyzer": "hindi" },
+          "zh": { "type": "text", "analyzer": "cjk" }
+        }
+      },
+      "ambiguous": { "type": "boolean" },
+      "context": { "type": "keyword" },
+      "source": { "type": "keyword" },
+      "semantic_text": { "type": "semantic_text", "inference_id": ".jina-embeddings-v5-text-small" }
+    }
+  }
+}
