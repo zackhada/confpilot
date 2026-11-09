@@ -67,18 +67,19 @@ The same rules as the phone (`contracts/README.md` section 6), proven by
    and "an ambiguous term with no context list needs a non-ambiguous term of the same category
    within five words".
 
-## LLM helpers (Elastic Inference Service)
+## LLM helpers
 
 `define_term(term, sentence)` returns a contract-shaped `Term` (`source: "llm"`, definition of 20
-words or fewer) for a word the glossary lacks; pass it to `upsert_terms([term])` to make it a
-glossary entry with its own percolator query. `translate_defs(terms, lang)` writes one-line
-translations into `translations.<lang>`. Both call a `completion` inference endpoint
-(`ES_LLM_ENDPOINT`, default `.anthropic-claude-5-sonnet-completion`) and must run async, never in
-the request path.
+words or fewer, never using the term itself) for a word the glossary lacks; pass it to
+`upsert_terms([term])` to make it a glossary entry with its own percolator query.
+`translate_defs(terms, lang)` writes one-line translations into `translations.<lang>`, about 20
+terms per request.
 
-**Status:** on the hackathon project every LLM endpoint (`completion` and `chat_completion`)
-currently answers `403 Forbidden`, so these two are covered by stub tests only and
-`tests/test_llm.py::test_define_and_translate_live` skips. Embedding endpoints are unaffected.
+Both call an OpenAI-compatible `POST {LLM_BASE_URL}/chat/completions` endpoint with httpx,
+configured by `LLM_BASE_URL`, `LLM_API_KEY` and `LLM_MODEL` (environment or `ENV_FILE`). They use a
+small `max_tokens`, a 20 second timeout and one retry, raise `LlmError` on failure, and must run
+async, never in the request path. The Elastic Inference Service chat endpoints are not used: on
+the hackathon project they answer `403 Forbidden`.
 
 ## Queries to show the judges
 

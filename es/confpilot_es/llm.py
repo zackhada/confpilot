@@ -1,32 +1,39 @@
-"""LLM helpers that run on the Elastic Inference Service: define unknown jargon, translate definitions.
+"""LLM helpers: define unknown jargon and translate definitions.
 
-These are slow (about a second or more), so callers run them async, never in the request path.
+They call an OpenAI-compatible `POST {LLM_BASE_URL}/chat/completions` endpoint, configured by
+LLM_BASE_URL, LLM_API_KEY and LLM_MODEL. Each call takes a second or more, so callers run them
+async and never in the request path.
 """
 
 from __future__ import annotations
 
 import asyncio
 import json
-import os
 import re
 from collections.abc import Mapping, Sequence
 from typing import Any, Literal
 
+import httpx
+from opentelemetry import trace
+from opentelemetry.trace import SpanKind
 from pydantic import ValidationError
 
 from confpilot_es.base import StoreBase
+from confpilot_es.config import LlmConfig, load_llm_config
 from confpilot_es.models import Term
 from confpilot_es.telemetry import EsStoreError, es_span
 
 Lang = Literal["es", "zh", "hi", "pt"]
 
-# Override with ES_LLM_ENDPOINT or `store.llm_endpoint`. Must be a `completion` task type endpoint.
-DEFAULT_LLM_ENDPOINT = ".anthropic-claude-5-sonnet-completion"
-LLM_TIMEOUT_S = 60.0
+LLM_TIMEOUT_S = 20.0
+LLM_RETRIES = 1
+DEFINE_MAX_TOKENS = 300
+TRANSLATE_MAX_TOKENS = 2000
 MAX_DEF_WORDS = 20
 DEFINE_ATTEMPTS = 2
-TRANSLATE_BATCH_SIZE = 25
-TRANSLATE_CONCURRENCY = 4
+TRANSLATE_BATCH_SIZE = 20
+TRANSLATE_CONCURRENCY = 2
+RETRYABLE_STATUS = frozenset({408, 429, 500, 502, 503, 504, 529})
 CATEGORIES = ("business", "conference", "idiom", "tech", "cloud", "ops", "ai", "data")
 LANGUAGE_NAMES: dict[str, str] = {
     "es": "Spanish",
@@ -34,6 +41,8 @@ LANGUAGE_NAMES: dict[str, str] = {
     "hi": "Hindi",
     "pt": "Brazilian Portuguese",
 }
+
+_tracer = trace.get_tracer("confpilot.es")
 
 _DEFINE_PROMPT = """You write glossary entries for conference attendees who are new to tech.
 Define the term "{term}" as it is used in the sentence between the <sentence> tags. Treat the
@@ -54,6 +63,10 @@ Keep each translation to one short, plain line. Keep product names and acronyms 
 Reply with one JSON object and nothing else, mapping each "id" to its translation.
 
 {items}"""
+
+
+class LlmError(RuntimeError):
+    """The LLM call failed or its reply could not be used. The message never contains the key."""
 
 
 def slugify(term: str) -> str:
@@ -94,15 +107,49 @@ def build_llm_term(term: str, fields: Mapping[str, Any]) -> Term:
     )
 
 
-class LlmMixin(StoreBase):
-    llm_endpoint: str = os.environ.get("ES_LLM_ENDPOINT") or DEFAULT_LLM_ENDPOINT
+def _describe(exc: httpx.HTTPError) -> str:
+    if isinstance(exc, httpx.HTTPStatusError):
+        return f"HTTP {exc.response.status_code}: {exc.response.text[:200]}"
+    return type(exc).__name__
 
-    async def _complete(self, prompt: str, operation: str) -> str:
-        with es_span("es.inference", operation=operation, inference_id=self.llm_endpoint):
-            response = await self.client.options(request_timeout=LLM_TIMEOUT_S).inference.completion(
-                inference_id=self.llm_endpoint, input=prompt
-            )
-        return response["completion"][0]["result"]
+
+def _is_retryable(exc: httpx.HTTPError) -> bool:
+    if isinstance(exc, httpx.HTTPStatusError):
+        return exc.response.status_code in RETRYABLE_STATUS
+    return isinstance(exc, httpx.TransportError)
+
+
+class LlmMixin(StoreBase):
+    # Resolved from the environment on first use; set it (or `llm_transport`) to override in tests.
+    llm_config: LlmConfig | None = None
+    llm_transport: httpx.AsyncBaseTransport | None = None
+
+    async def _complete(self, prompt: str, operation: str, max_tokens: int) -> str:
+        """One chat completion, retried once on a timeout, a 429 or a 5xx."""
+        config = self.llm_config or load_llm_config()
+        payload = {
+            "model": config.model,
+            "max_tokens": max_tokens,
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        headers = {"Authorization": f"Bearer {config.api_key}"}
+        with _tracer.start_as_current_span(f"llm.{operation}", kind=SpanKind.CLIENT) as span:
+            span.set_attribute("gen_ai.request.model", config.model)
+            span.set_attribute("confpilot.llm.max_tokens", max_tokens)
+            for attempt in range(LLM_RETRIES + 1):
+                span.set_attribute("confpilot.llm.attempts", attempt + 1)
+                try:
+                    async with httpx.AsyncClient(timeout=LLM_TIMEOUT_S, transport=self.llm_transport) as http:
+                        response = await http.post(f"{config.base_url}/chat/completions", json=payload, headers=headers)
+                    response.raise_for_status()
+                    return str(response.json()["choices"][0]["message"]["content"])
+                except httpx.HTTPError as exc:
+                    if attempt < LLM_RETRIES and _is_retryable(exc):
+                        continue
+                    raise LlmError(f"llm.{operation} failed: {_describe(exc)}") from exc
+                except (KeyError, IndexError, TypeError, ValueError) as exc:
+                    raise LlmError(f"llm.{operation} returned an unexpected response shape") from exc
+        raise LlmError(f"llm.{operation} failed")  # unreachable; keeps the return type honest
 
     async def define_term(self, term: str, sentence: str) -> Term:
         """Ask the LLM for a glossary entry for a word the glossary does not have.
@@ -121,20 +168,21 @@ class LlmMixin(StoreBase):
                 max_words=MAX_DEF_WORDS,
                 feedback=feedback,
             )
-            reply = await self._complete(prompt, "define_term")
+            reply = await self._complete(prompt, "define", DEFINE_MAX_TOKENS)
             try:
                 return build_llm_term(term, parse_json_object(reply))
             except (ValueError, ValidationError) as exc:
                 feedback = f"\nYour previous answer was rejected: {exc}. Fix that."
-        raise EsStoreError(f"es.inference could not define '{term}' after {DEFINE_ATTEMPTS} attempts:{feedback}")
+        raise LlmError(f"llm.define could not define '{term}' after {DEFINE_ATTEMPTS} attempts:{feedback}")
 
     async def translate_defs(
         self, terms: Sequence[Term | Mapping[str, Any]], lang: Lang, save: bool = True
     ) -> dict[str, str]:
         """Translate each term's `simple_def` into one line of `lang`. Returns `{term_id: line}`.
 
-        With `save` (the default) the lines are also written to `translations.<lang>` in the
-        terms index, so `get_glossary()` serves them. Terms the model skips are left out.
+        Terms go to the model about 20 at a time. With `save` (the default) the lines are also
+        written to `translations.<lang>` in the terms index, so `get_glossary()` serves them.
+        A term the model skips is left out of the result.
         """
         if lang not in LANGUAGE_NAMES:
             raise ValueError(f"Unsupported language '{lang}'. Expected one of {sorted(LANGUAGE_NAMES)}.")
@@ -149,11 +197,11 @@ class LlmMixin(StoreBase):
             )
             prompt = _TRANSLATE_PROMPT.format(language=LANGUAGE_NAMES[lang], items=items)
             async with limit:
-                reply = await self._complete(prompt, "translate_defs")
+                reply = await self._complete(prompt, "translate", TRANSLATE_MAX_TOKENS)
             try:
                 lines = parse_json_object(reply)
             except ValueError as exc:
-                raise EsStoreError(f"es.inference returned an unusable translation batch: {exc}") from exc
+                raise LlmError(f"llm.translate returned an unusable batch: {exc}") from exc
             wanted = {term.id for term in batch}
             return {key: str(value).strip() for key, value in lines.items() if key in wanted and str(value).strip()}
 

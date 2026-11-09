@@ -1,6 +1,7 @@
 """ConfPilot's Elasticsearch layer. Import `EsStore` and the contract models from here."""
 
-from confpilot_es.config import ConfigError, EsConfig
+from confpilot_es.config import ConfigError, EsConfig, LlmConfig
+from confpilot_es.llm import LlmError
 from confpilot_es.models import (
     Glossary,
     HeardTerm,
@@ -23,6 +24,8 @@ __all__ = [
     "HeardTerm",
     "Knowledge",
     "KnowledgePatch",
+    "LlmConfig",
+    "LlmError",
     "Recap",
     "SearchHit",
     "Speaker",
