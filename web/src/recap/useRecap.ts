@@ -45,7 +45,7 @@ export function useRecap(): RecapView {
     return () => {
       current = false
     }
-    // Refetch when the phone has heard a new distinct term, so the screen stays fresh while it is open.
+    // Refetch for distinct new terms so the list stays fresh without requesting frequency-only updates.
   }, [room, me, ready, heardCount])
 
   const useRemote = remote !== null && (remote.heard.length > 0 || local.heard.length === 0)

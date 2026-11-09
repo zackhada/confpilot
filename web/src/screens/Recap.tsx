@@ -5,13 +5,13 @@ import { useTermSheet } from '@/shared/useTermSheet'
 
 export function Recap() {
   const { recap } = useRecap()
+  const heard = useRoom((s) => s.heard)
   const terms = useRoom((s) => s.terms)
   const knowledge = useRoom((s) => s.knowledge)
   const records = useRoom((s) => s.records)
   const openTerm = useTermSheet((s) => s.open)
-  const newTerms = recap.heard.filter(
-    ({ term_id }) => knowledge[term_id] !== 'known' && !records[term_id]?.learned,
-  )
+  const heardIds = new Set([...recap.heard.map((term) => term.term_id), ...Object.keys(heard)])
+  const newTerms = [...heardIds].filter((id) => knowledge[id] !== 'known' && !records[id]?.learned)
 
   return (
     <>
@@ -27,14 +27,14 @@ export function Recap() {
 
         {newTerms.length > 0 && (
           <ul aria-label="New terms" className="mt-6">
-            {newTerms.map(({ term_id }) => (
-              <li key={term_id} className="border-b border-rule">
+            {newTerms.map((id) => (
+              <li key={id} className="border-b border-rule">
                 <button
                   type="button"
-                  onClick={() => openTerm(term_id)}
+                  onClick={() => openTerm(id)}
                   className="min-h-12 w-full py-2 text-left font-semibold"
                 >
-                  {terms[term_id]?.term ?? term_id}
+                  {terms[id]?.term ?? id}
                 </button>
               </li>
             ))}
