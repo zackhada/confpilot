@@ -56,9 +56,9 @@ async function waitForCard(page: Page, term: string, timeout = 70_000): Promise<
 async function afterTalkShots(page: Page): Promise<void> {
   const tab = (name: string) => page.getByRole('link', { name, exact: true }).click()
   await tab('Recap')
-  await page.getByRole('heading', { name: 'Learn next' }).waitFor()
+  await page.getByRole('list', { name: 'New terms' }).waitFor()
   await shot(page, 'recap-375-dark')
-  await page.getByRole('heading', { name: 'Learn next' }).locator('..').getByRole('button').first().click()
+  await page.getByRole('list', { name: 'New terms' }).getByRole('button').first().click()
   await page.waitForTimeout(500)
   await shot(page, 'recap-375-dark-term')
   await page.getByRole('button', { name: 'Close' }).click()
