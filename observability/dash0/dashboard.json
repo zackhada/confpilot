@@ -1,0 +1,530 @@
+{
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "confpilot-word-to-card",
+    "dash0Extensions": {
+      "id": "confpilot-word-to-card"
+    }
+  },
+  "spec": {
+    "display": {
+      "name": "ConfPilot: word to card",
+      "description": "Stop nodding along. The product promise is speed: 95% of cards on screen within 800 ms of the word being spoken."
+    },
+    "panels": {
+      "slo_fraction": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Cards within 800 ms",
+            "description": "Share of cards painted within 800 ms of the word being spoken, over the last 30 minutes. The SLO target is 95%."
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "percent"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "100 * histogram_fraction(0, 800, sum(rate({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[30m])))",
+                    "seriesNameFormat": ""
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "p95_now": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Word-to-card p95",
+            "description": "95th percentile of the time from a word being spoken to its card being painted, last 5 minutes."
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "milliseconds"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "histogram_quantile(0.95, sum(rate({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[5m])))",
+                    "seriesNameFormat": ""
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "cards_total": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Cards shown",
+            "description": "Cards painted on phones in the last 30 minutes."
+          },
+          "plugin": {
+            "kind": "StatChart",
+            "spec": {
+              "calculation": "last-number",
+              "format": {
+                "unit": "decimal"
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "histogram_count(sum(increase({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[30m])))",
+                    "seriesNameFormat": ""
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "latency": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Word-to-card latency",
+            "description": "Median and tail of word-to-card time. The line at 800 ms is the SLO threshold."
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "mode": "list",
+                "position": "bottom",
+                "showLegend": true
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "milliseconds"
+                },
+                "show": true
+              },
+              "thresholds": {
+                "steps": [
+                  {
+                    "value": 800,
+                    "name": "SLO 800 ms"
+                  }
+                ]
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "histogram_quantile(0.5, sum(rate({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[2m])))",
+                    "seriesNameFormat": "p50"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "histogram_quantile(0.95, sum(rate({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[2m])))",
+                    "seriesNameFormat": "p95"
+                  }
+                }
+              }
+            },
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "histogram_quantile(0.99, sum(rate({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[2m])))",
+                    "seriesNameFormat": "p99"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "latency_by_tier": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "p95 by tier",
+            "description": "Where the time goes: on-device matches against server and LLM cards."
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "mode": "list",
+                "position": "bottom",
+                "showLegend": true
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "milliseconds"
+                },
+                "show": true
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "histogram_quantile(0.95, sum by (confpilot_card_tier) (rate({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[5m])))",
+                    "seriesNameFormat": "tier {{confpilot_card_tier}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "cards_by_tier": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Cards per minute by tier",
+            "description": "Tier 1 is matched on the phone, tier 2 by the Elasticsearch percolator, tier 3 is a new term defined by the LLM."
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "mode": "list",
+                "position": "bottom",
+                "showLegend": true
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal"
+                },
+                "show": true
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "60 * sum by (confpilot_card_tier) (histogram_count(rate({otel_metric_name=\"confpilot.card.word_to_card_ms\"}[2m])))",
+                    "seriesNameFormat": "tier {{confpilot_card_tier}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "ops": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "API operations per minute",
+            "description": "Every route and room event is a span, so this is the live shape of a conversation."
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "mode": "list",
+                "position": "bottom",
+                "showLegend": true
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal"
+                },
+                "show": true
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "60 * sum by (dash0_operation_name) (rate({otel_metric_name=\"dash0.spans\", service_name=\"confpilot-api\", dash0_operation_name!=\"\"}[2m]))",
+                    "seriesNameFormat": "{{dash0_operation_name}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "op_p95": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Slowest operations (p95)",
+            "description": "Server-side time per operation. The transcript relay must stay in single-digit milliseconds."
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "mode": "list",
+                "position": "bottom",
+                "showLegend": true
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "milliseconds"
+                },
+                "show": true
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "1000 * histogram_quantile(0.95, sum by (dash0_operation_name) (rate({otel_metric_name=\"dash0.spans.duration\", service_name=\"confpilot-api\", dash0_operation_name!=\"\"}[5m])))",
+                    "seriesNameFormat": "{{dash0_operation_name}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "errors": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Errors per minute",
+            "description": "Spans that ended in error, by operation."
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "mode": "list",
+                "position": "bottom",
+                "showLegend": true
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal"
+                },
+                "show": true
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "60 * sum by (dash0_operation_name) (rate({otel_metric_name=\"dash0.spans\", service_name=\"confpilot-api\", otel_span_status_code=\"ERROR\"}[2m]))",
+                    "seriesNameFormat": "{{dash0_operation_name}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "logs": {
+        "kind": "Panel",
+        "spec": {
+          "display": {
+            "name": "Log records per minute",
+            "description": "By severity."
+          },
+          "plugin": {
+            "kind": "TimeSeriesChart",
+            "spec": {
+              "legend": {
+                "mode": "list",
+                "position": "bottom",
+                "showLegend": true
+              },
+              "yAxis": {
+                "format": {
+                  "unit": "decimal"
+                },
+                "show": true
+              }
+            }
+          },
+          "queries": [
+            {
+              "kind": "TimeSeriesQuery",
+              "spec": {
+                "plugin": {
+                  "kind": "PrometheusTimeSeriesQuery",
+                  "spec": {
+                    "query": "60 * sum by (otel_log_severity_range) (rate({otel_metric_name=\"dash0.logs\", service_name=\"confpilot-api\"}[2m]))",
+                    "seriesNameFormat": "{{otel_log_severity_range}}"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "layouts": [
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "Is the promise holding? Cards within 800 ms of the word"
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 8,
+              "height": 5,
+              "content": {
+                "$ref": "#/spec/panels/slo_fraction"
+              }
+            },
+            {
+              "x": 8,
+              "y": 0,
+              "width": 8,
+              "height": 5,
+              "content": {
+                "$ref": "#/spec/panels/p95_now"
+              }
+            },
+            {
+              "x": 16,
+              "y": 0,
+              "width": 8,
+              "height": 5,
+              "content": {
+                "$ref": "#/spec/panels/cards_total"
+              }
+            },
+            {
+              "x": 0,
+              "y": 5,
+              "width": 16,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/latency"
+              }
+            },
+            {
+              "x": 16,
+              "y": 5,
+              "width": 8,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/latency_by_tier"
+              }
+            },
+            {
+              "x": 0,
+              "y": 13,
+              "width": 24,
+              "height": 6,
+              "content": {
+                "$ref": "#/spec/panels/cards_by_tier"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "kind": "Grid",
+        "spec": {
+          "display": {
+            "title": "The service behind it"
+          },
+          "items": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 12,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/ops"
+              }
+            },
+            {
+              "x": 12,
+              "y": 0,
+              "width": 12,
+              "height": 8,
+              "content": {
+                "$ref": "#/spec/panels/op_p95"
+              }
+            },
+            {
+              "x": 0,
+              "y": 8,
+              "width": 12,
+              "height": 6,
+              "content": {
+                "$ref": "#/spec/panels/errors"
+              }
+            },
+            {
+              "x": 12,
+              "y": 8,
+              "width": 12,
+              "height": 6,
+              "content": {
+                "$ref": "#/spec/panels/logs"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
