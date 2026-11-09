@@ -1,17 +1,24 @@
 ---
 title: "ConfPilot guardrails"
-description: "Enforce timezone, contract, OTel, and accessibility conventions on ConfPilot PRs"
+description: "Check the speed, instrumentation, Kubernetes, accessibility and secrets promises on every code PR"
 type: check
-when: "Any PR that modifies app/ (backend), the frontend, or adds/changes an /api endpoint"
-actions: "Post a checklist comment and add a needs-review label when a required convention is missing"
+when: "Any PR that modifies api/, web/, worker/, stt/, es/, deploy/, content/ or contracts/"
+actions: "Post a checklist comment listing each missing item, and add the needs-review label when any item is missing"
 ---
 
-When a PR touches the backend or frontend:
-- Verify every datetime returned to the client is UTC and timezone-aware (IANA zones).
-- Verify any /api change updates the Pydantic schema, OpenAPI doc, and frontend fetcher together.
-- Verify new endpoints emit an OTel span (auto or manual) with useful attributes.
-- Verify UI changes include ARIA labels, aria-live for dynamic content, keyboard operability,
-  and plain-language summaries.
-- If any of these are missing, post a comment listing exactly what is missing and add the
-  `needs-review` label.
-- Skip this check for PRs that only touch docs/, .github/, or .gitar/.
+Check only the parts the PR touches:
+
+- **api/, worker/, stt/**: every new or changed route or handler opens an OpenTelemetry span
+  with `confpilot.*` attributes. No LLM call is awaited in the live card or transcript path.
+- **web/**: every control has an accessible name, tap targets are at least 44 px, color is
+  never the only signal, animation respects `prefers-reduced-motion`, and no key or token is
+  present in client code.
+- **deploy/**: every Deployment has resource requests and limits, readiness and liveness
+  probes, and `app.kubernetes.io/*` labels. The API has exactly one replica. No secret values.
+- **content/**: every `simple_def` is 15 words or fewer and does not use its own term. Every
+  `prereqs` id exists. No common word is added as an alias.
+- **contracts/**: every consumer of a changed shape is updated in the same PR.
+- **anywhere**: nothing outside `reference/` uses code from `reference/`.
+
+If everything passes, post a one-line confirmation. Skip PRs that only touch `docs/`,
+`.github/` or `.gitar/`.

@@ -1,48 +1,57 @@
 # ConfPilot review instructions
 
-ConfPilot is an accessible AI conference companion: FastAPI backend + static accessible
-frontend, Elasticsearch (hybrid BM25 + semantic_text search + RAG), Dash0 OpenTelemetry
-end-to-end, Radar on Kubernetes, and every feature lands through Gitar-reviewed PRs.
+ConfPilot decodes the jargon each conference attendee doesn't know, the moment it is said,
+then turns the conference into their study plan. A phone app (PWA in `web/`) streams speech
+to text, matches jargon on the device, and talks to a FastAPI service (`api/`) over one
+WebSocket per phone. Elasticsearch is the only database. The promise is speed: 95% of cards
+render within 800 ms of the word being spoken. Review every PR against that promise and
+against the five rules below. Shapes are defined in `contracts/`.
 
-## Timezone-safe session times (REQUIRED)
-- All session times are stored and transmitted in **UTC** (ISO-8601 with `Z` or explicit `+00:00`).
-- Any time the backend returns a time to the client, it must carry an **IANA timezone** for the
-  event and the attendee's own timezone must be applied on the client (or via an explicit
-  `tz` query parameter), never hard-coded to a single venue timezone.
-- Flag any code that: stores local wall-clock time, formats datetimes without a timezone,
-  does `new Date()`/`datetime.now()` without converting to the target zone, or assumes the
-  conference venue timezone (Salt Lake City, America/Denver) applies to all attendees.
-- Look for DST boundary bugs: prefer IANA zone names over fixed `UTC±n` offsets.
+## 1. Instrumented (Dash0)
+- Every new or changed API route, WebSocket handler and worker handler opens an
+  OpenTelemetry span and sets `confpilot.*` attributes (for example `confpilot.room`,
+  `confpilot.card.tier`).
+- Elasticsearch, speech-to-text token and LLM calls each get their own child span.
+- Flag handlers that do I/O with no span, and `except` blocks that swallow an error without
+  recording it on the span.
 
-## API/frontend contract check (REQUIRED)
-- The frontend consumes `/api/*` responses only through the typed schemas under
-  `app/schemas/` (Pydantic) — the JSON keys must match exactly (snake_case).
-- A PR that changes an endpoint's request/response shape MUST update the matching schema,
-  the OpenAPI doc, AND the frontend fetcher in the same PR — flag any mismatch.
-- Flag: silently changing a field name/type, adding required fields without a frontend change,
-  returning bare `dict`/`JSONResponse` instead of the typed schema, or drifting from the
-  example responses in `docs/`.
+## 2. Nothing slow in the card path
+- The LLM is never awaited in a request or WebSocket handler that produces live cards. It
+  runs async and delivers its result as a later `card` event.
+- A `transcript` event is relayed to the room before any storage or search work.
+- Cards are never queued or delayed in the UI; animation must not postpone the first paint.
+- Flag any `await` of an LLM or a slow network call added to the transcript relay path.
 
-## OTel span required on new endpoints (REQUIRED)
-- Every new/updated FastAPI route must produce a span (auto-instrumentation is the baseline;
-  add a manual child span for any non-trivial unit of work: Elasticsearch calls, embedding
-  calls, LLM/RAG calls, external fetches).
-- Spans must set `service.name` and add useful attributes (e.g. `db.system`, `gen_ai.*`,
-  query shape, result count). Flag routes that do I/O with no span or that swallow exceptions
-  without recording them on the span (`span.record_exception`).
+## 3. Kubernetes hygiene (Radar)
+- Every Deployment has resource requests and limits, readiness and liveness probes, and
+  `app.kubernetes.io/name`, `app.kubernetes.io/component` and `app.kubernetes.io/part-of`
+  labels.
+- The API Deployment stays at one replica, because the room hub is in memory.
+- Nothing is broken on purpose. Flag any staged failure, chaos switch or deliberately low
+  limit.
 
-## Accessibility (ARIA) required on UI changes (REQUIRED)
-- Screen-reader-first: every interactive control needs a programmatic name
-  (`aria-label` / `aria-labelledby` / real text), visible focus, and keyboard operability.
-- Dynamic updates (search results, filter changes, status messages) must use `aria-live`
-  regions (`role="status"` / `role="alert"`) so changes are announced.
-- Semantic landmarks: `<nav>`, `<main>`, `<header>`, `<footer>`; exactly one `<h1>`.
-- Flag: `onclick` on a `<div>`/`<span>` with no `role`/`tabindex`/keyboard handler, images
-  without meaningful `alt`, color-only indicators, and any new UI text without a plain-language
-  summary option.
+## 4. Accessible (Merge Forward)
+- Every interactive control has an accessible name and is keyboard operable.
+- Tap targets are at least 44 px. Color never carries meaning on its own.
+- Captions and new cards are announced through an `aria-live` region.
+- Animation uses transform and opacity only, and respects `prefers-reduced-motion`.
 
-## General project gotchas
-- Keep PRs small and single-purpose; do not bundle unrelated changes (the team merges ~10
-  small PRs/day through Gitar).
-- Do not commit secrets; read them from env. `.secrets/` is gitignored.
-- Tests live beside the code (`tests/`); every endpoint change needs a test in the same PR.
+## 5. Glossary quality
+- `simple_def` is 15 words or fewer, in plain (B1) English, and never uses the term to
+  define itself.
+- Every `prereqs` id exists in the glossary, and there are no prerequisite cycles.
+- Common words are never added as aliases (for example "drag" for RAG). A term that is also
+  a common word must be marked `ambiguous` with `context` words.
+
+## 6. Secrets and contracts
+- Speech-to-text and LLM keys reach the browser only through `POST /api/token`. Flag any key,
+  token or `Authorization` value in `web/`, in a manifest, or in a workflow file.
+- A PR that changes a shape in `contracts/` updates every consumer in the same PR.
+- Nothing outside `reference/` imports, copies or builds code from `reference/`. That folder
+  is pre-kickoff code and is not part of the submission.
+
+## How the team works
+- PRs stay under 300 changed lines and do one thing.
+- Each directory has one owner (see the README). Flag a PR that edits another owner's
+  directory without saying why.
+- Logic changes come with a test in the same PR.
