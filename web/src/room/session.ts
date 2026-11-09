@@ -10,6 +10,7 @@ import { loadSaved, storeSaved } from './identity'
 import { loadServerKnowledge, recordStatus, resetKnowledge, setSeedKnowledge } from './knowledge'
 import { seedKnowledge, type Persona } from './personas'
 import { createRoomSocket, type RoomSocket, type SocketStatus } from './socket'
+import { reportCardPainted } from '@/telemetry/dash0'
 import { allCards, useRoom, wordsOf } from './store'
 
 const TIME_SYNC_INTERVAL_MS = 30_000
@@ -192,6 +193,7 @@ export function cardPainted(cardId: string): void {
   const renderedAt = clock.now()
   const ms = wordToCardMs(card.spoken_at, renderedAt)
   room.markPainted(cardId, renderedAt)
+  reportCardPainted({ wordToCardMs: ms, tier: card.tier, room: room.room })
   socket?.send({
     type: 'card.shown',
     card_id: card.card_id,
