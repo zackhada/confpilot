@@ -64,7 +64,7 @@ def chat(messages: list[dict], temperature: float = 0.2, max_tokens: int = 800) 
                 resp = client.post(url, json=payload, headers=_headers())
                 resp.raise_for_status()
                 data = resp.json()
-        except Exception as exc:  # noqa: BLE001 - surface as domain error
+        except Exception as exc:
             span.set_status(trace.Status(trace.StatusCode.ERROR, str(exc)))
             span.record_exception(exc)
             log.warning("LLM chat call failed: %s", exc)

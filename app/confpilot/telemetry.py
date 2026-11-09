@@ -61,7 +61,11 @@ def _setup_metrics(resource: Resource, exporter) -> None:
 
 
 def _setup_logs(resource: Resource, exporter) -> None:
-    from opentelemetry.sdk._logs import LoggingHandler, LoggerProvider, set_logger_provider
+    from opentelemetry.sdk._logs import (
+        LoggerProvider,
+        LoggingHandler,
+        set_logger_provider,
+    )
     from opentelemetry.sdk._logs.export import BatchLogRecordProcessor
 
     provider = LoggerProvider(resource=resource)
@@ -84,7 +88,9 @@ def _instrument() -> None:
         log.exception("Failed to instrument httpx")
 
     try:
-        from opentelemetry.instrumentation.elasticsearch import ElasticsearchInstrumentor
+        from opentelemetry.instrumentation.elasticsearch import (
+            ElasticsearchInstrumentor,
+        )
 
         ElasticsearchInstrumentor().instrument()
     except Exception:  # pragma: no cover - defensive
@@ -111,9 +117,15 @@ def setup_telemetry() -> None:
     if endpoint:
         base = _base_endpoint(endpoint)
         try:
-            from opentelemetry.exporter.otlp.proto.http.metric_exporter import OTLPMetricExporter
-            from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-            from opentelemetry.exporter.otlp.proto.http._log_exporter import OTLPLogExporter
+            from opentelemetry.exporter.otlp.proto.http._log_exporter import (
+                OTLPLogExporter,
+            )
+            from opentelemetry.exporter.otlp.proto.http.metric_exporter import (
+                OTLPMetricExporter,
+            )
+            from opentelemetry.exporter.otlp.proto.http.trace_exporter import (
+                OTLPSpanExporter,
+            )
 
             _setup_traces(resource, OTLPSpanExporter(endpoint=base))
             _setup_metrics(resource, OTLPMetricExporter(endpoint=base))

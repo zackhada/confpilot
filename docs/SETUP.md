@@ -1,5 +1,7 @@
 # SETUP.md — TONIGHT checklist (Sun Nov 8, 2026)
 
+> **Start here:** the per-product setup guides are in [setup/](setup/README.md). This file is the original long-form research.
+
 Everything you must create/install **tonight** so tomorrow morning is pure feature-building.
 Do these in order. Each section is copy-paste runnable. Time estimate per section is in the header.
 

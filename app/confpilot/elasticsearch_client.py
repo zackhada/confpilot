@@ -52,5 +52,5 @@ def es_available() -> bool:
         return False
     try:
         return bool(es.ping())
-    except Exception:
+    except Exception:  # noqa: BLE001 - health check must never raise
         return False
