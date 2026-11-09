@@ -7,6 +7,7 @@ import { ScreenHeader } from '@/shell/ScreenHeader'
 import { Announcer } from './Announcer'
 import { Captions } from './Captions'
 import { CardStack } from './CardStack'
+import { MicButton, MicNotice } from './MicControls'
 import { RoomStatus } from './RoomStatus'
 
 /** The hero screen: rolling captions on top, jargon cards by the thumb. Nothing scrolls. */
@@ -21,10 +22,18 @@ export function LiveScreen() {
     <MotionConfig reducedMotion="user">
       <ScreenHeader
         actions={
-          <Button variant="ghost" className="max-w-36 gap-1.5 px-2.5" onClick={switchPerson} aria-label={`Joined as ${me?.name ?? 'guest'}. Switch person`}>
-            <UserRound aria-hidden="true" />
-            <span className="truncate text-(length:--text-note)">{me?.name}</span>
-          </Button>
+          <>
+            <MicButton />
+            <Button
+              variant="ghost"
+              className="max-w-32 gap-1.5 px-2.5"
+              onClick={switchPerson}
+              aria-label={`Joined as ${me?.name ?? 'guest'}. Switch person`}
+            >
+              <UserRound aria-hidden="true" />
+              <span className="truncate text-(length:--text-note)">{me?.name}</span>
+            </Button>
+          </>
         }
       >
         <h1 className="sr-only">Live captions</h1>
@@ -44,6 +53,7 @@ export function LiveScreen() {
         emptyHint="Waiting for someone to speak. Captions will roll here."
         className="px-safe"
       />
+      <MicNotice />
       <CardStack />
       <Announcer />
     </MotionConfig>

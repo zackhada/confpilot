@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import type { LiveCard } from '@/lib/cards'
 import { cardPainted, markKnown, reopenCard, toggleSave } from '@/room/session'
 import { cardLatencyMs, useRoom } from '@/room/store'
+import { StartPanel } from './MicControls'
 import { TermCard } from './TermCard'
 import { usePaintStamp } from './usePaintStamp'
 
@@ -85,13 +86,7 @@ export function CardStack() {
   useEffect(() => {
     if (newestId) navigator.vibrate?.(12)
   }, [newestId])
-  if (full.length === 0 && chips.length === 0) {
-    return (
-      <p className="px-safe pb-3 text-(length:--text-note) text-ink-soft">
-        Cards appear here for words that are new to you.
-      </p>
-    )
-  }
+  if (full.length === 0 && chips.length === 0) return <StartPanel />
 
   return (
     <section aria-label="Terms new to you" className="pb-3">

@@ -5,6 +5,7 @@ import { personaById } from '@/room/personas'
 import { useProfile } from '@/room/profile'
 import { joinRoom, leaveRoom } from '@/room/session'
 import { Join } from '@/screens/Join'
+import { stopListening } from '@/stt/mic'
 import { TabBar } from './TabBar'
 
 /** Phone frame: the screen fills the space above a fixed bottom tab bar. */
@@ -25,7 +26,10 @@ export function AppShell() {
       lang: profile.lang,
       persona: personaById(profile.persona),
     })
-    return leaveRoom
+    return () => {
+      stopListening()
+      leaveRoom()
+    }
   }, [room, profile])
 
   if (!room || !profile) {
