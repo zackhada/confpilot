@@ -35,5 +35,5 @@ Hackathon rules and judging criteria: `docs/HACKATHON.md`.
 ## Layout
 
 `contracts/` shapes · `api/` FastAPI · `es/` mappings and queries · `web/` phone app and stage
-view · `observability/` Dash0 · `deploy/` EKS · `content/` glossary · `stt/` speech-to-text ·
-`worker/` LLM definer · `docs/` plan and setup · `reference/` do not use
+view · `observability/` Dash0 · `deploy/` EKS · `content/` glossary · `docs/` plan and setup ·
+`reference/` do not use
