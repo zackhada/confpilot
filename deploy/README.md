@@ -142,8 +142,10 @@ The image mirrors the repo: `/app/api` (working directory, with the virtualenv),
 `contracts/` and `content/glossary.json` enter the build context; to add another path,
 allow it in `Dockerfile.dockerignore` and copy it in the Dockerfile.
 
-Non-secret settings are in `k8s/configmap.yaml`. `ALLOWED_ORIGINS` is empty there because
-the phone app is served from the API's own origin.
+Non-secret settings are the `configMapGenerator` entries in `k8s/kustomization.yaml`. The
+generated ConfigMap's name carries a hash of its content, so changing a value and running
+`kubectl apply -k deploy/k8s` rolls the pod; old ConfigMaps are left behind and can be
+deleted. `ALLOWED_ORIGINS` is empty because the phone app is served from the API's own origin.
 
 ## One replica, and what a release costs
 
@@ -221,7 +223,7 @@ Where it meets our manifests:
 - The app's own OTel SDK reads `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SERVICE_NAME` and
   `OTEL_RESOURCE_ATTRIBUTES` from the `app-config` ConfigMap and `OTEL_EXPORTER_OTLP_HEADERS`
   from `app-credentials`, so traces reach Dash0 directly even without the operator.
-- The endpoint in `k8s/configmap.yaml` is our Dash0 region, us-west-2
+- The endpoint in `k8s/kustomization.yaml` is our Dash0 region, us-west-2
   (`https://ingress.us-west-2.aws.dash0.com:4318`).
 - The pod has a read-only root filesystem and only `/tmp` writable.
 
@@ -269,6 +271,9 @@ ping should keep sockets open.
   have not tried to create one. Nodes could pull from ECR through `HackathonEKSNodeRole`, but
   GitHub Actions has no way to push there without an OIDC provider or long-lived keys, so
   GHCR stays the registry.
-- Remove the placeholder or the whole app: `kubectl delete -k deploy/k8s`.
+- `kubectl delete -k deploy/k8s` removes everything, because it deletes the namespace: the
+  app, the tunnel (the public URL is gone for good), `app-credentials` and `ghcr-pull`. To
+  stop only the app, use `kubectl -n confpilot scale deployment/confpilot --replicas=0`; the
+  next `kubectl apply -k deploy/k8s` brings it back.
 - Delete the cluster when the event is over:
   `eksctl delete cluster -f deploy/eks/cluster.yaml --profile hackathon-team`.
