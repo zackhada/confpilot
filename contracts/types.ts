@@ -71,13 +71,18 @@ export interface SessionResponse {
 //      session's user has never joined.
 // 429: too many requests; the Retry-After header says how many seconds to wait.
 
-// POST /api/token
+// POST /api/token   (the body's user_id must be the session's own)
 export interface TokenRequest { user_id: string }
 export interface TokenResponse {
   provider: "deepgram";
   token: string; // short-lived; the real key never reaches the browser
   expires_in_s: number;
-  ws_url: string; // full streaming URL including model, encoding and keyterms
+  // Full streaming URL including model, encoding and keyterms. Browsers cannot set an
+  // Authorization header on a WebSocket, so pass the token as a subprotocol:
+  //   new WebSocket(ws_url, ["bearer", token])
+  // ("token" in place of "bearer" is for raw API keys and gets a 401 with this token.)
+  // The token only has to be valid when the socket opens: fetch a new one per connection.
+  ws_url: string;
 }
 
 // GET /api/glossary -> Glossary
