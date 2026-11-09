@@ -1,0 +1,201 @@
+﻿@import 'tailwindcss';
+
+/*
+ * ConfPilot design tokens.
+ *
+ * Direction: "house lights down". The hall is a deep indigo; captions are warm white; the
+ * newest jargon card is the one lit object on screen (a paper index card under a reading
+ * light). The light theme flips it: paper hall, ink card.
+ *
+ * Colour carries meaning and is always paired with an icon, label or underline style:
+ *   fresh  (amber) a term that is new to this person
+ *   known  (green) a term this person already knows
+ *   beyond (grey)  a term past this person's frontier
+ */
+:root {
+  color-scheme: dark;
+  --hall: #0c1326;
+  --hall-raised: #172142;
+  --hall-sunk: #070c1a;
+  --rule: #2c3861;
+  --ink: #f3eee2;
+  --ink-soft: #aab3cc;
+  --fresh: #ffb547;
+  --fresh-ink: #1c1404;
+  --known: #62d6a0;
+  --beyond: #98a1ba;
+  --mark-bg: rgb(255 181 71 / 0.16);
+  --mark-ink: #ffd08a;
+  --lit: #f6f0e2;
+  --lit-ink: #131a30;
+  --lit-soft: #4a5370;
+  --lit-rule: #d6ccb4;
+  --lit-fresh: #8a4b00;
+  --lit-known: #0b6b43;
+  --focus: #9fd8ff;
+  --danger: #ff9a8f;
+  --lift-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.75);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --hall: #f4efe4;
+  --hall-raised: #fffdf8;
+  --hall-sunk: #e9e1d0;
+  --rule: #cdc3ad;
+  --ink: #131a30;
+  --ink-soft: #4a5370;
+  --fresh: #8a4b00;
+  --fresh-ink: #fff7e8;
+  --known: #0b6b43;
+  --beyond: #5b6480;
+  --mark-bg: #ffe0a3;
+  --mark-ink: #3d2400;
+  --lit: #131a30;
+  --lit-ink: #f6f0e2;
+  --lit-soft: #b4bcd4;
+  --lit-rule: #33406b;
+  --lit-fresh: #ffb547;
+  --lit-known: #62d6a0;
+  --focus: #0a4f8f;
+  --danger: #a3271c;
+  --lift-shadow: 0 18px 36px -20px rgb(19 26 48 / 0.45);
+}
+
+@theme inline {
+  --color-hall: var(--hall);
+  --color-hall-raised: var(--hall-raised);
+  --color-hall-sunk: var(--hall-sunk);
+  --color-rule: var(--rule);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-fresh: var(--fresh);
+  --color-fresh-ink: var(--fresh-ink);
+  --color-known: var(--known);
+  --color-beyond: var(--beyond);
+  --color-mark-bg: var(--mark-bg);
+  --color-mark-ink: var(--mark-ink);
+  --color-lit: var(--lit);
+  --color-lit-ink: var(--lit-ink);
+  --color-lit-soft: var(--lit-soft);
+  --color-lit-rule: var(--lit-rule);
+  --color-lit-fresh: var(--lit-fresh);
+  --color-lit-known: var(--lit-known);
+  --color-focus: var(--focus);
+  --color-danger: var(--danger);
+
+  --font-sans: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --font-display: 'Young Serif', 'Iowan Old Style', Georgia, serif;
+
+  /* Type scale (rem, so it follows the reader's text size setting). */
+  --text-note: 0.8125rem;
+  --text-body: 1rem;
+  --text-lead: 1.1875rem;
+  --text-caption-past: 1.1875rem;
+  --text-caption-now: clamp(1.625rem, 1.2rem + 2.2vw, 2.125rem);
+  --text-headword: 1.875rem;
+  --text-title: clamp(2rem, 1.4rem + 3vw, 2.75rem);
+
+  --radius-card: 1.125rem;
+  --radius-chip: 999px;
+  --radius-control: 0.875rem;
+
+  --shadow-lift: var(--lift-shadow);
+}
+
+@layer base {
+  html {
+    background: var(--hall);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+    font-size: var(--text-body);
+    line-height: 1.45;
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* Inside the lit card the surface flips, so the focus ring flips with it. */
+  .on-lit {
+    --focus: var(--lit-ink);
+  }
+
+  ::selection {
+    background: var(--fresh);
+    color: var(--fresh-ink);
+  }
+}
+
+@layer utilities {
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Older captions fade towards the top of the caption well. */
+  .fade-top {
+    mask-image: linear-gradient(to bottom, transparent 0, #000 3.5rem);
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* A jargon word gets one short wash of light when it is first heard. Opacity only. */
+@keyframes term-flash {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes level-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
