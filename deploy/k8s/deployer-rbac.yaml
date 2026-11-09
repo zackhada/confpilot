@@ -1,0 +1,76 @@
+# Identity for GitHub Actions (the KUBE_CONFIG secret). RBAC lets it patch the confpilot
+# Deployment and watch the rollout: no Secrets, no exec, no other namespace. A patch can
+# still change anything in the pod spec, so deploy/cluster/deployer-admission-policy.yaml
+# narrows it to "change the app image to one from our registry"; apply that too.
+# The token is long-lived. Revoke it at any time with:
+#   kubectl -n confpilot delete secret deployer-token
+# Build the kubeconfig with deploy/make-deployer-kubeconfig.ps1.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: deployer
+  namespace: confpilot
+  labels:
+    app.kubernetes.io/name: deployer
+    app.kubernetes.io/component: ci
+    app.kubernetes.io/part-of: confpilot
+    app.kubernetes.io/managed-by: kustomize
+automountServiceAccountToken: false
+---
+# Long-lived token for the ServiceAccount; the control plane fills in the value.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: deployer-token
+  namespace: confpilot
+  labels:
+    app.kubernetes.io/name: deployer
+    app.kubernetes.io/component: ci
+    app.kubernetes.io/part-of: confpilot
+    app.kubernetes.io/managed-by: kustomize
+  annotations:
+    kubernetes.io/service-account.name: deployer
+type: kubernetes.io/service-account-token
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployer
+  namespace: confpilot
+  labels:
+    app.kubernetes.io/name: deployer
+    app.kubernetes.io/component: ci
+    app.kubernetes.io/part-of: confpilot
+    app.kubernetes.io/managed-by: kustomize
+rules:
+  # `kubectl set image` reads the Deployment, then patches it.
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    resourceNames: ["confpilot"]
+    verbs: ["get", "patch"]
+  # `kubectl rollout status` lists and watches; the pod list is for failure output.
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: deployer
+  namespace: confpilot
+  labels:
+    app.kubernetes.io/name: deployer
+    app.kubernetes.io/component: ci
+    app.kubernetes.io/part-of: confpilot
+    app.kubernetes.io/managed-by: kustomize
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: deployer
+subjects:
+  - kind: ServiceAccount
+    name: deployer
+    namespace: confpilot
