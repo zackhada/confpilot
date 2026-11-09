@@ -178,3 +178,57 @@ def test_agent_streams_retrieved_moments_then_model_answer(talked: TestClient, m
     assert len(moments["hits"]) == 3
     assert answer == {"type": "answer", "answer": "Ana said RAG needs vectors."}
     assert talked.post("/api/ask", json=body, headers=bearer(talked, "u-ben")).status_code == 403
+
+
+def test_agent_streams_null_answer_when_no_moments_match(talked: TestClient, monkeypatch) -> None:
+    async def no_moments(*_args, **_kwargs):
+        return []
+
+    llm_calls: list[httpx.Request] = []
+
+    def complete(request: httpx.Request) -> httpx.Response:
+        llm_calls.append(request)
+        return httpx.Response(200, json={})
+
+    monkeypatch.setattr(talked.app.state.store, "search", no_moments)
+    monkeypatch.setattr(talked.app.state.settings, "llm_api_key", SecretStr("test"))
+    monkeypatch.setattr(talked.app.state, "http_transport", httpx.MockTransport(complete))
+
+    response = talked.post("/api/ask", json={"room": "slc1", "question": "unmatched"})
+    events = [json.loads(line[6:]) for line in response.text.splitlines() if line]
+
+    assert response.status_code == 200
+    assert events == [
+        {"type": "moments", "hits": []},
+        {"type": "answer", "answer": None},
+    ]
+    assert llm_calls == []
+
+
+def test_agent_streams_null_answer_when_llm_key_is_missing(talked: TestClient, monkeypatch) -> None:
+    monkeypatch.setattr(talked.app.state.settings, "llm_api_key", None)
+    body = {"room": "slc1", "question": "What did Ana say about RAG?"}
+
+    response = talked.post("/api/ask", json=body)
+    events = [json.loads(line[6:]) for line in response.text.splitlines() if line]
+
+    assert response.status_code == 200
+    assert events[0]["type"] == "moments"
+    assert len(events[0]["hits"]) == 3
+    assert events[1] == {"type": "answer", "answer": None}
+
+
+def test_agent_streams_null_answer_when_llm_request_fails(talked: TestClient, monkeypatch) -> None:
+    def fail(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(503)
+
+    monkeypatch.setattr(talked.app.state.settings, "llm_api_key", SecretStr("test"))
+    monkeypatch.setattr(talked.app.state, "http_transport", httpx.MockTransport(fail))
+    body = {"room": "slc1", "question": "What did Ana say about RAG?"}
+
+    response = talked.post("/api/ask", json=body)
+    events = [json.loads(line[6:]) for line in response.text.splitlines() if line]
+
+    assert response.status_code == 200
+    assert events[0]["type"] == "moments"
+    assert events[1] == {"type": "answer", "answer": None}
