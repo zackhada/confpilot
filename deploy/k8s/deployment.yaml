@@ -64,6 +64,10 @@ spec:
           envFrom:
             - configMapRef:
                 name: app-config
+            # Created by a human, never committed. Keys: SESSION_SECRET (kept here so
+            # sessions survive a restart), ES_URL, ES_API_KEY, DEEPGRAM_API_KEY,
+            # LLM_API_KEY, OTEL_EXPORTER_OTLP_HEADERS. Optional, so the pod starts
+            # without it.
             - secretRef:
                 name: app-credentials
                 optional: true
