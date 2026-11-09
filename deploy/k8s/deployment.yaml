@@ -1,0 +1,112 @@
+# The API keeps the room hub in memory, so it is exactly ONE replica (contracts/README.md).
+#
+# Rollout strategy: RollingUpdate with maxSurge 1 / maxUnavailable 0, not Recreate.
+#   Recreate stops the old pod first, so the site is down for the whole image pull and
+#   startup of the new one (15-40 s, and for good if the new image is broken).
+#   With surge, the old pod keeps serving until the new one passes readiness. Kubernetes
+#   then sends SIGTERM to the old pod, uvicorn closes its WebSockets, and every phone
+#   reconnects to the new pod. The two pods overlap for a second or two; a phone that
+#   connects to the old one in that window is dropped with the rest and reconnects, so the
+#   room converges on one hub. There is no preStop sleep on purpose: it would only keep the
+#   old hub alive longer. A broken image never takes the demo down, because the old pod
+#   stays until the new one is Ready.
+# Do not raise `replicas`, and do not add an HPA.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confpilot
+  namespace: confpilot
+  labels:
+    app.kubernetes.io/name: confpilot
+    app.kubernetes.io/component: api
+    app.kubernetes.io/part-of: confpilot
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  replicas: 1
+  revisionHistoryLimit: 5
+  progressDeadlineSeconds: 180
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: confpilot
+      app.kubernetes.io/component: api
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: confpilot
+        app.kubernetes.io/component: api
+        app.kubernetes.io/part-of: confpilot
+        app.kubernetes.io/managed-by: kustomize
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 15
+      # Needed only while the GHCR package is private. A missing Secret is ignored.
+      imagePullSecrets:
+        - name: ghcr-pull
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: ghcr.io/zackhada/confpilot:main
+          # `:main` moves, so always ask the registry; `:<sha>` tags are unaffected.
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: app-config
+            # Created by a human, never committed. Keys: SESSION_SECRET (kept here so
+            # sessions survive a restart), ES_URL, ES_API_KEY, DEEPGRAM_API_KEY,
+            # LLM_API_KEY, OTEL_EXPORTER_OTLP_HEADERS. Optional, so the pod starts
+            # without it.
+            - secretRef:
+                name: app-credentials
+                optional: true
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir:
+            sizeLimit: 64Mi

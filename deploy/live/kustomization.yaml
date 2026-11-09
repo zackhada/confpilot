@@ -1,0 +1,22 @@
+# Demo rollout: the app image from ECR, behind CloudFront. Local only until the deploy PRs land.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../k8s
+images:
+  - name: ghcr.io/zackhada/confpilot
+    newName: 045129524740.dkr.ecr.us-east-1.amazonaws.com/confpilot
+    newTag: demo-1
+configMapGenerator:
+  - name: app-config
+    namespace: confpilot
+    behavior: merge
+    literals:
+      - ALLOWED_ORIGINS=https://d1e92cjyapmt2m.cloudfront.net,https://finest-catering-literary-components.trycloudflare.com
+patches:
+  - target:
+      kind: Deployment
+      name: confpilot
+    patch: |-
+      - op: remove
+        path: /spec/template/spec/imagePullSecrets
