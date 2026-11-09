@@ -38,9 +38,7 @@ describe('askRoom', () => {
     )
     const events: AskEvent[] = []
     const request: AskRequest = { room: 'demo', question: 'What happened?' }
-
     await askRoom('Clayton', request, (event) => events.push(event), new AbortController().signal)
-
     expect(events).toEqual([
       { type: 'moments', hits: [] },
       { type: 'answer', answer: null },
