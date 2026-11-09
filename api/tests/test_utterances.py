@@ -230,9 +230,9 @@ def test_percolator_only_terms_become_tier_2_cards_for_everyone_but_the_speaker(
     assert to_ben[0]["spoken_at"] == T0 + last_word_end
     assert to_ana == []  # no card for words you said yourself
     utterance = client.app.state.store._utterances["slc1"][("u-ana", "utt-a1")]
-    assert utterance.term_ids == ["rag", "bm25", "kubernetes", "hybrid-search", "not-a-term"]
+    assert utterance.term_ids == ["rag", "bm25", "kubernetes", "hybrid-search"]
     percolates = [s for s in spans.get_finished_spans() if s.name == "utterance.percolate"]
-    assert percolates[0].attributes["confpilot.percolate.extra"] == 2
+    assert percolates[0].attributes["confpilot.percolate.extra"] == 1
     server = [s for s in spans.get_finished_spans() if s.name == "card.server"]
     assert server[0].attributes["confpilot.card.count"] == 1
 

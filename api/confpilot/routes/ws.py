@@ -149,6 +149,7 @@ def handle_transcript(state: State, connection: Connection, event: TranscriptEve
             relayed,
             words,
             admitted_at,
+            state.terms_by_id.keys(),
             server_card_sender(state, connection, event),
         )
         if not spawn(storing, "store_final"):
