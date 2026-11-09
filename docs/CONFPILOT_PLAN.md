@@ -344,7 +344,7 @@ The pitch runs 3 minutes, and all four of us speak. Rows marked "(cut)" come out
 
 The five must-catch terms are SRE, RAG, embed, BM25 and RRF. A take passes only if all five are caught, and the demo needs every take to pass.
 
-1. **Fixtures.** Skyler has the talk track rendered in seven synthetic English accents: two Indian, British, Australian, Irish, South African and US. Audio stays out of git. Add 2–3 real takes recorded on each speaker's own phone in the venue, since those matter most.
+1. **Fixtures.** `content/stt-fixtures/talk_track.txt` holds the talk track, and `content/make_fixtures.sh` renders it in seven synthetic English accents: two Indian, British, Australian, Irish, South African and US. Audio stays out of git. Add 2–3 real takes recorded on each speaker's own phone in the venue, since those matter most.
 2. **Run.** `DEEPGRAM_API_KEY=... content/stt_test.sh` sends each take to Deepgram with the same model and keyterms as the app. It then scores the transcripts with `python3 content/build_glossary.py --check` and exits with an error if any must-catch term is missed, so it can run in CI.
 3. **Fix what it finds.** Each miss becomes a new keyterm or a glossary alias, landed through a Gitar-reviewed PR.
 4. **Final check.** Before the demo, replay one real take through the live streaming path on both phones. That proves the whole chain, from audio to card.
