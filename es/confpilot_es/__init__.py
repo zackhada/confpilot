@@ -1,4 +1,4 @@
-﻿"""ConfPilot's Elasticsearch layer. Import the contract models from here."""
+"""ConfPilot's Elasticsearch layer. Import the contract models from here."""
 
 from confpilot_es.config import ConfigError, EsConfig
 from confpilot_es.models import (
