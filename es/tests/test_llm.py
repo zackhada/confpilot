@@ -102,6 +102,16 @@ async def test_an_unexpected_response_shape_is_reported() -> None:
     store, _, _ = llm_store(httpx.Response(200, json={"choices": []}))
     with pytest.raises(LlmError, match="unexpected response shape"):
         await store.define_term("eBPF", "x")
+    cut_off = {"choices": [{"finish_reason": "length", "message": {"role": "assistant", "content": ""}}]}
+    store, _, _ = llm_store(httpx.Response(200, json=cut_off))
+    with pytest.raises(LlmError, match=r"empty reply \(finish_reason: length\)"):
+        await store.define_term("eBPF", "x")
+
+
+def test_thinking_is_switched_off_for_anthropic_only() -> None:
+    anthropic = LlmConfig(base_url="https://api.anthropic.com/v1", api_key="k", model="m")
+    assert anthropic.extra_body == {"thinking": {"type": "disabled"}}
+    assert CONFIG.extra_body == {}
 
 
 async def test_translate_defs_batches_and_saves_only_requested_ids() -> None:

@@ -131,6 +131,7 @@ class LlmMixin(StoreBase):
             "model": config.model,
             "max_tokens": max_tokens,
             "messages": [{"role": "user", "content": prompt}],
+            **config.extra_body,
         }
         headers = {"Authorization": f"Bearer {config.api_key}"}
         with _tracer.start_as_current_span(f"llm.{operation}", kind=SpanKind.CLIENT) as span:
@@ -142,7 +143,12 @@ class LlmMixin(StoreBase):
                     async with httpx.AsyncClient(timeout=LLM_TIMEOUT_S, transport=self.llm_transport) as http:
                         response = await http.post(f"{config.base_url}/chat/completions", json=payload, headers=headers)
                     response.raise_for_status()
-                    return str(response.json()["choices"][0]["message"]["content"])
+                    choice = response.json()["choices"][0]
+                    content = choice["message"]["content"]
+                    if not content:
+                        reason = choice.get("finish_reason")
+                        raise LlmError(f"llm.{operation} returned an empty reply (finish_reason: {reason})")
+                    return str(content)
                 except httpx.HTTPError as exc:
                     if attempt < LLM_RETRIES and _is_retryable(exc):
                         continue

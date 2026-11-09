@@ -55,6 +55,16 @@ class LlmConfig:
     api_key: str
     model: str
 
+    @property
+    def extra_body(self) -> dict[str, object]:
+        """Provider-specific request fields.
+
+        Anthropic models think before answering by default, and that thinking is billed against
+        `max_tokens`: with a small budget the visible reply comes back empty. These helpers are
+        short formatting tasks, so thinking is switched off.
+        """
+        return {"thinking": {"type": "disabled"}} if "anthropic.com" in self.base_url else {}
+
 
 def load_llm_config() -> LlmConfig:
     """Read LLM_BASE_URL, LLM_API_KEY and LLM_MODEL from the environment or the file at ENV_FILE."""

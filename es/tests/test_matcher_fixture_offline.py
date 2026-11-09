@@ -7,12 +7,13 @@ from pathlib import Path
 
 import pytest
 
-from confpilot_es.models import Glossary
+from confpilot_es.models import Term
 
 from .offline_percolator import offline_percolate
 
 FIXTURES = Path(__file__).resolve().parents[2] / "contracts" / "fixtures"
-SAMPLE_TERMS = Glossary.model_validate_json((FIXTURES / "glossary.sample.json").read_text(encoding="utf-8")).terms
+SAMPLE = json.loads((FIXTURES / "glossary.sample.json").read_text(encoding="utf-8"))
+SAMPLE_TERMS = [Term.model_validate(term) for term in SAMPLE["terms"]]
 MATCHER_CASES = json.loads((FIXTURES / "matcher_cases.json").read_text(encoding="utf-8"))
 TWO_FORM_CASES = json.loads((Path(__file__).parent / "two_form_cases.json").read_text(encoding="utf-8"))
 
