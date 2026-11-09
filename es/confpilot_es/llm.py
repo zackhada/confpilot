@@ -71,9 +71,13 @@ def build_llm_term(term: str, fields: Mapping[str, Any]) -> Term:
     word_count = len(simple_def.split())
     if not 0 < word_count <= MAX_DEF_WORDS:
         raise ValueError(f"simple_def has {word_count} words; it needs 1 to {MAX_DEF_WORDS}")
-    if re.search(rf"(?<!\w){re.escape(display)}(?!\w)", simple_def, re.IGNORECASE):
+    forms = {display, term.strip()}
+    if any(re.search(rf"(?<!\w){re.escape(form)}(?!\w)", simple_def, re.IGNORECASE) for form in forms):
         raise ValueError("simple_def uses the term to define itself")
-    aliases = [str(alias).strip().lower() for alias in fields.get("aliases") or [] if str(alias).strip()]
+    raw_aliases = fields.get("aliases") or []
+    if not isinstance(raw_aliases, list):
+        raise ValueError("aliases must be a list of strings")
+    aliases = [term.strip().lower()] + [str(alias).strip().lower() for alias in raw_aliases if str(alias).strip()]
     return Term(
         id=slugify(display),
         term=display,

@@ -45,6 +45,18 @@ def test_reply_parsing_and_validation() -> None:
     term = build_llm_term("ebpf", parse_json_object(GOOD_REPLY))
     assert (term.id, term.term, term.source, term.level, term.category) == ("ebpf", "eBPF", "llm", 4, "cloud")
     assert term.aliases == ["extended berkeley packet filter"]  # the term itself is not an alias
+    renamed = build_llm_term(
+        "elastic sock",
+        {"term": "Elasticsearch", "simple_def": "A search engine for large collections of data."},
+    )
+    assert renamed.aliases == ["elastic sock"]
+    with pytest.raises(ValueError, match="define itself"):
+        build_llm_term(
+            "elastic sock",
+            {"term": "Elasticsearch", "simple_def": "Elastic Sock is a search engine for data."},
+        )
+    with pytest.raises(ValueError, match="aliases must be a list"):
+        build_llm_term("ebpf", {"simple_def": "Runs programs inside the Linux kernel.", "aliases": 7})
     assert slugify("Service Mesh (Istio)") == "service-mesh-istio"
     with pytest.raises(ValueError, match="21 words"):
         build_llm_term("ebpf", parse_json_object(LONG_REPLY))
@@ -71,6 +83,16 @@ async def test_define_term_asks_again_with_feedback_when_the_reply_breaks_the_ru
     assert (await store.define_term("eBPF", "We moved the proxies to eBPF.")).source == "llm"
     prompts = [json.loads(request.content)["messages"][0]["content"] for request in requests]
     assert "rejected" in prompts[1] and "rejected" not in prompts[0]
+
+
+async def test_define_term_retries_when_aliases_are_not_a_list() -> None:
+    malformed = chat(json.dumps({"term": "eBPF", "aliases": 7, "simple_def": "Runs programs inside the Linux kernel."}))
+    store, requests = llm_store(malformed, chat(GOOD_REPLY))
+
+    assert (await store.define_term("eBPF", "We moved the proxies to eBPF.")).source == "llm"
+    assert len(requests) == 2
+    retry_prompt = json.loads(requests[1].content)["messages"][0]["content"]
+    assert "aliases must be a list of strings" in retry_prompt
 
 
 async def test_define_term_gives_up_clearly() -> None:
