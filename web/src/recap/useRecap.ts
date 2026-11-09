@@ -18,11 +18,14 @@ export interface RecapView {
 export function useRecap(): RecapView {
   const room = useRoom((s) => s.room)
   const me = useRoom((s) => s.me)
+  const ready = useRoom((s) => s.status === 'open' && s.members.some((m) => m.user_id === s.me?.user_id))
   const heard = useRoom((s) => s.heard)
+  const heardCount = Object.keys(heard).length
   const shownTermIds = useRoom((s) => s.stack.shownTermIds)
   const terms = useRoom((s) => s.terms)
   const knowledge = useRoom((s) => s.knowledge)
-  const [remote, setRemote] = useState<Recap | null>(null)
+  const [result, setResult] = useState<{ userId: string; recap: Recap } | null>(null)
+  const remote = result && result.recap.room === room && result.userId === me?.user_id ? result.recap : null
 
   const local = useMemo(
     () => localRecap({ room: room ?? '', heard, shownTermIds, terms: Object.values(terms), knowledge }),
@@ -30,20 +33,20 @@ export function useRecap(): RecapView {
   )
 
   useEffect(() => {
-    if (!room || !me) return
+    if (!room || !me || !ready) return
     let current = true
     fetchRecap(me.name, room, me.user_id)
       .then((recap) => {
-        if (current) setRemote(recap)
+        if (current) setResult({ userId: me.user_id, recap })
       })
       .catch(() => {
-        if (current) setRemote(null)
+        if (current) setResult(null)
       })
     return () => {
       current = false
     }
-    // Refetch when the phone has heard more, so the screen stays fresh while it is open.
-  }, [room, me, shownTermIds.length])
+    // Refetch for distinct new terms so the list stays fresh without requesting frequency-only updates.
+  }, [room, me, ready, heardCount])
 
   const useRemote = remote !== null && (remote.heard.length > 0 || local.heard.length === 0)
   return useRemote ? { recap: remote, source: 'api' } : { recap: local, source: 'local' }

@@ -38,6 +38,9 @@ class Store(Protocol):
     async def touch_session(self, room: str, speaker: Speaker | None, at: int) -> RoomSession:
         """Create the room's session if needed, record activity and the speaker."""
 
+    async def percolate(self, text: str) -> list[str]:
+        """Glossary term ids spoken in ``text`` (tier 2). Empty when the store has no percolator."""
+
     async def get_session(self, room: str) -> RoomSession | None:
         """The room's session, or None if nothing happened there."""
 
@@ -115,6 +118,9 @@ class MemoryStore:
         )
         self._sessions[room] = updated
         return updated
+
+    async def percolate(self, text: str) -> list[str]:
+        return []  # no percolator in memory: the phone's tier 1 matcher is all there is
 
     async def get_session(self, room: str) -> RoomSession | None:
         return self._sessions.get(room)

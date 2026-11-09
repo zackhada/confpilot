@@ -1,8 +1,10 @@
 # Performance baseline
 
-Measured Nov 9, 2026, 3:30 to 3:40 PM MT, on `main` at `0036a06`. Targets are first guesses
-from the planning prompt, not requirements from the plan. This repo-wide baseline lives in the top-level
-`docs/` rather than `web/docs/` because it covers the phone, speech, API asset delivery and Elasticsearch.
+Hops 1, 2 and 4 measured Nov 9, 2026, 3:30 to 3:40 PM MT, on `main` at `0036a06`. Hop 3 and the 4b Lighthouse
+'after' run were measured later on `main` at `42c051e` (#39). Targets are first guesses from the planning prompt,
+not requirements from the plan. This repo-wide baseline lives in the top-level `docs/` rather than `web/docs/`
+because it covers the phone, speech, API asset delivery and Elasticsearch. This update adds room-relay timing and
+the Lighthouse comparison to capture the end-to-end performance impact of #39's asset delivery change.
 
 ## Hot path
 
@@ -11,8 +13,9 @@ from the planning prompt, not requirements from the plan. This repo-wide baselin
 | 1. Audio to interim caption (Deepgram lag) | 119 to 141 ms | 264 to 437 ms | under 300 ms p50 | Two runs streaming a 21 s speech clip in real time, in 43 ms chunks (the phone's worklet batch), to Deepgram with the app's own `listen_url` and keyterms, from a laptop on Wi-Fi. Lag = arrival time minus the end of the audio the result covers. |
 | 1b. Audio to final transcript | 123 to 137 ms | 198 to 332 ms | none | Same runs. |
 | 2. Transcript to card (phone compute) | 0.03 ms | 0.2 ms (max 7.8 ms) | under 150 ms p50 | 2,400 timed calls of the matcher plus `reduceTranscript` (the work the phone does per interim, word by word through the same 21 s script, 50 rounds) in Node on the laptop. 12 cards found. Index build is 12.5 ms, once per glossary load. A phone is slower, but even at 10 times this the hop is a few ms plus one frame to paint. Cards come from interims, so no card waits for a final. On-device word-to-card time is reported to Dash0 as `confpilot.card.word_to_card_ms` on every card paint; no phone session has sent one yet. |
-| 3. Room WebSocket fan-out | not measured | | under 100 ms added | Needs two phones on the tunnel. Not in the card path: each phone matches its own captions locally. |
-| 4. First-load bytes on the wire | before 605 KB, after **192 KB** | | JS under 150 KB gzipped | index.html plus entry JS, CSS and App chunk from a real `pnpm build`, served by the API. The API sent them uncompressed with no cache headers; #39 adds gzip and `immutable` caching for hashed assets. Gzipped JS alone is 184 KB, still over the 150 KB target. Lighthouse was not run. |
+| 3. Room WebSocket fan-out (server relay) | 1.4 ms | 1.5 ms (max 3.7 ms) | under 100 ms added | 300 interim transcripts sent by one speaker through the real room WebSocket handler (in-process test client), timed until both a second phone and the stage view received each. Network time over the tunnel is extra and needs two phones to measure. |
+| 4. First-load bytes on the wire | before 605 KB, after **192 KB** | | JS under 150 KB gzipped | index.html plus entry JS, CSS and App chunk from a real `pnpm build`, served by the API. The API sent them uncompressed with no cache headers; #39 adds gzip and `immutable` caching for hashed assets. Gzipped JS alone is 184 KB, still over the 150 KB target. |
+| 4b. Lighthouse mobile (simulated slow 4G) | before: score 71, interactive 5.0 s, FCP 3.6 s, 634 KiB. After: **score 89, interactive 3.1 s, FCP 2.0 s, 255 KiB** | | interactive under 2 s | Lighthouse 12, headless Chrome. Before = the pre-#39 server on the local demo build; after = main with #39 serving a main build. Interactive is still over 2 s; the remaining cost is JS size (see next steps). |
 | 5. ES calls blocking captions | no | | never | Captions go phone to Deepgram to phone. The API and Elasticsearch are not in that path. |
 
 ## What was checked and ruled out
@@ -25,7 +28,7 @@ from the planning prompt, not requirements from the plan. This repo-wide baselin
 
 ## Verdict
 
-Hops 1 and 2, the top priorities, meet their targets as measured, so no code change was needed there.
+Hops 1, 2 and the server side of 3 meet their targets as measured, so no code change was needed there.
 Hop 4: first-load download fell 68 percent with gzip and caching (#39). Gzipped JS is still
 184 KB against the 150 KB target; lazy routes saved under 2 percent and were reverted. The bigger fix is listed below and was left until after the demo on purpose.
 
@@ -33,7 +36,7 @@ Hop 4: first-load download fell 68 percent with gzip and caching (#39). Gzipped 
 
 | Change | Result | Kept? |
 | --- | --- | --- |
-| gzip plus immutable cache headers on the API (#39) | First-load wire bytes 605 KB to 192 KB (-68 percent), about 3.0 s to 1.0 s on a 1.6 Mbps slow-4G link. Repeat visits reuse cached assets. | Yes |
+| gzip plus immutable cache headers on the API (#39) | First-load wire bytes 605 KB to 192 KB (-68 percent), about 3.0 s to 1.0 s on a 1.6 Mbps slow-4G link; Lighthouse mobile 71 to 89, interactive 5.0 s to 3.1 s. Repeat visits reuse cached assets. | Yes |
 | Lazy-load Recap, Flashcards and Ask routes | Initial JS 186 to 183 KB. The App chunk lost 17 KB but a 14 KB shared chunk still loads on first paint. | No, under 2 percent |
 
 ## Next steps, if there is time after the demo

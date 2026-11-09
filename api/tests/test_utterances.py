@@ -196,3 +196,71 @@ def test_an_early_started_at_cannot_remove_a_stored_final(client: TestClient) ->
 
     assert stored(client) == {("u-ana", "utt-a1"): SENTENCE}
     assert client.app.state.store._utterances["slc1"][("u-ana", "utt-a1")].spoken_at == T0
+
+
+def _cards(socket, rounds: int = 3) -> list[dict]:
+    """Tier 2 cards come from background work, so give it a few ping round trips."""
+    seen: list[dict] = []
+    for _ in range(rounds):
+        seen += [event for event in settle(socket) if event["type"] == "card"]
+    return seen
+
+
+def test_percolator_only_terms_become_tier_2_cards_for_everyone_but_the_speaker(
+    client: TestClient, spans, monkeypatch
+) -> None:
+    async def percolate(text: str) -> list[str]:
+        # The phone already matched rag, bm25 and kubernetes; "not-a-term" is not in the glossary.
+        return ["rag", "hybrid-search", "kubernetes", "not-a-term", "hybrid-search"]
+
+    monkeypatch.setattr(client.app.state.store, "percolate", percolate)
+    with (
+        client.websocket_connect(_ana(client)) as ana,
+        client.websocket_connect(_ben(client)) as ben,
+    ):
+        ana.send_json(final("utt-a1", SENTENCE))
+        settle(ana)
+        to_ben = _cards(ben)
+        to_ana = _cards(ana)
+
+    assert [(c["tier"], c["term"]["id"], c["utterance_id"]) for c in to_ben] == [
+        (2, "hybrid-search", "utt-a1")
+    ]
+    last_word_end = (len(SENTENCE.split()) - 1) * 100 + 90
+    assert to_ben[0]["spoken_at"] == T0 + last_word_end
+    assert to_ana == []  # no card for words you said yourself
+    utterance = client.app.state.store._utterances["slc1"][("u-ana", "utt-a1")]
+    assert utterance.term_ids == ["rag", "bm25", "kubernetes", "hybrid-search"]
+    percolates = [s for s in spans.get_finished_spans() if s.name == "utterance.percolate"]
+    assert percolates[0].attributes["confpilot.percolate.extra"] == 1
+    server = [s for s in spans.get_finished_spans() if s.name == "card.server"]
+    assert server[0].attributes["confpilot.card.count"] == 1
+
+
+def test_a_failing_percolator_still_stores_the_final_without_cards(
+    client: TestClient, spans, monkeypatch
+) -> None:
+    async def percolate(text: str) -> list[str]:
+        raise RuntimeError("elasticsearch is down")
+
+    monkeypatch.setattr(client.app.state.store, "percolate", percolate)
+    with (
+        client.websocket_connect(_ana(client)) as ana,
+        client.websocket_connect(_ben(client)) as ben,
+    ):
+        ana.send_json(final("utt-a1", SENTENCE))
+        settle(ana)
+        to_ben = _cards(ben)
+
+    assert to_ben == []
+    assert stored(client) == {("u-ana", "utt-a1"): SENTENCE}
+    utterance = client.app.state.store._utterances["slc1"][("u-ana", "utt-a1")]
+    assert utterance.term_ids == ["rag", "bm25", "kubernetes"]
+    failed = [s for s in spans.get_finished_spans() if s.name == "utterance.percolate"]
+    assert failed[0].status.status_code.name == "ERROR"
+
+
+def test_the_memory_store_has_no_percolator(client: TestClient) -> None:
+    import asyncio
+
+    assert asyncio.run(client.app.state.store.percolate("RAG on Kubernetes")) == []
