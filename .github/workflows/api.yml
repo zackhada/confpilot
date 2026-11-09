@@ -1,0 +1,38 @@
+name: API
+on:
+  pull_request:
+    paths:
+      - "api/**"
+      - "contracts/**"
+      - "content/**"
+      - ".github/workflows/api.yml"
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+      - "contracts/**"
+      - "content/**"
+      - ".github/workflows/api.yml"
+permissions:
+  contents: read
+jobs:
+  test:
+    name: Lint and test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: api/uv.lock
+      - name: Install (Python 3.12, locked)
+        run: uv sync --locked --python 3.12
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format
+        run: uv run ruff format --check .
+      - name: Tests
+        run: uv run pytest -q
