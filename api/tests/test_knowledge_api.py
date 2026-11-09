@@ -168,11 +168,21 @@ def test_agent_streams_retrieved_moments_then_model_answer(talked: TestClient, m
             200, json={"choices": [{"message": {"content": "Ana said RAG needs vectors."}}]}
         )
 
+    queries = []
+    search = talked.app.state.store.search
+
+    async def capture_search(q, room, limit=20):
+        queries.append(q)
+        return await search(q, room=room, limit=limit)
+
+    monkeypatch.setattr(talked.app.state.store, "search", capture_search)
     monkeypatch.setattr(talked.app.state.settings, "llm_api_key", SecretStr("test"))
     monkeypatch.setattr(talked.app.state, "http_transport", httpx.MockTransport(complete))
     body = {"room": "slc1", "question": "What did Ana say about RAG?"}
     response = talked.post("/api/ask", json=body)
     assert response.headers["content-type"].startswith("text/event-stream")
+    assert len(queries) == 1
+    assert queries[0].startswith(f"{body['question']} ")
     moments, answer = [json.loads(line[6:]) for line in response.text.splitlines() if line]
     assert moments["type"] == "moments"
     assert len(moments["hits"]) == 3

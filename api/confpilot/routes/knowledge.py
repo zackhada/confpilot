@@ -137,7 +137,7 @@ async def ask(request: Request, body: AskRequest, user: CurrentUser) -> Streamin
             for term in request.app.state.glossary.terms
             if term.id in term_ids
         ]
-        query = " ".join(subjects) or body.question
+        query = " ".join([body.question, *subjects])
         hits = await store.search(query, room=body.room, limit=8)
 
     async def events() -> AsyncIterator[str]:
