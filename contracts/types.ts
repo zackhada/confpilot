@@ -143,8 +143,16 @@ export interface CardShownEvent {
 export interface KnowledgeSetEvent { type: "knowledge.set"; term_id: string; status: KnowledgeStatus }
 export interface TimePing { type: "time.ping"; t0: number } // t0 is the client clock
 export interface TimePong { type: "time.pong"; t0: number; server_ts: number }
+// Sent to the whole room on every join and leave. The server also resends it to each socket
+// every 20 seconds as its heartbeat; there is no separate ping event.
 export interface RoomState { type: "room.state"; members: (Speaker & { role: Role })[] }
-export interface ErrorEvent { type: "error"; code: string; message: string }
+
+// bad_request: bad join parameters; the socket then closes with code 1008.
+// bad_event: a frame that is not a valid ClientEvent. forbidden: e.g. a viewer sent a transcript.
+// store_unavailable: a knowledge.set could not be saved. internal: the event failed on the server.
+// After every code except bad_request the socket stays open.
+export type ErrorCode = "bad_request" | "bad_event" | "forbidden" | "store_unavailable" | "internal";
+export interface ErrorEvent { type: "error"; code: ErrorCode; message: string }
 
 export type ClientEvent = TranscriptEvent | CardShownEvent | KnowledgeSetEvent | TimePing;
 export type ServerEvent =
