@@ -1,0 +1,89 @@
+# Public HTTPS without IAM, DNS or an account: a Cloudflare quick tunnel.
+# cloudflared dials out to Cloudflare and gets a random https://<words>.trycloudflare.com
+# name that proxies to the confpilot Service (WebSockets included; SSE is not supported,
+# and we do not use it). Print the name with deploy/tunnel-url.ps1.
+#
+# The name lives only as long as this container. A restart gives a NEW URL, so:
+#   - one replica, Recreate (two replicas would be two different URLs)
+#   - the liveness probe is deliberately slow to fire (2 minutes with no edge connection)
+#   - never `rollout restart` this Deployment during the demo
+# Upgrade path once we have a DNS name: deploy/README.md, "Stable URL".
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudflared
+  namespace: confpilot
+  labels:
+    app.kubernetes.io/name: cloudflared
+    app.kubernetes.io/component: tunnel
+    app.kubernetes.io/part-of: confpilot
+    app.kubernetes.io/managed-by: kustomize
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cloudflared
+      app.kubernetes.io/component: tunnel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cloudflared
+        app.kubernetes.io/component: tunnel
+        app.kubernetes.io/part-of: confpilot
+        app.kubernetes.io/managed-by: kustomize
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: cloudflared
+          image: cloudflare/cloudflared:2026.10.3
+          args:
+            - tunnel
+            - --no-autoupdate
+            - --metrics
+            - 0.0.0.0:2000
+            - --url
+            - http://confpilot:80
+          ports:
+            - name: metrics
+              containerPort: 2000
+          # /ready is 200 while at least one connection to the Cloudflare edge is up.
+          startupProbe:
+            httpGet:
+              path: /ready
+              port: metrics
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: metrics
+            periodSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: metrics
+            periodSeconds: 10
+            failureThreshold: 12
+          resources:
+            requests:
+              cpu: 20m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
