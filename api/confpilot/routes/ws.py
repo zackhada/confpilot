@@ -26,6 +26,7 @@ from confpilot.models import (
 )
 from confpilot.rooms import Connection, Hub
 from confpilot.telemetry import tracer, word_to_card_ms
+from confpilot.utterances import store_final_or_release, transcript_words
 
 MAX_FRAME_CHARS = 128_000
 MAX_RECORDED_LATENCY_MS = 60_000  # beyond this a clock is wrong, keep it out of the SLI
@@ -98,6 +99,31 @@ def handle_transcript(state: State, connection: Connection, event: TranscriptEve
         relayed = event.model_copy(update={"speaker": connection.speaker})
         count = hub.broadcast(connection.room, relayed, exclude=connection)  # relay comes first
         span.set_attribute("confpilot.room.recipients", count)
+        if not event.is_final:
+            return
+        # Storage work starts only now, after the relay is queued.
+        words = transcript_words(event)
+        admitted_at = time.monotonic()
+        fresh = state.recent_finals.admit(
+            connection.room, connection.member.user_id, words, admitted_at
+        )
+        span.set_attribute("confpilot.utterance.duplicate", not fresh)
+        if not fresh:
+            return
+        storing = store_final_or_release(
+            state.store,
+            state.matcher,
+            state.recent_finals,
+            connection.room,
+            relayed,
+            words,
+            admitted_at,
+        )
+        if not spawn(storing, "store_final"):
+            state.recent_finals.forget(
+                connection.room, connection.member.user_id, words, admitted_at
+            )
+            span.set_attribute("confpilot.utterance.store_dropped", True)
 
 
 def handle_card_shown(hub: Hub, connection: Connection, event: CardShownEvent) -> None:
