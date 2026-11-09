@@ -1,6 +1,6 @@
 name: Deploy
 # On every merge to main: build the image, push it to GHCR, then roll it out to EKS.
-# The rollout needs the KUBE_CONFIG repo secret (deploy/make-deployer-kubeconfig.ps1).
+# The rollout needs the KUBE_CONFIG production environment secret (deploy/make-deployer-kubeconfig.ps1).
 # Without it the image is still built and pushed, and the workflow succeeds.
 on:
   push:
@@ -23,6 +23,7 @@ env:
 jobs:
   image:
     name: Build and push image
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -56,7 +57,9 @@ jobs:
 
   rollout:
     name: Roll out to EKS
+    if: github.ref == 'refs/heads/main'
     needs: image
+    environment: production
     runs-on: ubuntu-latest
     env:
       # Secrets cannot be read in `if:`, so the steps test this variable instead.
