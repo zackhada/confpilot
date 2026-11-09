@@ -36,6 +36,11 @@ codex mcp add radar --url http://localhost:9280/mcp-readonly
 
 ## Use the in-cluster Radar from Codex (EKS)
 
+This EKS-specific guide fills the gap between the local setup above and the team's EKS
+installation: Radar runs in the cluster, while Codex runs on a developer's computer. The
+Radar track requires using its UI and MCP, so a loopback-only port-forward provides access
+without exposing Radar publicly.
+
 The EKS install runs Radar inside the `radar` namespace. Its Kubernetes Service is
 `ClusterIP`, so it has no public address. Use `kubectl port-forward` to make the Radar UI
 and MCP endpoint available only on this computer. Keep the port-forward running while using
