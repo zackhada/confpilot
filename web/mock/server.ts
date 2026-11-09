@@ -113,6 +113,15 @@ async function handleData(req: IncomingMessage, res: ServerResponse, url: URL, r
     const hits = searchMoments(url.searchParams.get('q') ?? '', room.moments, await glossaryTerms(), limit)
     return sendJson(res, 200, { hits })
   }
+  if (route === 'POST /api/ask') {
+    const body = await readBody(req)
+    const room = roomFor(String(body.room ?? 'demo'))
+    const hits = searchMoments(String(body.question ?? ''), room.moments, await glossaryTerms(), 8)
+    res.writeHead(200, { 'Content-Type': 'text/event-stream' })
+    res.write(`data: ${JSON.stringify({ type: 'moments', hits })}\n\n`)
+    res.end('data: {"type":"answer","answer":null}\n\n')
+    return
+  }
   if (route === 'POST /api/probe') {
     const body = await readBody(req)
     // The real endpoint waits on an LLM; a short pause lets the progress state be seen.
