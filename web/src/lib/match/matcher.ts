@@ -1,5 +1,7 @@
 // On-device glossary matcher (tier 1 cards). Behaviour: contracts/README.md section 6.
-// Whole words, longest phrase first, no overlaps; ambiguous terms need a context word nearby.
+// Whole words, longest phrase first, no overlaps. An ambiguous term needs tech context within
+// five words: one of its `context` words, or (with no list) a matched, non-ambiguous term of
+// the same category.
 
 import type { Term } from '../../../../contracts/types';
 import { normalizeWords } from './normalize';
@@ -17,22 +19,43 @@ export type Matcher = (words: string[]) => Match[];
 interface Entry {
   readonly termId: string;
   readonly tokens: readonly string[];
-  /** null for ordinary terms; the allowed context words for ambiguous ones. */
+  readonly category: string;
+  readonly ambiguous: boolean;
+  /** The term's own context words; null when it has none. */
   readonly context: ReadonlySet<string> | null;
   readonly order: number;
 }
 
+/** A matched entry and its inclusive token span. */
+interface Hit {
+  readonly entry: Entry;
+  readonly start: number;
+  readonly end: number;
+}
+
 type Index = ReadonlyMap<string, readonly Entry[]>;
+type Accept = (hit: Hit) => boolean;
 
 export const CONTEXT_WINDOW_WORDS = 5;
+
+// "Service (Kubernetes)" is spoken as "service": the bracketed part only labels the card.
+const BRACKETED = /\s*\([^)]*\)\s*/g;
 
 const phraseTokens = (phrase: string): string[] => normalizeWords(phrase.split(/\s+/)).tokens;
 
 function entriesFor(term: Term, termOrder: number): Entry[] {
-  const context = term.ambiguous ? new Set((term.context ?? []).flatMap(phraseTokens)) : null;
-  const phrases = [term.term, ...term.aliases].map(phraseTokens).filter((tokens) => tokens.length > 0);
+  const contextWords = (term.context ?? []).flatMap(phraseTokens);
+  const shared = {
+    termId: term.id,
+    category: term.category,
+    ambiguous: term.ambiguous === true,
+    context: contextWords.length > 0 ? new Set(contextWords) : null,
+    order: termOrder,
+  };
+  const spoken = [term.term.replace(BRACKETED, ' '), ...term.aliases];
+  const phrases = spoken.map(phraseTokens).filter((tokens) => tokens.length > 0);
   const unique = new Map(phrases.map((tokens) => [tokens.join(' '), tokens] as const));
-  return [...unique.values()].map((tokens) => ({ termId: term.id, tokens, context, order: termOrder }));
+  return [...unique.values()].map((tokens) => ({ ...shared, tokens }));
 }
 
 /** Entries bucketed by first token, longest first, then in glossary order. */
@@ -58,23 +81,52 @@ function phraseAt(tokens: readonly string[], start: number, phrase: readonly str
   return true;
 }
 
-function hasContextNearby(tokens: readonly string[], start: number, end: number, context: ReadonlySet<string>): boolean {
-  const from = Math.max(0, start - CONTEXT_WINDOW_WORDS);
-  const to = Math.min(tokens.length - 1, end + CONTEXT_WINDOW_WORDS);
+function hasContextWordNearby(tokens: readonly string[], hit: Hit, context: ReadonlySet<string>): boolean {
+  const from = Math.max(0, hit.start - CONTEXT_WINDOW_WORDS);
+  const to = Math.min(tokens.length - 1, hit.end + CONTEXT_WINDOW_WORDS);
   for (let j = from; j <= to; j += 1) {
-    const outsideMatch = j < start || j > end;
+    const outsideMatch = j < hit.start || j > hit.end;
     if (outsideMatch && context.has(tokens[j] as string)) return true;
   }
   return false;
 }
 
-function entryAt(index: Index, tokens: readonly string[], start: number): Entry | undefined {
-  const candidates = index.get(tokens[start] as string) ?? [];
-  return candidates.find((entry) => {
-    if (!phraseAt(tokens, start, entry.tokens)) return false;
-    const end = start + entry.tokens.length - 1;
-    return entry.context === null || hasContextNearby(tokens, start, end, entry.context);
-  });
+function hasAnchorNearby(hit: Hit, anchors: readonly Hit[]): boolean {
+  return anchors.some(
+    (anchor) =>
+      anchor.entry.category === hit.entry.category &&
+      anchor.start <= hit.end + CONTEXT_WINDOW_WORDS &&
+      anchor.end >= hit.start - CONTEXT_WINDOW_WORDS,
+  );
+}
+
+/** Left to right, longest accepted phrase first, never overlapping. */
+function scan(index: Index, tokens: readonly string[], accept: Accept): Hit[] {
+  const hits: Hit[] = [];
+  let i = 0;
+  while (i < tokens.length) {
+    const start = i;
+    const hit = (index.get(tokens[start] as string) ?? [])
+      .filter((entry) => phraseAt(tokens, start, entry.tokens))
+      .map((entry): Hit => ({ entry, start, end: start + entry.tokens.length - 1 }))
+      .find(accept);
+    if (hit) hits.push(hit);
+    i = hit ? hit.end + 1 : i + 1;
+  }
+  return hits;
+}
+
+function findHits(index: Index, tokens: readonly string[]): Hit[] {
+  const passesOwnContext: Accept = (hit) =>
+    !hit.entry.ambiguous || hit.entry.context === null || hasContextWordNearby(tokens, hit, hit.entry.context);
+  // First pass: ambiguous terms with no context list are let through, to find the anchors.
+  const tentative = scan(index, tokens, passesOwnContext);
+  const needsAnchor = (hit: Hit): boolean => hit.entry.ambiguous && hit.entry.context === null;
+  if (!tentative.some(needsAnchor)) return tentative;
+  // Second pass: those terms now need a non-ambiguous term of their category nearby. Scanning
+  // again (rather than filtering) lets a shorter term match where a longer one was rejected.
+  const anchors = tentative.filter((hit) => !hit.entry.ambiguous);
+  return scan(index, tokens, (hit) => passesOwnContext(hit) && (!needsAnchor(hit) || hasAnchorNearby(hit, anchors)));
 }
 
 /** Builds the index once; the returned function is pure and safe to call on every interim. */
@@ -82,20 +134,10 @@ export function createMatcher(terms: Term[]): Matcher {
   const index = buildIndex(terms);
   return (words: string[]): Match[] => {
     const { tokens, origin } = normalizeWords(words);
-    const matches: Match[] = [];
-    let i = 0;
-    while (i < tokens.length) {
-      const entry = entryAt(index, tokens, i);
-      if (entry) {
-        const end = i + entry.tokens.length - 1;
-        const [firstWord] = origin[i] as [number, number];
-        const [, lastWord] = origin[end] as [number, number];
-        matches.push({ term_id: entry.termId, first_word: firstWord, last_word: lastWord });
-        i = end + 1;
-      } else {
-        i += 1;
-      }
-    }
-    return matches;
+    return findHits(index, tokens).map((hit) => {
+      const [firstWord] = origin[hit.start] as [number, number];
+      const [, lastWord] = origin[hit.end] as [number, number];
+      return { term_id: hit.entry.termId, first_word: firstWord, last_word: lastWord };
+    });
   };
 }
