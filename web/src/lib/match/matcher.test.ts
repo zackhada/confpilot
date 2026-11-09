@@ -49,6 +49,10 @@ describe('createMatcher', () => {
     ]);
   });
 
+  it('matches a spelled acronym before a trailing i or a', () => {
+    expect(match('we use r r f i and r r f a'.split(' ')).map((m) => m.term_id)).toEqual(['rrf', 'rrf']);
+  });
+
   it('prefers the longest term and never overlaps', () => {
     const words = 'root cause analysis of the crash loop back off'.split(' ');
     expect(match(words)).toEqual([
@@ -59,6 +63,12 @@ describe('createMatcher', () => {
 
   it('matches whole words only', () => {
     expect(match('the podcast was about ragtime'.split(' '))).toEqual([]);
+  });
+
+  it('matches a phrase across already-glued input tokens', () => {
+    const phrase = createMatcher([makeTerm('phrase', { term: 'foo bar baz' })]);
+    expect(phrase(['foob', 'arbaz'])).toEqual([{ term_id: 'phrase', first_word: 0, last_word: 1 }]);
+    expect(phrase(['foobarbaz'])).toEqual([{ term_id: 'phrase', first_word: 0, last_word: 0 }]);
   });
 
   it('matches an ambiguous term only within five words of a context word', () => {
@@ -72,6 +82,13 @@ describe('createMatcher', () => {
     expect(match('the service behind the ingress'.split(' ')).map((m) => m.term_id)).toEqual(['service']);
   });
 
+  it('counts context distance in input words when words normalize to multiple tokens', () => {
+    expect(match('kubernetes one two three long-running service'.split(' ')).map((m) => m.term_id)).toEqual([
+      'kubernetes',
+      'service',
+    ]);
+  });
+
   describe('ambiguous terms without a context list', () => {
     const ids = (text: string, terms: Term[]): string[] => createMatcher(terms)(text.split(' ')).map((m) => m.term_id);
     const agent = makeTerm('agent', { category: 'ai', ambiguous: true, say: null });
@@ -81,6 +98,7 @@ describe('createMatcher', () => {
     it('match when a non-ambiguous term of the same category is within five words', () => {
       expect(ids('rag is what the new agent uses', [agent, rag])).toEqual(['rag', 'agent']);
       expect(ids('the agent we built today does rag', [agent, rag])).toEqual(['agent', 'rag']);
+      expect(ids('rag one two three long-running agent', [agent, rag])).toEqual(['rag', 'agent']);
     });
 
     it('do not match when that term is more than five words away', () => {

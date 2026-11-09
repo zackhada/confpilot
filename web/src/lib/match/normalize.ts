@@ -90,9 +90,13 @@ function joinSpelledLetters(pieces: readonly Piece[]): Piece[] {
     }
     const run = pieces.slice(i, end);
     const hasArticle = run.length > 1 && (run[0] as Piece).text === 'a';
-    const letters = hasArticle ? run.slice(1) : run;
+    let letters = hasArticle ? run.slice(1) : run;
+    const lastText = (letters[letters.length - 1] as Piece | undefined)?.text;
+    const trailing = letters.length > 2 && (lastText === 'i' || lastText === 'a') ? letters[letters.length - 1] : undefined;
+    if (trailing) letters = letters.slice(0, -1);
     if (hasArticle) out.push(run[0] as Piece);
     out.push(letters.length >= 2 ? joinPieces(letters, true) : (letters[0] as Piece));
+    if (trailing) out.push(trailing);
     i = end;
   }
   return out;
