@@ -29,9 +29,7 @@ class GlossaryMixin(StoreBase):
                 if await self.client.indices.exists(index=index):
                     continue
                 body = load_index_body(name)
-                await self.client.indices.create(
-                    index=index, mappings=body["mappings"], settings=body.get("settings")
-                )
+                await self.client.indices.create(index=index, mappings=body["mappings"], settings=body.get("settings"))
                 created.append(index)
         return created
 
@@ -56,9 +54,7 @@ class GlossaryMixin(StoreBase):
             _raise_on_bulk_errors(response)
         if version is not None:
             with es_span("es.indices.put_mapping", glossary_version=version):
-                await self.client.indices.put_mapping(
-                    index=self.index("terms"), meta={"glossary_version": version}
-                )
+                await self.client.indices.put_mapping(index=self.index("terms"), meta={"glossary_version": version})
         return len(parsed)
 
     async def prune_seed_terms(self, keep_ids: Iterable[str]) -> int:

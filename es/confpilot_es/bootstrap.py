@@ -1,6 +1,6 @@
 """Create the ConfPilot indices and load a glossary.
 
-    python -m confpilot_es.bootstrap --glossary ../contracts/fixtures/glossary.sample.json [--recreate]
+python -m confpilot_es.bootstrap --glossary ../contracts/fixtures/glossary.sample.json [--recreate]
 """
 
 from __future__ import annotations

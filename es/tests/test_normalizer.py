@@ -14,6 +14,10 @@ from confpilot_es.normalizer import normalize, variants
         ("retrieval-augmented generation is common", "retrieval augmented generation is common"),
         ("the user's K 8 s cluster", "the users k8s cluster"),
         ("a pod goes into CrashLoopBackOff", "a pod goes into crashloopbackoff"),
+        ("we ship CI/CD on-call", "we ship ci cd on call"),
+        ("M&A talks, e.g. here", "ma talks eg here"),
+        ("the user's B.M. 25 score", "the users bm25 score"),
+        ("hybrid search — including RAG", "hybrid search including rag"),
         ("", ""),
     ],
 )
@@ -23,5 +27,5 @@ def test_normalize(raw: str, expected: str) -> None:
 
 def test_variants_keep_the_unjoined_form() -> None:
     # The aggressive join must never hide a plain match such as "kubernetes".
-    assert variants("Kubernetes 1.30 is out") == ["kubernetes 1 30 is out", "kubernetes1 30 is out"]
+    assert variants("Kubernetes 1.30 is out") == ["kubernetes 130 is out", "kubernetes130 is out"]
     assert variants("managed hybrid search") == ["managed hybrid search"]

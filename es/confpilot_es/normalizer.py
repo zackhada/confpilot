@@ -1,9 +1,9 @@
 """Matcher normalizer: the Python twin of contracts/README.md section 6.
 
-`base_tokens` only lowercases and strips punctuation. `normalize` applies every rule
-(number words, spelled-out letters, letter and number runs). The percolator is fed both
-forms, so an aggressive join such as "kubernetes 1.30" -> "kubernetes130" can add a match
-but can never hide one.
+`base_tokens` lowercases, turns hyphens and slashes into spaces and deletes other punctuation.
+`normalize` then applies the joining rules (number words, spelled-out letters, letter and
+number runs). The percolator is fed both forms, so an aggressive join such as
+"kubernetes 1.30" -> "kubernetes130" can add a match but can never hide one.
 """
 
 from __future__ import annotations
@@ -11,22 +11,23 @@ from __future__ import annotations
 import re
 import unicodedata
 
-_UNITS = (
+_UNITS = (  # noqa: SIM905 - one readable line beats twenty
     "zero one two three four five six seven eight nine ten eleven twelve thirteen "
     "fourteen fifteen sixteen seventeen eighteen nineteen"
 ).split()
-_TENS = "twenty thirty forty fifty sixty seventy eighty ninety".split()
+_TENS = "twenty thirty forty fifty sixty seventy eighty ninety".split()  # noqa: SIM905
 _UNIT_VALUES = {word: value for value, word in enumerate(_UNITS)}
 _TENS_VALUES = {word: (index + 2) * 10 for index, word in enumerate(_TENS)}
 
-_APOSTROPHES = re.compile(r"['’`]")
+_DASHES = "".join(chr(code) for code in range(0x2010, 0x2016))  # Unicode hyphens and dashes
+_WORD_BREAKS = re.compile(rf"[-/\\{_DASHES}]")
 _PUNCTUATION = re.compile(r"[^\w\s]|_")
 
 
 def base_tokens(text: str) -> list[str]:
-    """Lowercase, drop apostrophes, and turn all other punctuation into spaces."""
+    """Lowercase, turn hyphens and slashes into spaces, and delete every other punctuation mark."""
     lowered = unicodedata.normalize("NFKC", text).lower()
-    return _PUNCTUATION.sub(" ", _APOSTROPHES.sub("", lowered)).split()
+    return _PUNCTUATION.sub("", _WORD_BREAKS.sub(" ", lowered)).split()
 
 
 def _read_number_words(tokens: list[str]) -> list[str]:

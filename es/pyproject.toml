@@ -30,4 +30,12 @@ markers = ["live: needs the live Elasticsearch project (ES_URL and ES_API_KEY, o
 dev = [
     "pytest>=9.2.0",
     "pytest-asyncio>=1.4.1.post1",
+    "ruff>=0.17.4",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "ASYNC", "RUF"]

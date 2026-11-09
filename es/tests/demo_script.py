@@ -19,8 +19,7 @@ SCRIPT: list[tuple[dict[str, str], str]] = [
     (ZACK, RAG_LINE),
     (
         CLAYTON,
-        "Nice! So that will help power apps' search engines, or what are customers trying to do "
-        "with your technology?",
+        "Nice! So that will help power apps' search engines, or what are customers trying to do with your technology?",
     ),
     (
         ZACK,

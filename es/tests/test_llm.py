@@ -25,7 +25,7 @@ class StubInference:
         self.replies = list(replies)
         self.prompts: list[str] = []
 
-    async def completion(self, inference_id: str, input: str) -> dict[str, Any]:  # noqa: A002 - client keyword
+    async def completion(self, inference_id: str, input: str) -> dict[str, Any]:
         self.prompts.append(input)
         return {"completion": [{"result": self.replies.pop(0)}]}
 

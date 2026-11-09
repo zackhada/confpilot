@@ -8,11 +8,20 @@ from typing import Any
 
 from confpilot_es.base import StoreBase
 from confpilot_es.models import HeardTerm, Knowledge, KnowledgePatch, Recap
-from confpilot_es.queries import recap_body
 from confpilot_es.telemetry import es_span
 
 MAX_KNOWLEDGE_ITEMS = 2000
 LEARN_NEXT_LIMIT = 5
+MAX_HEARD_TERMS = 500
+
+
+def recap_body(room: str) -> dict[str, Any]:
+    """How often each glossary term was heard in a room, most heard first."""
+    return {
+        "size": 0,
+        "query": {"term": {"room": room}},
+        "aggs": {"heard": {"terms": {"field": "term_ids", "size": MAX_HEARD_TERMS}}},
+    }
 
 
 class KnowledgeMixin(StoreBase):
@@ -27,9 +36,7 @@ class KnowledgeMixin(StoreBase):
             )
         return [Knowledge.model_validate(hit["_source"]) for hit in response["hits"]["hits"]]
 
-    async def put_knowledge(
-        self, user_id: str, term_id: str, patch: KnowledgePatch | Mapping[str, Any]
-    ) -> Knowledge:
+    async def put_knowledge(self, user_id: str, term_id: str, patch: KnowledgePatch | Mapping[str, Any]) -> Knowledge:
         """Merge `patch` into the user's record for a term, creating it with SM-2 defaults.
 
         The document id is `"{user_id}:{term_id}"`, so there is exactly one per user and term.

@@ -41,8 +41,8 @@ Both `semantic_text` fields use the inference endpoint `.jina-embeddings-v5-text
 ```python
 from confpilot_es import EsStore
 
-store = EsStore.from_env()                       # one per process; `await store.close()` on shutdown
-term_ids = await store.percolate("It uses BM 25 and R.R.F. to rank the results")   # ["bm25", "rrf"]
+store = EsStore.from_env()  # one per process; `await store.close()` on shutdown
+term_ids = await store.percolate("It uses BM 25 and R.R.F. to rank the results")  # ["bm25", "rrf"]
 await store.index_utterance(utterance_id, room, speaker, spoken_at, text, term_ids)
 hits = await store.search("¿cómo ordena los resultados?", room="slc1", size=5)
 await store.put_knowledge(user_id, "rrf", {"status": "known", "source": "tap"})

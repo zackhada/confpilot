@@ -1,0 +1,30 @@
+name: ES
+on:
+  pull_request:
+    paths: ["es/**", "contracts/**", "content/**", ".github/workflows/es.yml"]
+  push:
+    branches: [main]
+    paths: ["es/**", "contracts/**", "content/**", ".github/workflows/es.yml"]
+jobs:
+  es:
+    name: es lint and tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: es
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: es/uv.lock
+      - name: Install
+        run: uv sync --locked
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format check
+        run: uv run ruff format --check .
+      # No Elasticsearch credentials in CI: live tests skip, offline tests must still pass.
+      - name: Tests
+        run: uv run pytest -q -rs

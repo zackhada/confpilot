@@ -12,8 +12,6 @@ from confpilot_es.search import SearchMixin
 
 class EsStore(GlossaryMixin, PercolateMixin, SearchMixin, KnowledgeMixin, LlmMixin):
     @classmethod
-    def from_env(
-        cls, prefix: str = DEFAULT_PREFIX, refresh: bool = False, config: EsConfig | None = None
-    ) -> EsStore:
+    def from_env(cls, prefix: str = DEFAULT_PREFIX, refresh: bool = False, config: EsConfig | None = None) -> EsStore:
         """Build a store from ES_URL and ES_API_KEY (or the file named by ENV_FILE)."""
         return cls(create_client(config), prefix=prefix, refresh=refresh)

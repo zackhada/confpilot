@@ -8,11 +8,40 @@ from typing import Any
 
 from confpilot_es.base import StoreBase
 from confpilot_es.models import SearchHit, Speaker
-from confpilot_es.queries import hybrid_search_body
 from confpilot_es.telemetry import es_span
 
 DEFAULT_SEARCH_SIZE = 10
 MAX_SEARCH_SIZE = 50
+RRF_RANK_WINDOW = 50
+RRF_RANK_CONSTANT = 20
+
+
+def hybrid_search_body(q: str, room: str, size: int) -> dict[str, Any]:
+    """ "Ask your conference": BM25 and semantic retrievers fused with RRF, limited to one room.
+
+    The semantic leg runs on a multilingual embedding, so a question in Spanish finds the
+    English moment. Highlights come from the BM25 field, HTML-escaped, with <mark> tags.
+    """
+    lexical = {"multi_match": {"query": q, "type": "most_fields", "fields": ["text^2", "speaker.name"]}}
+    semantic = {"semantic": {"field": "semantic_text", "query": q}}
+    return {
+        "retriever": {
+            "rrf": {
+                "retrievers": [{"standard": {"query": lexical}}, {"standard": {"query": semantic}}],
+                "filter": {"term": {"room": room}},
+                "rank_window_size": max(RRF_RANK_WINDOW, size),
+                "rank_constant": RRF_RANK_CONSTANT,
+            }
+        },
+        "size": size,
+        "_source": ["utterance_id", "speaker", "spoken_at", "text", "term_ids"],
+        "highlight": {
+            "encoder": "html",
+            "pre_tags": ["<mark>"],
+            "post_tags": ["</mark>"],
+            "fields": {"text": {"number_of_fragments": 0, "highlight_query": {"match": {"text": q}}}},
+        },
+    }
 
 
 class SearchMixin(StoreBase):

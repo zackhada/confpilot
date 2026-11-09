@@ -45,7 +45,7 @@ async def test_talk_track_catches_the_five_must_catch_terms(real_store: EsStore)
     for line in lines:
         found = await real_store.percolate(line)
         print(f"\ntalk track line matched {len(found)} terms: {found}")
-        assert MUST_CATCH <= set(found), f"missed {sorted(MUST_CATCH - set(found))}"
+        assert set(found) >= MUST_CATCH, f"missed {sorted(MUST_CATCH - set(found))}"
 
 
 async def test_ambiguous_real_terms_need_a_same_category_neighbour(real_store: EsStore) -> None:
