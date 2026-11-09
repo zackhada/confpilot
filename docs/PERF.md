@@ -11,7 +11,7 @@ from the planning prompt, not requirements from the plan.
 | 1b. Audio to final transcript | 123 to 137 ms | 198 to 332 ms | none | Same runs. |
 | 2. Transcript to card (phone compute) | 0.03 ms | 0.2 ms (max 7.8 ms) | under 150 ms p50 | 2,400 timed calls of the matcher plus `reduceTranscript` (the work the phone does per interim, word by word through the same 21 s script, 50 rounds) in Node on the laptop. 12 cards found. Index build is 12.5 ms, once per glossary load. A phone is slower, but even at 10 times this the hop is a few ms plus one frame to paint. Cards come from interims, so no card waits for a final. On-device word-to-card time is reported to Dash0 as `confpilot.card.word_to_card_ms` on every card paint; no phone session has sent one yet. |
 | 3. Room WebSocket fan-out | not measured | | under 100 ms added | Needs two phones on the tunnel. Not in the card path: each phone matches its own captions locally. |
-| 4. First-load JS (gzipped) | 186 KB (`index` 73 KB + `App` 113 KB) | | under 150 KB | `pnpm build`. StageView (8 KB) and the Dash0 SDK (28 KB) already load separately. Lighthouse was not run. |
+| 4. First-load bytes on the wire | before 605 KB, after **192 KB** | | JS under 150 KB gzipped | index.html plus entry JS, CSS and App chunk from a real `pnpm build`, served by the API. The API sent them uncompressed with no cache headers; #39 adds gzip and `immutable` caching for hashed assets. Gzipped JS alone is 184 KB, still over the 150 KB target. Lighthouse was not run. |
 | 5. ES calls blocking captions | no | | never | Captions go phone to Deepgram to phone. The API and Elasticsearch are not in that path. |
 
 ## What was checked and ruled out
@@ -25,13 +25,14 @@ from the planning prompt, not requirements from the plan.
 ## Verdict
 
 Hops 1 and 2, the top priorities, meet their targets as measured, so no code change was needed there.
-Hop 4 misses its 150 KB target (186 KB); the only safe change found saved under 2 percent and
-was reverted. The bigger fix is listed below and was left until after the demo on purpose.
+Hop 4: first-load download fell 68 percent with gzip and caching (#39). Gzipped JS is still
+184 KB against the 150 KB target; lazy routes saved under 2 percent and were reverted. The bigger fix is listed below and was left until after the demo on purpose.
 
 ## Changes tried
 
 | Change | Result | Kept? |
 | --- | --- | --- |
+| gzip plus immutable cache headers on the API (#39) | First-load wire bytes 605 KB to 192 KB (-68 percent), about 3.0 s to 1.0 s on a 1.6 Mbps slow-4G link. Repeat visits reuse cached assets. | Yes |
 | Lazy-load Recap, Flashcards and Ask routes | Initial JS 186 to 183 KB. The App chunk lost 17 KB but a 14 KB shared chunk still loads on first paint. | No, under 2 percent |
 
 ## Next steps, if there is time after the demo
