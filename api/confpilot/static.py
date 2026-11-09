@@ -7,6 +7,9 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
 RESERVED_PREFIXES = frozenset({"api", "ws", "healthz"})
+# Vite puts a content hash in every file name under assets/, so a phone can keep them forever.
+IMMUTABLE = {"Cache-Control": "public, max-age=31536000, immutable"}
+NO_CACHE = {"Cache-Control": "no-cache"}  # index.html, sw.js: always check for a new release
 
 _log = logging.getLogger(__name__)
 
@@ -29,10 +32,11 @@ def add_static_routes(app: FastAPI, static_dir: Path) -> bool:
         except (OSError, ValueError):  # for example a NUL byte in the path
             raise HTTPException(status_code=404, detail="Not found") from None
         if is_file:
-            return FileResponse(candidate)
+            headers = IMMUTABLE if path.startswith("assets/") else NO_CACHE
+            return FileResponse(candidate, headers=headers)
         if "." in path.rsplit("/", 1)[-1]:
             # A missing asset is a 404, not a page: never answer app.js with HTML.
             raise HTTPException(status_code=404, detail="Not found")
-        return FileResponse(index, headers={"Cache-Control": "no-cache"})
+        return FileResponse(index, headers=NO_CACHE)
 
     return True

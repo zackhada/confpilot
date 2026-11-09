@@ -58,3 +58,23 @@ def test_static_dir_without_index_is_skipped(tmp_path: Path, make_settings) -> N
 
     assert client.get("/").status_code == 404
     assert client.get("/healthz").status_code == 200
+
+
+def test_static_gzips_large_assets(tmp_path: Path, make_settings) -> None:
+    site = tmp_path / "site"
+    (site / "assets").mkdir(parents=True)
+    (site / "index.html").write_text("<h1>ConfPilot</h1>", encoding="utf-8")
+    (site / "assets" / "big-abc123.js").write_text("export const x = 1;\n" * 500, encoding="utf-8")
+    client = TestClient(create_app(make_settings(static_dir=site)))
+
+    response = client.get("/assets/big-abc123.js", headers={"Accept-Encoding": "gzip"})
+
+    assert response.headers["content-encoding"] == "gzip"
+    assert response.text.startswith("export const x")
+
+
+def test_static_caches_hashed_assets_but_not_the_shell(static_client: TestClient) -> None:
+    asset = static_client.get("/assets/app.js").headers["cache-control"]
+    assert "immutable" in asset
+    assert "max-age=31536000" in asset
+    assert static_client.get("/").headers["cache-control"] == "no-cache"
