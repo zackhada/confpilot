@@ -82,20 +82,17 @@ All screenshots are in [web/docs/screens/](web/docs/screens/).
 
 ## Layout
 
-| Path | What |
-| --- | --- |
-| `contracts/` | API and event shapes every part agrees on, plus shared matcher fixtures |
-| `api/` | FastAPI service: token, session, probe, room WebSocket hub, knowledge, recap, search |
-| `es/` | Elasticsearch layer (`confpilot_es`): mappings, bootstrap, percolator, hybrid search, recap |
-| `web/` | Phone app (PWA), stage view, mock server, screenshots |
-| `content/` | The 200-term glossary, its validator and the demo talk track |
-| `deploy/` | Dockerfile, EKS config, Kustomize manifests, rollout scripts, deploy runbook |
-| `.gitar/` | Gitar review instructions, rules and auto-apply policy |
-| `.github/workflows/` | CI for each part, deploy on merge, Gitar labelling |
-| `docs/` | Plan, hackathon rules, performance notes, sponsor setup guides |
-| `bin/` | Helper scripts for delegating tasks to coding subagents |
-| `recordings/` | Two short clips of our own rehearsal |
-| `reference/` | Pre-kickoff scaffold, not part of the submission |
+| Path | What | Owner |
+| --- | --- | --- |
+| `contracts/` | API and event shapes every part agrees on, plus shared matcher fixtures | all (change by PR) |
+| `api/`, `es/` | FastAPI service (token, session, probe, room WebSocket hub, knowledge, recap, search) and the Elasticsearch layer `confpilot_es` (mappings, bootstrap, percolator, hybrid search, recap) | Zack |
+| `web/` | Phone app (PWA), stage view, mock server, screenshots | Tanner |
+| `deploy/` | Dockerfile, EKS config, Kustomize manifests, rollout scripts, deploy runbook | Clayton |
+| `content/`, `.gitar/`, `docs/` | The 200-term glossary and its validator, Gitar rules, plan and setup guides | Skyler |
+| `.github/workflows/` | CI for each part, deploy on merge, Gitar labelling | shared |
+| `bin/` | Helper scripts for delegating tasks to coding subagents | shared |
+| `recordings/` | Two short clips of our own rehearsal | shared |
+| `reference/` | Pre-kickoff scaffold, not part of the submission | nobody |
 
 ## Run it locally
 
@@ -161,8 +158,7 @@ The promise is that 95% of cards appear within 800 ms of the word being spoken, 
   [api/confpilot/routes/ws.py](api/confpilot/routes/ws.py)
 - Elasticsearch spans (`es.percolate`, `es.search`, ...): [es/confpilot_es/telemetry.py](es/confpilot_es/telemetry.py)
 - Browser RUM: [web/src/telemetry/dash0.ts](web/src/telemetry/dash0.ts)
-- Dashboard "confpilot-word-to-card" kept as code in `observability/dash0/`, and an SLO of
-  95% of cards within 800 ms
+- Dashboard "confpilot-word-to-card" and an SLO of 95% of cards within 800 ms, configured in Dash0
 - Measurements: [docs/PERF.md](docs/PERF.md). Setup: [docs/setup/DASH0.md](docs/setup/DASH0.md)
 
 ### Radar: operating the cluster
