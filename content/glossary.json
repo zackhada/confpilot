@@ -1,0 +1,3329 @@
+{
+  "version": 1,
+  "generated": "2026-11-09",
+  "levels": {
+    "1": "business, conference and idioms",
+    "2": "general tech",
+    "3": "cloud-native and AI practitioner",
+    "4": "specialist"
+  },
+  "terms": [
+    {
+      "id": "ipo",
+      "term": "IPO",
+      "aliases": [
+        "initial public offering",
+        "pre-IPO",
+        "going public",
+        "goes public"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": "eye-pee-oh",
+      "simple_def": "When a private company first sells its shares to the public on the stock market.",
+      "prereqs": [
+        "equity"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "series-funding",
+      "term": "Series A / B / C",
+      "aliases": [
+        "Series A",
+        "Series B",
+        "Series C",
+        "funding round",
+        "seed round"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "A stage when investors give a startup money in exchange for owning part of it.",
+      "prereqs": [
+        "venture-capital"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "venture-capital",
+      "term": "venture capital",
+      "aliases": [
+        "VC",
+        "VCs",
+        "venture capitalist"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": "vee-see",
+      "simple_def": "Investors who give money to young, risky companies hoping they grow very large.",
+      "prereqs": [
+        "equity"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "equity",
+      "term": "equity",
+      "aliases": [
+        "stock options"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "Owning a part of a company, usually as shares.",
+      "prereqs": [],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "valuation",
+      "term": "valuation",
+      "aliases": [
+        "valued at"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "How much money people agree a company is worth.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "runway",
+      "term": "runway",
+      "aliases": [],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "How many months a company can keep operating before its money runs out.",
+      "prereqs": [
+        "burn-rate"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "burn-rate",
+      "term": "burn rate",
+      "aliases": [],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "How much money a company spends each month beyond what it earns.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "arr",
+      "term": "ARR",
+      "aliases": [
+        "annual recurring revenue"
+      ],
+      "category": "business",
+      "level": 2,
+      "say": "ay-ar-ar",
+      "simple_def": "Money a company expects to earn every year from subscriptions.",
+      "prereqs": [
+        "saas"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "saas",
+      "term": "SaaS",
+      "aliases": [
+        "software as a service"
+      ],
+      "category": "business",
+      "level": 2,
+      "say": "sass",
+      "simple_def": "Software you rent online by subscription instead of installing and owning it.",
+      "prereqs": [
+        "cloud"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "b2b",
+      "term": "B2B",
+      "aliases": [
+        "business to business"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": "bee-two-bee",
+      "simple_def": "A company that sells to other companies, not to regular people.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "go-to-market",
+      "term": "go-to-market",
+      "aliases": [
+        "GTM",
+        "go to market"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "The plan for how a product will reach and be sold to customers.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "product-market-fit",
+      "term": "product-market fit",
+      "aliases": [
+        "PMF",
+        "product market fit"
+      ],
+      "category": "business",
+      "level": 2,
+      "say": null,
+      "simple_def": "When many customers clearly want and pay for what you built.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "roi",
+      "term": "ROI",
+      "aliases": [
+        "return on investment"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": "ar-oh-eye",
+      "simple_def": "How much value you get back compared with what you spent.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "kpi",
+      "term": "KPI",
+      "aliases": [
+        "KPIs",
+        "key performance indicator"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": "kay-pee-eye",
+      "simple_def": "A number a team watches to see if it is reaching its goals.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "okr",
+      "term": "OKR",
+      "aliases": [
+        "OKRs",
+        "objectives and key results"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": "oh-kay-ar",
+      "simple_def": "A goal plus a few measurable results that show if the goal was met.",
+      "prereqs": [
+        "kpi"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "stakeholder",
+      "term": "stakeholder",
+      "aliases": [
+        "stakeholders"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "A person or group affected by a project who cares how it turns out.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "roadmap",
+      "term": "roadmap",
+      "aliases": [
+        "road map"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "A plan showing what a team will build and roughly when.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "mvp",
+      "term": "MVP",
+      "aliases": [
+        "minimum viable product"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": "em-vee-pee",
+      "simple_def": "The simplest version of a product that real users can try.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "pivot",
+      "term": "pivot",
+      "aliases": [
+        "pivoted"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "When a company changes direction to a new product or market.",
+      "prereqs": [],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "churn",
+      "term": "churn",
+      "aliases": [
+        "churn rate"
+      ],
+      "category": "business",
+      "level": 2,
+      "say": null,
+      "simple_def": "The share of customers who stop paying over a period.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "unicorn",
+      "term": "unicorn",
+      "aliases": [
+        "unicorns"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "A private startup valued at more than one billion dollars.",
+      "prereqs": [
+        "valuation"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "acquisition",
+      "term": "acquisition",
+      "aliases": [
+        "M&A",
+        "acquired",
+        "acquires"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "When one company buys another company.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "moat",
+      "term": "moat",
+      "aliases": [],
+      "category": "business",
+      "level": 2,
+      "say": null,
+      "simple_def": "Something that makes it hard for competitors to copy a company.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "vendor-lock-in",
+      "term": "vendor lock-in",
+      "aliases": [
+        "lock-in",
+        "locked in"
+      ],
+      "category": "business",
+      "level": 2,
+      "say": null,
+      "simple_def": "When switching away from a supplier is so hard or costly that you stay.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "poc",
+      "term": "POC",
+      "aliases": [
+        "proof of concept",
+        "PoC"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": "pee-oh-see",
+      "simple_def": "A small test to show an idea can work before building it fully.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "enterprise",
+      "term": "enterprise",
+      "aliases": [
+        "enterprise customers"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "Large companies, which usually need extra security, support, and contracts.",
+      "prereqs": [],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "sla",
+      "term": "SLA",
+      "aliases": [
+        "SLAs",
+        "service level agreement"
+      ],
+      "category": "business",
+      "level": 2,
+      "say": "ess-el-ay",
+      "simple_def": "A written promise to customers about uptime or speed, often with penalties.",
+      "prereqs": [
+        "uptime"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "keynote",
+      "term": "keynote",
+      "aliases": [
+        "keynotes"
+      ],
+      "category": "conference",
+      "level": 1,
+      "say": null,
+      "simple_def": "The main talk of a conference, usually given to everyone at once.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "breakout-session",
+      "term": "breakout session",
+      "aliases": [
+        "breakout",
+        "breakouts"
+      ],
+      "category": "conference",
+      "level": 1,
+      "say": null,
+      "simple_def": "A smaller talk that runs at the same time as other talks.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "hallway-track",
+      "term": "hallway track",
+      "aliases": [],
+      "category": "conference",
+      "level": 1,
+      "say": null,
+      "simple_def": "The useful conversations people have between talks, outside the rooms.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "lightning-talk",
+      "term": "lightning talk",
+      "aliases": [
+        "lightning talks"
+      ],
+      "category": "conference",
+      "level": 1,
+      "say": null,
+      "simple_def": "A very short talk, usually five minutes or less.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "cfp",
+      "term": "CFP",
+      "aliases": [
+        "call for papers",
+        "call for proposals"
+      ],
+      "category": "conference",
+      "level": 2,
+      "say": "see-eff-pee",
+      "simple_def": "The open request for people to submit talk ideas to a conference.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "booth",
+      "term": "booth",
+      "aliases": [
+        "expo hall",
+        "sponsor booth"
+      ],
+      "category": "conference",
+      "level": 1,
+      "say": null,
+      "simple_def": "A company's stand at a conference where you can meet its team.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "swag",
+      "term": "swag",
+      "aliases": [],
+      "category": "conference",
+      "level": 1,
+      "say": null,
+      "simple_def": "Free items companies give away, like stickers and t-shirts.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "circle-back",
+      "term": "circle back",
+      "aliases": [
+        "circling back",
+        "circle back on"
+      ],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "To return to a topic later.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "take-offline",
+      "term": "take it offline",
+      "aliases": [
+        "take this offline"
+      ],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "To discuss something later, privately, not in the current meeting.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "ping",
+      "term": "ping me",
+      "aliases": [
+        "pinged"
+      ],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "Send someone a short message.",
+      "prereqs": [],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "bandwidth",
+      "term": "bandwidth",
+      "aliases": [
+        "no bandwidth"
+      ],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "Free time or energy to take on more work. In networks: how much data can move.",
+      "prereqs": [],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "low-hanging-fruit",
+      "term": "low-hanging fruit",
+      "aliases": [
+        "low hanging fruit"
+      ],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "Easy tasks that give good results quickly.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "move-the-needle",
+      "term": "move the needle",
+      "aliases": [
+        "moves the needle"
+      ],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "To make a change big enough to notice.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "boil-the-ocean",
+      "term": "boil the ocean",
+      "aliases": [
+        "boiling the ocean"
+      ],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "To try to do far too much at once.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "table-stakes",
+      "term": "table stakes",
+      "aliases": [],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "The basic features everyone expects; you need them just to compete.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "dogfooding",
+      "term": "dogfooding",
+      "aliases": [
+        "dogfood",
+        "eat our own dog food"
+      ],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "When a company uses its own product every day.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "north-star-metric",
+      "term": "north star metric",
+      "aliases": [
+        "north star"
+      ],
+      "category": "idiom",
+      "level": 2,
+      "say": null,
+      "simple_def": "The one number a team uses to judge if it is succeeding.",
+      "prereqs": [
+        "kpi"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "deep-dive",
+      "term": "deep dive",
+      "aliases": [],
+      "category": "idiom",
+      "level": 1,
+      "say": null,
+      "simple_def": "A long, detailed look at one topic.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "api",
+      "term": "API",
+      "aliases": [
+        "APIs",
+        "application programming interface"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": "ay-pee-eye",
+      "simple_def": "A set of rules that lets one program ask another program for data or actions.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "sdk",
+      "term": "SDK",
+      "aliases": [
+        "software development kit"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": "ess-dee-kay",
+      "simple_def": "A package of tools and code that makes building on a platform easier.",
+      "prereqs": [
+        "api"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "cloud",
+      "term": "cloud",
+      "aliases": [
+        "the cloud",
+        "cloud computing"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Renting computers and storage over the internet instead of owning them.",
+      "prereqs": [
+        "server"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "server",
+      "term": "server",
+      "aliases": [
+        "servers"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "A computer that runs programs and answers requests from other computers.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "database",
+      "term": "database",
+      "aliases": [
+        "DB",
+        "databases"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Organized storage for data that programs can search and update.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "latency",
+      "term": "latency",
+      "aliases": [
+        "low latency",
+        "high latency"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": "LAY-ten-see",
+      "simple_def": "The delay between asking for something and getting the answer.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "throughput",
+      "term": "throughput",
+      "aliases": [],
+      "category": "tech",
+      "level": 2,
+      "say": "THROO-put",
+      "simple_def": "How much work a system finishes in a period of time.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "frontend",
+      "term": "frontend",
+      "aliases": [
+        "front end",
+        "front-end"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "The part of software that users see and touch.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "backend",
+      "term": "backend",
+      "aliases": [
+        "back end",
+        "back-end"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "The part of software that runs on servers, out of the user's sight.",
+      "prereqs": [
+        "server"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "open-source",
+      "term": "open source",
+      "aliases": [
+        "open-source",
+        "OSS"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Software whose code is public, so anyone can read, use, and change it.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "repository",
+      "term": "repository",
+      "aliases": [
+        "repo",
+        "repos"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": "ri-POZ-i-tor-ee",
+      "simple_def": "The place where a project's code and its history are stored.",
+      "prereqs": [
+        "git"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "git",
+      "term": "Git",
+      "aliases": [],
+      "category": "tech",
+      "level": 2,
+      "say": "git (hard g)",
+      "simple_def": "A tool that tracks every change to code and who made it.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "pull-request",
+      "term": "pull request",
+      "aliases": [
+        "PR",
+        "PRs",
+        "merge request",
+        "pull requests"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "A proposed code change that teammates review before it is accepted.",
+      "prereqs": [
+        "git"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "commit",
+      "term": "commit",
+      "aliases": [
+        "commits"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "A saved snapshot of code changes, with a short message.",
+      "prereqs": [
+        "git"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "branch",
+      "term": "branch",
+      "aliases": [
+        "branches"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "A separate copy of the code where you can work without affecting others.",
+      "prereqs": [
+        "git"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "merge",
+      "term": "merge",
+      "aliases": [
+        "merged",
+        "merging"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Combining changes from one branch into another.",
+      "prereqs": [
+        "branch"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "code-review",
+      "term": "code review",
+      "aliases": [
+        "code reviews"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "When teammates read your code changes to find problems before they ship.",
+      "prereqs": [
+        "pull-request"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "ci-cd",
+      "term": "CI/CD",
+      "aliases": [
+        "CI",
+        "CD",
+        "continuous integration",
+        "continuous delivery",
+        "continuous deployment"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": "see-eye see-dee",
+      "simple_def": "Automatic testing and shipping of code every time someone changes it.",
+      "prereqs": [
+        "commit"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "deploy",
+      "term": "deploy",
+      "aliases": [
+        "deployed",
+        "deploying"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "To put a new version of software where users can use it.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "production",
+      "term": "production",
+      "aliases": [
+        "prod",
+        "in production"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "The live system that real users are using.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "staging",
+      "term": "staging",
+      "aliases": [
+        "staging environment"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "A copy of the live system for testing before release.",
+      "prereqs": [
+        "production"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "bug",
+      "term": "bug",
+      "aliases": [
+        "bugs"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "A mistake in software that makes it behave wrongly.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "hotfix",
+      "term": "hotfix",
+      "aliases": [
+        "hot fix"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "An urgent fix shipped quickly to repair a live problem.",
+      "prereqs": [
+        "bug",
+        "production"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "rollback",
+      "term": "rollback",
+      "aliases": [
+        "roll back",
+        "rolled back"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Returning to the previous working version after a bad release.",
+      "prereqs": [
+        "deploy"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "refactor",
+      "term": "refactor",
+      "aliases": [
+        "refactoring"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": "ree-FAK-ter",
+      "simple_def": "Rewriting code to make it cleaner without changing what it does.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "technical-debt",
+      "term": "technical debt",
+      "aliases": [
+        "tech debt"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Shortcuts in code that save time now but cost more work later.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "legacy",
+      "term": "legacy",
+      "aliases": [
+        "legacy code",
+        "legacy system"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Old software that still runs but is hard to change.",
+      "prereqs": [],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "monolith",
+      "term": "monolith",
+      "aliases": [
+        "monolithic"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": "MON-oh-lith",
+      "simple_def": "One big application where all parts are built and deployed together.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "microservices",
+      "term": "microservices",
+      "aliases": [
+        "microservice"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": null,
+      "simple_def": "Building an app as many small services that talk to each other.",
+      "prereqs": [
+        "api",
+        "monolith"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "scalability",
+      "term": "scalability",
+      "aliases": [
+        "scalable",
+        "scale out",
+        "scaling"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Being able to handle more users or data without breaking.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "load-balancer",
+      "term": "load balancer",
+      "aliases": [
+        "load balancing",
+        "load balancers"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": null,
+      "simple_def": "A system that spreads incoming traffic across several servers.",
+      "prereqs": [
+        "server"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "cache",
+      "term": "cache",
+      "aliases": [
+        "caching",
+        "cached"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": "cash",
+      "simple_def": "A fast copy of data kept close by so it loads quicker.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "cdn",
+      "term": "CDN",
+      "aliases": [
+        "content delivery network"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": "see-dee-en",
+      "simple_def": "Servers around the world that deliver files from a location near each user.",
+      "prereqs": [
+        "cache"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "dns",
+      "term": "DNS",
+      "aliases": [
+        "domain name system"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": "dee-en-ess",
+      "simple_def": "The internet's address book that turns website names into server addresses.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "webhook",
+      "term": "webhook",
+      "aliases": [
+        "webhooks"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": null,
+      "simple_def": "A message one app sends to another automatically when something happens.",
+      "prereqs": [
+        "api"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "authentication",
+      "term": "authentication",
+      "aliases": [
+        "auth",
+        "authn"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Checking who you are, for example with a password.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "authorization",
+      "term": "authorization",
+      "aliases": [
+        "authz",
+        "permissions"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Checking what you are allowed to do after you log in.",
+      "prereqs": [
+        "authentication"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "encryption",
+      "term": "encryption",
+      "aliases": [
+        "encrypted",
+        "encrypt"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Scrambling data so only people with the right key can read it.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "uptime",
+      "term": "uptime",
+      "aliases": [],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "The share of time a system is working and available.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "outage",
+      "term": "outage",
+      "aliases": [
+        "downtime",
+        "outages"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "A period when a service is not working for users.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "serverless",
+      "term": "serverless",
+      "aliases": [
+        "functions as a service",
+        "FaaS",
+        "Lambda"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": null,
+      "simple_def": "Running code without managing servers; the provider runs it only when needed.",
+      "prereqs": [
+        "cloud",
+        "server"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "agile",
+      "term": "agile",
+      "aliases": [],
+      "category": "tech",
+      "level": 1,
+      "say": null,
+      "simple_def": "A way of working in short cycles, delivering small pieces often.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "sprint",
+      "term": "sprint",
+      "aliases": [
+        "sprints"
+      ],
+      "category": "tech",
+      "level": 1,
+      "say": null,
+      "simple_def": "A short fixed period, often two weeks, to finish a set of work.",
+      "prereqs": [
+        "agile"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "standup",
+      "term": "standup",
+      "aliases": [
+        "stand-up",
+        "daily standup"
+      ],
+      "category": "tech",
+      "level": 1,
+      "say": null,
+      "simple_def": "A short daily team meeting to share progress and problems.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "edge-case",
+      "term": "edge case",
+      "aliases": [
+        "edge cases",
+        "corner case"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "An unusual situation that software may not handle well.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "regression",
+      "term": "regression",
+      "aliases": [
+        "regressed"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "When something that used to work breaks after a change.",
+      "prereqs": [
+        "bug"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "linux",
+      "term": "Linux",
+      "aliases": [],
+      "category": "tech",
+      "level": 2,
+      "say": "LIN-ux",
+      "simple_def": "A free, open-source operating system that runs most servers.",
+      "prereqs": [
+        "open-source"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "yaml",
+      "term": "YAML",
+      "aliases": [
+        "yml"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": "YAM-ul",
+      "simple_def": "A simple text format for writing settings, used a lot in Kubernetes.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "json",
+      "term": "JSON",
+      "aliases": [],
+      "category": "tech",
+      "level": 2,
+      "say": "JAY-son",
+      "simple_def": "A common text format for sending structured data between programs.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "data-pipeline",
+      "term": "data pipeline",
+      "aliases": [
+        "pipeline",
+        "ETL"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": null,
+      "simple_def": "Automatic steps that move and clean data from one place to another.",
+      "prereqs": [
+        "database"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "real-time",
+      "term": "real-time",
+      "aliases": [
+        "realtime",
+        "real time"
+      ],
+      "category": "tech",
+      "level": 2,
+      "say": null,
+      "simple_def": "Happening right away, with almost no delay.",
+      "prereqs": [
+        "latency"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "event-driven",
+      "term": "event-driven",
+      "aliases": [
+        "event driven"
+      ],
+      "category": "tech",
+      "level": 3,
+      "say": null,
+      "simple_def": "A design where parts of a system react when something happens.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "container",
+      "term": "container",
+      "aliases": [
+        "containers"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "A package holding an app and everything it needs, so it runs the same anywhere.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "docker",
+      "term": "Docker",
+      "aliases": [],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "The most popular tool for building and running containers.",
+      "prereqs": [
+        "container"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "container-image",
+      "term": "container image",
+      "aliases": [
+        "image",
+        "docker image",
+        "images"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "The saved template a container starts from.",
+      "prereqs": [
+        "container"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "container-registry",
+      "term": "container registry",
+      "aliases": [
+        "registry",
+        "image registry"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "A storage place for container images.",
+      "prereqs": [
+        "container-image"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "kubernetes",
+      "term": "Kubernetes",
+      "aliases": [
+        "K8s",
+        "kube"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": "koo-ber-NET-eez",
+      "simple_def": "Open-source software that runs and manages many containers across many computers.",
+      "prereqs": [
+        "container"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "cluster",
+      "term": "cluster",
+      "aliases": [
+        "clusters"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "A group of computers working together as one system.",
+      "prereqs": [
+        "server"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "node",
+      "term": "node",
+      "aliases": [
+        "nodes",
+        "worker node"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "One computer, real or virtual, inside a cluster.",
+      "prereqs": [
+        "cluster"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "pod",
+      "term": "pod",
+      "aliases": [
+        "pods"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "The smallest unit Kubernetes runs: one or a few containers together.",
+      "prereqs": [
+        "kubernetes",
+        "container"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "k8s-deployment",
+      "term": "Deployment (Kubernetes)",
+      "aliases": [
+        "Deployment"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Kubernetes settings that keep a chosen number of copies of an app running.",
+      "prereqs": [
+        "pod"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "k8s-service",
+      "term": "Service (Kubernetes)",
+      "aliases": [
+        "Service"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "A stable address in Kubernetes that sends traffic to the right pods.",
+      "prereqs": [
+        "pod"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "ingress",
+      "term": "ingress",
+      "aliases": [
+        "ingress controller"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": "IN-gress",
+      "simple_def": "Kubernetes rules for how outside web traffic reaches services inside the cluster.",
+      "prereqs": [
+        "k8s-service"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "namespace",
+      "term": "namespace",
+      "aliases": [
+        "namespaces"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "A named area inside a cluster that keeps teams' resources separate.",
+      "prereqs": [
+        "cluster"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "helm",
+      "term": "Helm",
+      "aliases": [
+        "Helm chart",
+        "Helm charts"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "A package manager for Kubernetes that installs apps with one command.",
+      "prereqs": [
+        "kubernetes"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "kubectl",
+      "term": "kubectl",
+      "aliases": [
+        "kube control",
+        "cube control",
+        "cube cuddle"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": "KOOB-control (some say \"cube cuddle\")",
+      "simple_def": "The command-line tool for talking to a Kubernetes cluster.",
+      "prereqs": [
+        "kubernetes"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "control-plane",
+      "term": "control plane",
+      "aliases": [],
+      "category": "cloud",
+      "level": 4,
+      "say": null,
+      "simple_def": "The brain of a Kubernetes cluster that decides where things run.",
+      "prereqs": [
+        "cluster"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "etcd",
+      "term": "etcd",
+      "aliases": [],
+      "category": "cloud",
+      "level": 4,
+      "say": "ET-see-dee",
+      "simple_def": "The database where Kubernetes stores the state of the cluster.",
+      "prereqs": [
+        "control-plane"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "k8s-operator",
+      "term": "operator (Kubernetes)",
+      "aliases": [
+        "operator",
+        "operators"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": null,
+      "simple_def": "Software that automatically runs and repairs a complex app inside Kubernetes.",
+      "prereqs": [
+        "kubernetes"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "crd",
+      "term": "CRD",
+      "aliases": [
+        "CRDs",
+        "custom resource",
+        "custom resource definition"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": "see-ar-dee",
+      "simple_def": "A way to add your own object types to Kubernetes.",
+      "prereqs": [
+        "kubernetes"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "manifest",
+      "term": "manifest",
+      "aliases": [
+        "manifests"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "A file, usually YAML, that describes what should run in Kubernetes.",
+      "prereqs": [
+        "yaml"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "autoscaling",
+      "term": "autoscaling",
+      "aliases": [
+        "HPA",
+        "horizontal pod autoscaler",
+        "autoscaler"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Automatically adding or removing copies of an app as traffic changes.",
+      "prereqs": [
+        "scalability"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "replica",
+      "term": "replica",
+      "aliases": [
+        "replicas"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": "REP-li-ka",
+      "simple_def": "One identical copy of an app or database.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "crashloopbackoff",
+      "term": "CrashLoopBackOff",
+      "aliases": [
+        "crash loop",
+        "crashlooping",
+        "crash loop back off"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": "crash-loop-back-off",
+      "simple_def": "A pod that keeps crashing and restarting, with longer waits between tries.",
+      "prereqs": [
+        "pod"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "oomkilled",
+      "term": "OOMKilled",
+      "aliases": [
+        "OOM",
+        "out of memory",
+        "OOM killed"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": "oom-killed",
+      "simple_def": "A container was stopped because it used more memory than allowed.",
+      "prereqs": [
+        "container"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "sidecar",
+      "term": "sidecar",
+      "aliases": [
+        "sidecars"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": null,
+      "simple_def": "A helper container that runs next to the main app in the same pod.",
+      "prereqs": [
+        "pod"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "service-mesh",
+      "term": "service mesh",
+      "aliases": [
+        "Istio",
+        "Linkerd"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": null,
+      "simple_def": "A layer that controls, secures, and observes traffic between microservices.",
+      "prereqs": [
+        "microservices"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "ebpf",
+      "term": "eBPF",
+      "aliases": [],
+      "category": "cloud",
+      "level": 4,
+      "say": "ee-bee-pee-eff",
+      "simple_def": "A way to run small safe programs inside the Linux kernel to watch or control the system.",
+      "prereqs": [
+        "linux"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "gitops",
+      "term": "GitOps",
+      "aliases": [
+        "Argo CD",
+        "ArgoCD"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": "GIT-ops",
+      "simple_def": "Managing systems by changing files in Git, which tools then apply automatically.",
+      "prereqs": [
+        "git",
+        "deploy"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "infrastructure-as-code",
+      "term": "infrastructure as code",
+      "aliases": [
+        "IaC",
+        "Terraform"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Creating servers and networks from code files instead of clicking in a console.",
+      "prereqs": [
+        "cloud"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "multi-cloud",
+      "term": "multi-cloud",
+      "aliases": [
+        "multicloud",
+        "multi cloud"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Using more than one cloud provider at the same time.",
+      "prereqs": [
+        "cloud"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "platform-engineering",
+      "term": "platform engineering",
+      "aliases": [
+        "platform team",
+        "internal developer platform",
+        "IDP"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "A team building shared tools so other developers can ship easily on their own.",
+      "prereqs": [
+        "devops"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "devops",
+      "term": "DevOps",
+      "aliases": [],
+      "category": "cloud",
+      "level": 2,
+      "say": "dev-ops",
+      "simple_def": "Developers and operations working together to ship and run software faster.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "sre",
+      "term": "SRE",
+      "aliases": [
+        "site reliability engineering",
+        "site reliability engineer",
+        "SREs"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "ess-ar-ee",
+      "simple_def": "Engineers who use software to keep live systems reliable and fast.",
+      "prereqs": [
+        "production"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "cncf",
+      "term": "CNCF",
+      "aliases": [
+        "Cloud Native Computing Foundation"
+      ],
+      "category": "cloud",
+      "level": 2,
+      "say": "see-en-see-eff",
+      "simple_def": "The nonprofit that hosts Kubernetes and many other open-source projects; it runs KubeCon.",
+      "prereqs": [
+        "open-source"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "cloud-native",
+      "term": "cloud native",
+      "aliases": [
+        "cloud-native"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Software designed from the start to run on cloud platforms in containers.",
+      "prereqs": [
+        "cloud",
+        "container"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "workload",
+      "term": "workload",
+      "aliases": [
+        "workloads"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Any app or job running on a system.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "orchestration",
+      "term": "orchestration",
+      "aliases": [
+        "orchestrator"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Automatically starting, stopping, and placing many containers across machines.",
+      "prereqs": [
+        "container"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "zero-trust",
+      "term": "zero trust",
+      "aliases": [
+        "zero-trust"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Security that checks every request, never trusting anything just because it is inside.",
+      "prereqs": [
+        "authentication"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "rbac",
+      "term": "RBAC",
+      "aliases": [
+        "role-based access control"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": "AR-back",
+      "simple_def": "Giving permissions to roles, then giving roles to people.",
+      "prereqs": [
+        "authorization"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "secrets-management",
+      "term": "secrets management",
+      "aliases": [
+        "secrets manager"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": null,
+      "simple_def": "Safely storing passwords and keys that programs need.",
+      "prereqs": [
+        "encryption"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "supply-chain-security",
+      "term": "supply chain security",
+      "aliases": [
+        "software supply chain"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": null,
+      "simple_def": "Protecting all the code and tools your software is built from.",
+      "prereqs": [
+        "open-source"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "sbom",
+      "term": "SBOM",
+      "aliases": [
+        "software bill of materials"
+      ],
+      "category": "cloud",
+      "level": 4,
+      "say": "ESS-bom",
+      "simple_def": "A list of every component inside a piece of software.",
+      "prereqs": [
+        "supply-chain-security"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "cve",
+      "term": "CVE",
+      "aliases": [
+        "CVEs",
+        "vulnerability",
+        "vulnerabilities"
+      ],
+      "category": "cloud",
+      "level": 3,
+      "say": "see-vee-ee",
+      "simple_def": "A publicly listed security weakness with an ID number.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "gpu",
+      "term": "GPU",
+      "aliases": [
+        "GPUs",
+        "graphics processing unit"
+      ],
+      "category": "ai",
+      "level": 2,
+      "say": "jee-pee-yoo",
+      "simple_def": "A chip that does many calculations at once; it powers AI.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "observability",
+      "term": "observability",
+      "aliases": [
+        "o11y"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "ob-ZER-va-BIL-i-tee",
+      "simple_def": "Being able to understand what a live system is doing from the data it sends out.",
+      "prereqs": [
+        "telemetry"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "monitoring",
+      "term": "monitoring",
+      "aliases": [],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "Watching a system's health and warning people when something looks wrong.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "telemetry",
+      "term": "telemetry",
+      "aliases": [],
+      "category": "ops",
+      "level": 3,
+      "say": "te-LEM-e-tree",
+      "simple_def": "Data a system sends about itself: logs, metrics, and traces.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "opentelemetry",
+      "term": "OpenTelemetry",
+      "aliases": [
+        "OTel",
+        "open telemetry"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "OH-tel",
+      "simple_def": "An open standard for collecting telemetry from any app.",
+      "prereqs": [
+        "telemetry"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "trace",
+      "term": "trace",
+      "aliases": [
+        "traces",
+        "tracing",
+        "distributed tracing"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": null,
+      "simple_def": "A record of one request's full path through many services, with timing.",
+      "prereqs": [
+        "microservices"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "span",
+      "term": "span",
+      "aliases": [
+        "spans"
+      ],
+      "category": "ops",
+      "level": 4,
+      "say": null,
+      "simple_def": "One timed step inside a trace.",
+      "prereqs": [
+        "trace"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "logs",
+      "term": "logs",
+      "aliases": [
+        "logging"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "Time-stamped text messages a program writes about what it did.",
+      "prereqs": [],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "metrics",
+      "term": "metrics",
+      "aliases": [
+        "metric"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "Numbers measured over time, like requests per second.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "dashboard",
+      "term": "dashboard",
+      "aliases": [
+        "dashboards"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "A screen of charts showing a system's health at a glance.",
+      "prereqs": [
+        "metrics"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "alert",
+      "term": "alert",
+      "aliases": [
+        "alerts",
+        "alerting"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "An automatic warning sent when something crosses a limit.",
+      "prereqs": [
+        "monitoring"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "sli",
+      "term": "SLI",
+      "aliases": [
+        "SLIs",
+        "service level indicator"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "ess-el-eye",
+      "simple_def": "A measurement of how well a service works for users, like success rate.",
+      "prereqs": [
+        "metrics"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "slo",
+      "term": "SLO",
+      "aliases": [
+        "SLOs",
+        "service level objective"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "ess-el-oh",
+      "simple_def": "A target for a reliability measurement, like 99.9% of requests succeed.",
+      "prereqs": [
+        "sli"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "error-budget",
+      "term": "error budget",
+      "aliases": [
+        "budget burn"
+      ],
+      "category": "ops",
+      "level": 4,
+      "say": null,
+      "simple_def": "How much failure an SLO allows before the team must stop and fix reliability.",
+      "prereqs": [
+        "slo"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "percentile-latency",
+      "term": "p99",
+      "aliases": [
+        "p95",
+        "p50",
+        "tail latency"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "pee-ninety-nine",
+      "simple_def": "The time within which 99% of requests finish; the slowest 1% take longer.",
+      "prereqs": [
+        "latency"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "mttr",
+      "term": "MTTR",
+      "aliases": [
+        "mean time to recovery",
+        "mean time to resolve"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "em-tee-tee-ar",
+      "simple_def": "The average time it takes to fix a problem.",
+      "prereqs": [
+        "incident"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "incident",
+      "term": "incident",
+      "aliases": [
+        "incidents"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "An unplanned problem that hurts a service and needs a fast response.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "on-call",
+      "term": "on-call",
+      "aliases": [
+        "on call"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "Being the person who must respond if the system breaks, even at night.",
+      "prereqs": [
+        "incident"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "paging",
+      "term": "paging",
+      "aliases": [
+        "paged",
+        "pager"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "Urgently alerting the on-call engineer by phone.",
+      "prereqs": [
+        "on-call"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "postmortem",
+      "term": "postmortem",
+      "aliases": [
+        "post-mortem",
+        "incident review"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "A written review after an incident about what happened and how to prevent it.",
+      "prereqs": [
+        "incident"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "root-cause",
+      "term": "root cause",
+      "aliases": [
+        "RCA",
+        "root cause analysis"
+      ],
+      "category": "ops",
+      "level": 2,
+      "say": null,
+      "simple_def": "The deepest reason a problem happened, not just its symptoms.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "rum",
+      "term": "RUM",
+      "aliases": [
+        "real user monitoring"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "rum",
+      "simple_def": "Measuring the speed and errors real users see in their browsers or apps.",
+      "prereqs": [
+        "monitoring"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "apm",
+      "term": "APM",
+      "aliases": [
+        "application performance monitoring"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": "ay-pee-em",
+      "simple_def": "Tools that measure how fast an app responds and where it slows down.",
+      "prereqs": [
+        "monitoring"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "chaos-engineering",
+      "term": "chaos engineering",
+      "aliases": [
+        "chaos testing"
+      ],
+      "category": "ops",
+      "level": 4,
+      "say": null,
+      "simple_def": "Breaking things on purpose to check that a system recovers.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "toil",
+      "term": "toil",
+      "aliases": [],
+      "category": "ops",
+      "level": 3,
+      "say": null,
+      "simple_def": "Repetitive manual work that could be automated.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "runbook",
+      "term": "runbook",
+      "aliases": [
+        "runbooks"
+      ],
+      "category": "ops",
+      "level": 3,
+      "say": null,
+      "simple_def": "Step-by-step instructions for handling a known problem.",
+      "prereqs": [
+        "incident"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "ai-sre",
+      "term": "AI SRE",
+      "aliases": [
+        "AI SRE agent"
+      ],
+      "category": "ops",
+      "level": 4,
+      "say": null,
+      "simple_def": "An AI agent that investigates incidents and suggests fixes for engineers.",
+      "prereqs": [
+        "sre",
+        "ai-agent"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "machine-learning",
+      "term": "machine learning",
+      "aliases": [
+        "ML"
+      ],
+      "category": "ai",
+      "level": 2,
+      "say": null,
+      "simple_def": "Computers learning patterns from data instead of following hand-written rules.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "llm",
+      "term": "LLM",
+      "aliases": [
+        "LLMs",
+        "large language model",
+        "large language models"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": "el-el-em",
+      "simple_def": "An AI model trained on huge amounts of text that can read and write language.",
+      "prereqs": [
+        "machine-learning"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "prompt",
+      "term": "prompt",
+      "aliases": [
+        "prompts",
+        "prompt engineering"
+      ],
+      "category": "ai",
+      "level": 2,
+      "say": null,
+      "simple_def": "The instructions or question you give to an AI model.",
+      "prereqs": [],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "token",
+      "term": "token",
+      "aliases": [
+        "tokens"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "A small piece of text, often part of a word, that an AI model reads.",
+      "prereqs": [
+        "llm"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "context-window",
+      "term": "context window",
+      "aliases": [],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "How much text an AI model can read at once.",
+      "prereqs": [
+        "token"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "hallucination",
+      "term": "hallucination",
+      "aliases": [
+        "hallucinate",
+        "hallucinating",
+        "hallucinations"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "When an AI confidently says something that is false.",
+      "prereqs": [
+        "llm"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "fine-tuning",
+      "term": "fine-tuning",
+      "aliases": [
+        "fine-tune",
+        "fine tuning",
+        "fine tuned"
+      ],
+      "category": "ai",
+      "level": 4,
+      "say": null,
+      "simple_def": "Extra training of a model on your own examples to make it better at one task.",
+      "prereqs": [
+        "llm"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "inference",
+      "term": "inference",
+      "aliases": [
+        "inference serving"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": "IN-fer-ence",
+      "simple_def": "Using a trained model to get answers, as opposed to training it.",
+      "prereqs": [
+        "machine-learning"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "embedding",
+      "term": "embedding",
+      "aliases": [
+        "embed",
+        "embeds",
+        "embeddings",
+        "vector embeddings",
+        "vector embedding"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "Turning text into a list of numbers that captures its meaning, so similar meanings sit close together.",
+      "prereqs": [
+        "vector",
+        "machine-learning"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "vector",
+      "term": "vector",
+      "aliases": [
+        "vectors"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "A list of numbers that stands for something, like the meaning of a sentence.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "vector-database",
+      "term": "vector database",
+      "aliases": [
+        "vector DB",
+        "vector store"
+      ],
+      "category": "data",
+      "level": 3,
+      "say": null,
+      "simple_def": "A database that finds items with similar meaning by comparing embeddings.",
+      "prereqs": [
+        "embedding",
+        "database"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "rag",
+      "term": "RAG",
+      "aliases": [
+        "retrieval-augmented generation",
+        "retrieval augmented generation"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": "rag",
+      "simple_def": "Giving an AI relevant documents from a search first, so its answer uses real facts.",
+      "prereqs": [
+        "llm",
+        "semantic-search"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "chunking",
+      "term": "chunking",
+      "aliases": [
+        "chunks",
+        "chunk"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "Splitting long documents into small pieces so search and AI can use them.",
+      "prereqs": [
+        "rag"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "ai-agent",
+      "term": "AI agent",
+      "aliases": [
+        "agent",
+        "agents",
+        "agentic",
+        "AI agents"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "An AI that can plan steps and use tools to finish a task by itself.",
+      "prereqs": [
+        "llm"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "mcp",
+      "term": "MCP",
+      "aliases": [
+        "Model Context Protocol"
+      ],
+      "category": "ai",
+      "level": 4,
+      "say": "em-see-pee",
+      "simple_def": "An open standard that lets AI agents connect to tools and data.",
+      "prereqs": [
+        "ai-agent"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "guardrails",
+      "term": "guardrails",
+      "aliases": [],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "Rules and checks that stop an AI from doing harmful or wrong things.",
+      "prereqs": [
+        "llm"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "evals",
+      "term": "evals",
+      "aliases": [
+        "eval",
+        "evaluations"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "Tests that measure how well an AI system does its job.",
+      "prereqs": [
+        "llm"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "gen-ai",
+      "term": "generative AI",
+      "aliases": [
+        "GenAI",
+        "gen AI"
+      ],
+      "category": "ai",
+      "level": 2,
+      "say": null,
+      "simple_def": "AI that creates new text, images, code, or sound.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "speech-to-text",
+      "term": "speech-to-text",
+      "aliases": [
+        "STT",
+        "ASR",
+        "speech to text"
+      ],
+      "category": "ai",
+      "level": 3,
+      "say": null,
+      "simple_def": "Turning spoken words into written text automatically.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "keyword-search",
+      "term": "keyword search",
+      "aliases": [
+        "lexical search",
+        "full-text search"
+      ],
+      "category": "data",
+      "level": 3,
+      "say": null,
+      "simple_def": "Finding documents that contain the exact words you typed.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "semantic-search",
+      "term": "semantic search",
+      "aliases": [],
+      "category": "data",
+      "level": 3,
+      "say": "se-MAN-tik",
+      "simple_def": "Finding results by meaning, even if they use different words.",
+      "prereqs": [
+        "embedding"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "hybrid-search",
+      "term": "hybrid search",
+      "aliases": [],
+      "category": "data",
+      "level": 3,
+      "say": null,
+      "simple_def": "Combining keyword search and semantic search to get better results.",
+      "prereqs": [
+        "keyword-search",
+        "semantic-search"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "bm25",
+      "term": "BM25",
+      "aliases": [],
+      "category": "data",
+      "level": 4,
+      "say": "bee-em-twenty-five",
+      "simple_def": "A classic formula for ranking keyword search results.",
+      "prereqs": [
+        "keyword-search"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "rrf",
+      "term": "RRF",
+      "aliases": [
+        "reciprocal rank fusion"
+      ],
+      "category": "data",
+      "level": 4,
+      "say": "ar-ar-eff",
+      "simple_def": "A way to merge two ranked result lists into one.",
+      "prereqs": [
+        "hybrid-search"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "reranker",
+      "term": "reranker",
+      "aliases": [
+        "reranking",
+        "rerank",
+        "rerankers"
+      ],
+      "category": "data",
+      "level": 4,
+      "say": null,
+      "simple_def": "A model that reorders search results so the most relevant come first.",
+      "prereqs": [
+        "semantic-search"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "search-index",
+      "term": "index",
+      "aliases": [
+        "indices",
+        "indexes",
+        "indexing"
+      ],
+      "category": "data",
+      "level": 3,
+      "say": null,
+      "simple_def": "A structure that makes searching data fast, like the list at the back of a book.",
+      "prereqs": [
+        "database"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "percolator",
+      "term": "percolator",
+      "aliases": [
+        "percolate",
+        "percolate query"
+      ],
+      "category": "data",
+      "level": 4,
+      "say": null,
+      "simple_def": "A search that runs backwards: stored queries are checked against each new document.",
+      "prereqs": [
+        "search-index"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "retrieval",
+      "term": "retrieval",
+      "aliases": [
+        "retrieve",
+        "retrieved",
+        "retriever"
+      ],
+      "category": "data",
+      "level": 3,
+      "say": null,
+      "simple_def": "Finding and fetching the most useful pieces of information for a question.",
+      "prereqs": [
+        "search-index"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "knowledge-base",
+      "term": "knowledge base",
+      "aliases": [
+        "knowledge bases"
+      ],
+      "category": "ai",
+      "level": 2,
+      "say": null,
+      "simple_def": "A collection of documents that people or an AI can search to find answers.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "query",
+      "term": "query",
+      "aliases": [
+        "queries"
+      ],
+      "category": "data",
+      "level": 2,
+      "say": "KWEER-ee",
+      "simple_def": "A question or search request sent to a database or search engine.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "relevance",
+      "term": "relevance",
+      "aliases": [
+        "relevant",
+        "relevancy"
+      ],
+      "category": "data",
+      "level": 2,
+      "say": null,
+      "simple_def": "How well a search result matches what the person was looking for.",
+      "prereqs": [
+        "query"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "use-case",
+      "term": "use case",
+      "aliases": [
+        "use cases"
+      ],
+      "category": "business",
+      "level": 1,
+      "say": null,
+      "simple_def": "A specific situation or problem that a product is used to solve.",
+      "prereqs": [],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "managed-service",
+      "term": "managed service",
+      "aliases": [
+        "managed",
+        "managed services",
+        "fully managed"
+      ],
+      "category": "business",
+      "level": 2,
+      "say": null,
+      "simple_def": "A product the provider runs and maintains for you, so your team does not operate it.",
+      "prereqs": [
+        "cloud"
+      ],
+      "ambiguous": true,
+      "source": "seed",
+      "translations": {}
+    },
+    {
+      "id": "elasticsearch",
+      "term": "Elasticsearch",
+      "aliases": [
+        "Elastic",
+        "Elastic Search"
+      ],
+      "category": "data",
+      "level": 3,
+      "say": "ee-LAS-tik-search",
+      "simple_def": "A popular search engine and database for keyword, semantic, and hybrid search.",
+      "prereqs": [
+        "search-index"
+      ],
+      "ambiguous": false,
+      "source": "seed",
+      "translations": {}
+    }
+  ]
+}

@@ -62,11 +62,15 @@ Normalizer rules, applied before matching:
 - join spelled-out letters (`r r f` becomes `rrf`)
 - join letter and number runs, and read number words (`bm 25`, `bm twenty five` become `bm25`)
 - match whole words only, longest term first
-- a term marked `ambiguous` matches only within five words of one of its `context` words
+- a term marked `ambiguous` needs tech context within five words on either side:
+  - if it has a `context` list, one of those words
+  - if it has none (the case for every ambiguous term in `content/glossary.json`), another
+    matched term that is not ambiguous and has the same `category`
 
 ## Other decisions
 
 - SM-2 runs on the phone and is saved through `PUT /api/users/{id}/knowledge/{term_id}`.
 - Audio goes from the phone straight to the speech-to-text provider as 16 kHz linear PCM,
   which behaves the same on iOS and Android. Audio never touches our servers.
-- `fixtures/glossary.sample.json` is a stand-in. `content/glossary.json` replaces it.
+- `content/glossary.json` (200 terms) is what the app serves. `fixtures/glossary.sample.json`
+  is a small, stable glossary that exists only so `matcher_cases.json` has fixed term ids.
