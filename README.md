@@ -92,7 +92,7 @@ All screenshots are in [web/docs/screens/](web/docs/screens/).
 | `content/`, `.gitar/`, `docs/` | The 200-term glossary and its validator, Gitar rules, plan and setup guides | Skyler |
 | `.github/workflows/` | CI for each part, deploy on merge, Gitar labelling | shared |
 | `bin/` | Helper scripts for delegating tasks to coding subagents | shared |
-| `recordings/` | A short clip of our own rehearsal | shared |
+| `recordings/` | Two short clips of our own rehearsal | shared |
 | `reference/` | Pre-kickoff scaffold, not part of the submission | nobody |
 
 ## Run it locally
