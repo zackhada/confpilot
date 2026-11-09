@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { defineConfig } from 'vitest/config'
 
 const API_TARGET = process.env.CONFPILOT_API ?? 'http://localhost:8000'
+const here = (path: string): string => fileURLToPath(new URL(path, import.meta.url))
 
 export default defineConfig({
   plugins: [
@@ -65,6 +66,8 @@ export default defineConfig({
   },
   server: {
     host: true,
+    // Tests import the shared glossary and fixtures, which live outside web/.
+    fs: { allow: [here('.'), here('../content'), here('../contracts')] },
     proxy: {
       '/api': { target: API_TARGET, changeOrigin: true },
       '/ws': { target: API_TARGET, ws: true, changeOrigin: true },

@@ -69,7 +69,7 @@ function Band({ band }: { band: MapBand }) {
           <span className="sr-only"> terms</span>
         </p>
       </div>
-      <p className="pt-0.5 pl-[1.875rem] text-(length:--text-note) opacity-80">{look.note}</p>
+      <p className="pt-0.5 pl-[1.875rem] text-(length:--text-note)">{look.note}</p>
       <ul className="flex flex-wrap gap-x-2 gap-y-1.5 pt-3">
         {band.sample.map((term: Term) => (
           <li key={term.id}>
@@ -86,7 +86,7 @@ function Band({ band }: { band: MapBand }) {
             )}
           </li>
         ))}
-        {more > 0 && <li className="self-center text-(length:--text-note) opacity-80">and {more} more</li>}
+        {more > 0 && <li className="self-center text-(length:--text-note)">and {more} more</li>}
       </ul>
     </motion.section>
   )
