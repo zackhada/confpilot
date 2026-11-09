@@ -26,7 +26,7 @@ from confpilot.models import (
 )
 from confpilot.rooms import Connection, Hub
 from confpilot.telemetry import tracer, word_to_card_ms
-from confpilot.utterances import store_final, transcript_words
+from confpilot.utterances import store_final_or_release, transcript_words
 
 MAX_FRAME_CHARS = 128_000
 MAX_RECORDED_LATENCY_MS = 60_000  # beyond this a clock is wrong, keep it out of the SLI
@@ -106,9 +106,12 @@ def handle_transcript(state: State, connection: Connection, event: TranscriptEve
             connection.room, connection.member.user_id, transcript_words(event), time.monotonic()
         )
         span.set_attribute("confpilot.utterance.duplicate", not fresh)
-        if fresh and not spawn(
-            store_final(state.store, state.matcher, connection.room, relayed), "store_final"
-        ):
+        if not fresh:
+            return
+        storing = store_final_or_release(
+            state.store, state.matcher, state.recent_finals, connection.room, relayed
+        )
+        if not spawn(storing, "store_final"):
             state.recent_finals.forget(connection.room, connection.member.user_id)
             span.set_attribute("confpilot.utterance.store_dropped", True)
 

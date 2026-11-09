@@ -69,6 +69,19 @@ class RecentFinals:
             self._rooms.pop(room, None)
 
 
+async def store_final_or_release(
+    store: Store, matcher: Matcher, recent: RecentFinals, room: str, event: TranscriptEvent
+) -> None:
+    """Store an admitted final. If storing fails, release its admission, so that the other
+    phone's copy of the same sentence can still be stored, then let the failure be logged."""
+    try:
+        await store_final(store, matcher, room, event)
+    except Exception:
+        if event.speaker is not None:
+            recent.forget(room, event.speaker.user_id)
+        raise
+
+
 async def store_final(store: Store, matcher: Matcher, room: str, event: TranscriptEvent) -> None:
     """Run the matcher and save the utterance with its term ids. ``event.speaker`` is set."""
     if event.speaker is None:

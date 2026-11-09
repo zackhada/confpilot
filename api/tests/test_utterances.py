@@ -111,6 +111,30 @@ def test_dropped_store_work_does_not_suppress_another_speakers_copy(
     assert [s.attributes["confpilot.utterance.store_dropped"] for s in relays] == [True, True]
 
 
+def test_a_failed_store_releases_the_final_so_the_other_copy_is_kept(
+    client: TestClient, monkeypatch
+) -> None:
+    store = client.app.state.store
+    real_add = store.add_utterance
+    calls = []
+
+    async def fail_once(utterance) -> None:
+        calls.append(utterance.utterance_id)
+        if len(calls) == 1:
+            raise RuntimeError("store is down")
+        await real_add(utterance)
+
+    monkeypatch.setattr(store, "add_utterance", fail_once)
+    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+        ana.send_json(final("utt-a1", SENTENCE))  # storing this one fails
+        settle(ana)
+        ben.send_json(final("utt-b1", SENTENCE))  # the same sentence from the other phone
+        settle(ben)
+
+    assert calls == ["utt-a1", "utt-b1"]
+    assert stored(client) == {("u-ben", "utt-b1"): SENTENCE}
+
+
 def test_a_one_word_final_cannot_suppress_or_replace_a_long_one(client: TestClient) -> None:
     with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
         ben.send_json(final("utt-b1", "search"))  # arrives first, shares a word
