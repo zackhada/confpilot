@@ -1,25 +1,24 @@
 import type { SearchHit } from '@contracts'
 import { LoaderCircle, Search } from 'lucide-react'
-import { useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { parseHighlight, timeAgo } from '@/ask/highlight'
 import { Button } from '@/components/ui/button'
-import { searchRoom } from '@/room/api'
+import { askRoom } from '@/room/api'
 import { serverNow } from '@/room/session'
 import { useRoom } from '@/room/store'
 import { ScreenHeader } from '@/shell/ScreenHeader'
 import { useTermSheet } from '@/shared/useTermSheet'
 
-const SUGGESTIONS: readonly { text: string; lang: string }[] = [
-  { text: 'What did Zack say about RAG?', lang: 'en' },
-  { text: '¿Qué dijeron sobre la búsqueda híbrida?', lang: 'es' },
-  { text: 'How does the search rank results?', lang: 'en' },
-]
+const DEMO_QUESTION = 'What did Zack say about RAG?'
 
-type Status =
-  | { kind: 'idle' }
-  | { kind: 'loading'; q: string }
-  | { kind: 'done'; q: string; hits: SearchHit[] }
-  | { kind: 'error'; q: string }
+interface Query {
+  room: string
+  userId: string
+  question: string
+  hits: SearchHit[] | null
+  answer: string | null
+  pending: boolean
+}
 
 function Moment({ hit }: { hit: SearchHit }) {
   const terms = useRoom((s) => s.terms)
@@ -61,28 +60,41 @@ function Moment({ hit }: { hit: SearchHit }) {
   )
 }
 
-/** Ask your conference: search everything said in the room, in any language. */
+/** Answer a question using moments retrieved from the room transcript. */
 export function Ask() {
   const me = useRoom((s) => s.me)
   const room = useRoom((s) => s.room)
+  const ready = useRoom((s) => s.status === 'open' && s.members.some((m) => m.user_id === s.me?.user_id))
   const [text, setText] = useState('')
-  const [status, setStatus] = useState<Status>({ kind: 'idle' })
-  const latest = useRef(0)
+  const [query, setQuery] = useState<Query | null>(null)
+  const active = useRef<AbortController | null>(null)
+  const status = query?.room === room && query?.userId === me?.user_id ? query : null
+
+  useEffect(() => () => {
+    active.current?.abort()
+    setQuery(null)
+  }, [room, me?.user_id])
 
   const ask = (question: string): void => {
     const q = question.trim()
-    if (!q || !me || !room) return
+    if (!q || !me || !room || !ready) return
+    active.current?.abort()
+    const controller = new AbortController()
+    active.current = controller
     setText(q)
-    setStatus({ kind: 'loading', q })
-    latest.current += 1
-    const request = latest.current
-    searchRoom(me.name, room, q)
-      .then((hits) => {
-        if (request === latest.current) setStatus({ kind: 'done', q, hits })
-      })
-      .catch(() => {
-        if (request === latest.current) setStatus({ kind: 'error', q })
-      })
+
+    let next: Query = { room, userId: me.user_id, question: q, hits: null, answer: null, pending: true }
+    setQuery(next)
+    const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)])
+    void askRoom(me.name, { room, question: q }, (event) => {
+      if (controller.signal.aborted) return
+      next = event.type === 'moments'
+        ? { ...next, hits: event.hits }
+        : { ...next, answer: event.answer, pending: false }
+      setQuery(next)
+    }, signal).catch(() => {
+      if (!controller.signal.aborted) setQuery({ ...next, pending: false })
+    })
   }
 
   const submit = (event: FormEvent): void => {
@@ -93,64 +105,66 @@ export function Ask() {
   return (
     <>
       <ScreenHeader>
-        <h1 className="font-display text-xl">Ask</h1>
+        <h1 className="font-display text-xl">Agent</h1>
       </ScreenHeader>
 
-      <div className="px-safe min-h-0 flex-1 overflow-y-auto" aria-live="polite" aria-busy={status.kind === 'loading'}>
-        {status.kind === 'idle' && (
+      <div className="px-safe min-h-0 flex-1 overflow-y-auto" aria-live="polite" aria-busy={status?.pending && status.hits === null}>
+        {!status && (
           <div className="flex h-full flex-col justify-end pb-5">
             <p className="max-w-[13ch] font-display text-(length:--text-title) leading-[1.05]">
               Ask about anything you heard.
             </p>
             <p className="max-w-[30ch] pt-4 text-(length:--text-lead) text-ink-soft">
-              Use your own language. The answer is the moment it was said.
+              Get an answer grounded in the conversation, with the moments it draws on.
             </p>
           </div>
         )}
-        {status.kind === 'loading' && (
+        {status?.pending && status.hits === null && (
           <p className="flex items-center gap-2.5 pt-4 text-(length:--text-lead) text-ink-soft">
-            <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
+            <LoaderCircle className="size-5 motion-safe:animate-spin" aria-hidden="true" />
             Searching the conversation
           </p>
         )}
-        {status.kind === 'error' && (
+        {status && !status.pending && status.hits === null && (
           <div role="alert" className="pt-4">
             <p className="max-w-[28ch] text-(length:--text-lead) font-semibold">
-              Search is not reachable right now. Your question is still in the box.
+              The agent couldn’t search the room. Your question is still in the box.
             </p>
-            <Button className="mt-4" onClick={() => ask(status.q)}>Try again</Button>
+            <Button className="mt-4" disabled={!ready} onClick={() => ask(status.question)}>Try again</Button>
           </div>
         )}
-        {status.kind === 'done' && status.hits.length === 0 && (
+        {status?.hits?.length === 0 && (
           <p className="max-w-[28ch] pt-4 text-(length:--text-lead) text-ink-soft">
-            No moment matched &ldquo;{status.q}&rdquo;. Try a word you heard, such as a term from your recap.
+            No moment matched &ldquo;{status.question}&rdquo;. Try a word you heard, such as a term from your recap.
           </p>
         )}
-        {status.kind === 'done' && status.hits.length > 0 && (
+        {status?.hits && status.hits.length > 0 && (
           <>
+            <section aria-labelledby="agent-answer" className="mt-3 rounded-(--radius-card) border border-rule bg-hall-raised p-4">
+              <h2 id="agent-answer" className="font-display text-xl">Answer</h2>
+              <p className="pt-2 text-(length:--text-lead) leading-snug">
+                {status.pending ? 'Writing an answer from these moments…' : status.answer ?? 'An answer is unavailable. You can still read the moments below.'}
+              </p>
+            </section>
             <p className="pt-3 text-(length:--text-note) font-semibold text-ink-soft">
               {status.hits.length} {status.hits.length === 1 ? 'moment' : 'moments'}
             </p>
-            <ol>{status.hits.map((hit) => <Moment key={hit.utterance_id} hit={hit} />)}</ol>
+            <ol>{status.hits.map((hit) => <Moment key={`${hit.speaker.user_id}:${hit.utterance_id}`} hit={hit} />)}</ol>
           </>
         )}
       </div>
 
       <div className="border-t border-rule pt-3 pb-3">
-        <ul aria-label="Suggested questions" className="scrollbar-none px-safe flex gap-2 overflow-x-auto pb-3">
-          {SUGGESTIONS.map((suggestion) => (
-            <li key={suggestion.text} className="shrink-0">
-              <button
-                type="button"
-                lang={suggestion.lang}
-                onClick={() => ask(suggestion.text)}
-                className="min-h-11 rounded-(--radius-chip) border border-rule bg-hall-raised px-4 text-(length:--text-note) font-semibold"
-              >
-                {suggestion.text}
-              </button>
-            </li>
-          ))}
-        </ul>
+        <div className="px-safe pb-3">
+          <button
+            type="button"
+            onClick={() => ask(DEMO_QUESTION)}
+            disabled={!ready}
+            className="min-h-11 rounded-(--radius-chip) border border-rule bg-hall-raised px-4 text-(length:--text-note) font-semibold"
+          >
+            {DEMO_QUESTION}
+          </button>
+        </div>
         <search>
           <form onSubmit={submit} className="px-safe flex gap-2">
           <input
@@ -158,11 +172,12 @@ export function Ask() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             aria-label="Your question"
+            maxLength={200}
             placeholder="Ask in any language"
             enterKeyHint="search"
             className="min-h-13 min-w-0 flex-1 rounded-(--radius-control) border border-rule bg-hall-raised px-4 text-(length:--text-lead) text-ink placeholder:text-ink-soft"
           />
-          <Button type="submit" variant="primary" size="icon" className="size-13" aria-label="Search" disabled={!text.trim()}>
+          <Button type="submit" variant="primary" size="icon" className="size-13" aria-label="Ask the agent" disabled={!ready || !text.trim()}>
             <Search aria-hidden="true" />
           </Button>
           </form>
