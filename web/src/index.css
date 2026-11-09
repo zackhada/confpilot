@@ -157,7 +157,11 @@
     padding-right: max(1rem, env(safe-area-inset-right));
   }
   .tabular {
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: lining-nums tabular-nums;
+  }
+  /* Terms such as BM25 and K8s read better with full-height figures. */
+  .font-display {
+    font-variant-numeric: lining-nums;
   }
   /* Older captions fade towards the top of the caption well. */
   .fade-top {

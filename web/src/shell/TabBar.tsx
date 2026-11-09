@@ -40,7 +40,7 @@ export function TabBar() {
                   <span
                     aria-hidden="true"
                     className={cn(
-                      'absolute top-0 h-[3px] w-10 rounded-b-full bg-fresh transition-opacity duration-150',
+                      'absolute top-0 left-1/2 h-[3px] w-10 -translate-x-1/2 rounded-b-full bg-fresh transition-opacity duration-150',
                       isActive ? 'opacity-100' : 'opacity-0',
                     )}
                   />

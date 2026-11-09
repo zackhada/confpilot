@@ -75,13 +75,13 @@ export function StartPanel() {
     <div className="px-safe pb-4">
       <p className="pb-3 text-(length:--text-note) text-ink-soft">
         {on
-          ? 'Listening. Cards appear here for words that are new to you.'
-          : 'Cards appear here for words that are new to you. Speaking too? Turn on your mic.'}
+          ? 'Your mic is on. Cards appear here for words that are new to you.'
+          : 'Cards appear here for words that are new to you. Turn on your mic if you are speaking too.'}
       </p>
       {!on && (
         <Button variant="primary" size="lg" className="w-full" onClick={() => toggleMic(state)}>
           <Mic aria-hidden="true" />
-          Start listening
+          Turn on my mic
         </Button>
       )}
     </div>

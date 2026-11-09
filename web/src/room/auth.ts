@@ -93,6 +93,24 @@ export function ensureSession(name: string, fresh = false): Promise<StoredSessio
 }
 
 /**
+ * Ask the API whether the stored session is still accepted. Only a clear 401 counts as
+ * rejected: a network error says nothing about the session, and replacing a good session
+ * would give the phone a new user id in the middle of a talk.
+ */
+export async function sessionRejected(name: string): Promise<boolean> {
+  const stored = storedSession(name)
+  if (!stored) return true
+  try {
+    const response = await fetch(`/api/users/${encodeURIComponent(stored.user_id)}/knowledge`, {
+      headers: { authorization: `Bearer ${stored.session}` },
+    })
+    return response.status === 401
+  } catch {
+    return false
+  }
+}
+
+/**
  * fetch for /api/* with the session attached. On a 401 it creates a new session once and
  * retries; a second 401 is returned to the caller.
  */

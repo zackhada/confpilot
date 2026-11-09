@@ -4,7 +4,7 @@ import type { Lang, Role, ServerEvent, Term, TranscriptEvent } from '@contracts'
 import { createClock } from '@/lib/clock'
 import { wordToCardMs } from '@/lib/latency'
 import { createMatcher, type Match } from '@/lib/match/matcher'
-import { ensureSession, storedSession } from './auth'
+import { ensureSession, sessionRejected, storedSession } from './auth'
 import { cachedGlossary, indexTerms, loadGlossary } from './glossary'
 import { loadKnowledge, loadSaved, storeKnowledge, storeSaved } from './identity'
 import { seedKnowledge, type Persona } from './personas'
@@ -13,7 +13,7 @@ import { allCards, useRoom, wordsOf } from './store'
 
 const TIME_SYNC_INTERVAL_MS = 30_000
 const SESSION_RETRY_MS = 3000
-/** Failed connection attempts in a row before the session is assumed to be rejected. */
+/** After every this many failed connection attempts in a row, check the session over HTTP. */
 const FAILURES_BEFORE_RENEW = 2
 
 export interface JoinOptions {
@@ -104,9 +104,13 @@ function handleStatus(status: SocketStatus, options: JoinOptions, token: number)
     sendPing()
   }
   if (status === 'reconnecting') {
-    // A browser cannot see a 401 on a WebSocket handshake; repeated failures stand in for it.
+    // A browser cannot see a 401 on a WebSocket handshake. After repeated failures, ask the
+    // API over HTTP; a plain network drop must not cost the phone its identity.
     failures += 1
-    if (failures >= FAILURES_BEFORE_RENEW) renewSession(options, token)
+    if (failures % FAILURES_BEFORE_RENEW !== 0) return
+    void sessionRejected(options.name).then((rejected) => {
+      if (rejected) renewSession(options, token)
+    })
   }
 }
 

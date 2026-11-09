@@ -48,7 +48,7 @@ async function join(page: Page): Promise<void> {
 
 /** Wait until a card for `term` is on screen, then let its spring settle. */
 async function waitForCard(page: Page, term: string, timeout = 70_000): Promise<void> {
-  await page.getByRole('heading', { name: term, exact: true }).waitFor({ timeout })
+  await page.getByRole('article', { name: term, exact: true }).first().waitFor({ timeout })
   await page.waitForTimeout(700)
 }
 

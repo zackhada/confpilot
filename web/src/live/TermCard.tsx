@@ -71,8 +71,8 @@ export function TermCard(props: TermCardProps) {
           aria-label={`Open the ${name} card`}
           className="min-w-0 flex-1 rounded-l-(--radius-card) py-2.5 pr-1 pl-4 text-left -outline-offset-4"
         >
-          <span className="flex items-baseline gap-2.5">
-            <span id={headingId} className="truncate font-display text-xl leading-tight">{name}</span>
+          <span className="flex flex-wrap items-baseline gap-x-2.5">
+            <span id={headingId} className="font-display text-xl leading-tight">{name}</span>
             <LatencyBadge ms={latencyMs} className="font-medium text-ink-soft" />
           </span>
           <span className="mt-0.5 line-clamp-2 text-[0.9375rem] leading-snug text-ink-soft [@media(max-height:700px)]:line-clamp-1">

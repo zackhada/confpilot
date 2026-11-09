@@ -172,9 +172,11 @@ function micSupported(): boolean {
 
 /** Call from a tap: browsers only start audio from a user gesture. */
 export async function startListening(): Promise<void> {
-  const me = useRoom.getState().me
-  if (session || !me) return
+  if (session) return
   if (!micSupported()) return setState('unsupported')
+  // No identity yet means the room is not connected, so there is nowhere to send captions.
+  const me = useRoom.getState().me
+  if (!me) return setState('unavailable')
   const current: MicSession = {
     userId: me.user_id,
     name: me.name,

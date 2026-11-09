@@ -23,6 +23,18 @@ export function isGlossary(value: unknown): value is Glossary {
   return typeof v.version === 'string' && Array.isArray(v.terms) && v.terms.every(isTerm)
 }
 
+/**
+ * Accepts a glossary off the wire. content/glossary.json carries a numeric version (1)
+ * while the contract says string, so the version is normalised here instead of rejected.
+ */
+export function parseGlossary(value: unknown): Glossary | null {
+  if (typeof value !== 'object' || value === null) return null
+  const raw = value as Record<string, unknown>
+  const version = typeof raw.version === 'number' ? String(raw.version) : raw.version
+  const candidate = { version, terms: raw.terms }
+  return isGlossary(candidate) ? candidate : null
+}
+
 /** The glossary saved on this phone from an earlier visit, if any. */
 export function cachedGlossary(): Glossary | null {
   return readStoredJson(CACHE_KEY, isGlossary)
@@ -36,10 +48,10 @@ export async function loadGlossary(fetchImpl: typeof fetch = fetch): Promise<Glo
   try {
     const response = await fetchImpl('/api/glossary')
     if (!response.ok) throw new Error(`The glossary request failed (${response.status}).`)
-    const body: unknown = await response.json()
-    if (!isGlossary(body)) throw new Error('The glossary response had an unexpected shape.')
-    if (cachedGlossary()?.version !== body.version) writeStored(CACHE_KEY, JSON.stringify(body))
-    return body
+    const glossary = parseGlossary(await response.json())
+    if (!glossary) throw new Error('The glossary response had an unexpected shape.')
+    if (cachedGlossary()?.version !== glossary.version) writeStored(CACHE_KEY, JSON.stringify(glossary))
+    return glossary
   } catch (error) {
     const cached = cachedGlossary()
     if (cached) return cached

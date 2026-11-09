@@ -28,9 +28,9 @@ export function StageMeter({ room, joinUrl }: StageMeterProps) {
 
       <div aria-live="polite" aria-atomic="true">
         <p className="text-(length:--text-lead) text-ink-soft">Word spoken to card on screen</p>
-        <p className="tabular font-display text-[5.5rem] leading-none">
+        <p className="tabular text-[5.5rem] leading-none font-bold tracking-tight">
           {value ?? '–'}
-          <span className="pl-2 font-sans text-3xl font-semibold text-ink-soft">ms</span>
+          <span className="pl-2 text-3xl font-semibold tracking-normal text-ink-soft">ms</span>
         </p>
         <p className="mt-3 text-(length:--text-lead) text-ink-soft">
           95th percentile of {latencies.length} {latencies.length === 1 ? 'card' : 'cards'}
