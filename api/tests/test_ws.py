@@ -171,6 +171,7 @@ def test_knowledge_set_updates_the_store(client: TestClient, room) -> None:
         '{"type": "nope"}',
         '{"type": "transcript", "text": 5}',
         '{"type": "time.ping"}',
+        '{"type": "time.ping", "t0": 1e400}',
     ],
 )
 def test_bad_input_gets_an_error_event_and_the_socket_stays_open(room, frame: str) -> None:
