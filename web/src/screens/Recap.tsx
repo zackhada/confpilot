@@ -1,3 +1,4 @@
+import { NextSteps } from '@/next/NextSteps'
 import { useRecap } from '@/recap/useRecap'
 import { useRoom } from '@/room/store'
 import { ScreenHeader } from '@/shell/ScreenHeader'
@@ -40,6 +41,8 @@ export function Recap() {
             ))}
           </ul>
         )}
+
+        {heardIds.size > 0 && <NextSteps heardIds={[...heardIds]} />}
       </div>
     </>
   )

@@ -1,5 +1,6 @@
 import { act, render, screen, within } from '@testing-library/react'
 import type { Knowledge, Term } from '@contracts'
+import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { initialKnowledge } from '@/lib/sm2'
 import { fetchRecap } from '@/room/api'
@@ -55,7 +56,7 @@ describe('Recap', () => {
       records: { learned: learnedRecord, learning: { ...learnedRecord, term_id: 'learning', learned: false } },
     })
 
-    render(<Recap />)
+    render(<Recap />, { wrapper: MemoryRouter })
 
     expect(screen.getByText('2')).toBeInTheDocument()
     expect(screen.getByText('new terms')).toBeInTheDocument()
@@ -85,7 +86,7 @@ describe('Recap', () => {
       knowledge: { rag: 'known' },
       records: { rrf: { ...initialKnowledge('zack', 'rrf'), learned: true } },
     })
-    render(<Recap />)
+    render(<Recap />, { wrapper: MemoryRouter })
     expect(fetchRecap).not.toHaveBeenCalled()
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('You heard0new terms')
     expect(screen.queryByText(/nothing to recap/i)).not.toBeInTheDocument()
