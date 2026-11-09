@@ -5,6 +5,7 @@ import { personaById } from '@/room/personas'
 import { useProfile } from '@/room/profile'
 import { joinRoom, leaveRoom } from '@/room/session'
 import { Join } from '@/screens/Join'
+import { TermSheet } from '@/shared/TermSheet'
 import { stopListening } from '@/stt/mic'
 import { TabBar } from './TabBar'
 
@@ -56,6 +57,7 @@ export function AppShell() {
         <Outlet />
       </main>
       <TabBar />
+      <TermSheet />
     </div>
   )
 }
