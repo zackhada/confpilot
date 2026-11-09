@@ -32,6 +32,7 @@ ENV CI=true
 RUN npm install --global --no-fund --no-audit pnpm@${PNPM_VERSION}
 # contracts/ sits beside web/ so imports of ../contracts resolve as they do in the repo.
 COPY contracts/ /src/contracts/
+COPY content/glossary.json /src/content/glossary.json
 WORKDIR /src/web
 COPY --from=sources /out/web/ ./
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
