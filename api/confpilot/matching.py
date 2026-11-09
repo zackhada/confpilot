@@ -91,6 +91,18 @@ def _select(candidates: Iterable[Candidate], token_count: int) -> list[Candidate
     return chosen
 
 
+def _near(first: Token, last: Token, match_first: Token, match_last: Token) -> bool:
+    """Is the span first..last within five spoken words of the match on either side?
+
+    Distances are counted in input words, not tokens: "long-running" is one word although it
+    becomes two tokens, and "twenty five" is two words although it becomes one.
+    """
+    return (
+        last.last >= match_first.first - CONTEXT_WINDOW
+        and first.first <= match_last.last + CONTEXT_WINDOW
+    )
+
+
 class Matcher:
     def __init__(self, terms: Iterable[Term]) -> None:
         self._forms: dict[str, str] = {}  # glued form -> term id
@@ -115,10 +127,12 @@ class Matcher:
         context = self._context.get(term_id)
         if context is None:
             return True
-        nearby = tokens[max(0, i - CONTEXT_WINDOW) : i] + tokens[j + 1 : j + 1 + CONTEXT_WINDOW]
-        return any(t.text in context for t in nearby)
+        outside = (*tokens[:i], *tokens[j + 1 :])
+        return any(t.text in context and _near(t, t, tokens[i], tokens[j]) for t in outside)
 
-    def _is_lonely(self, candidate: Candidate, chosen: Iterable[Candidate]) -> bool:
+    def _is_lonely(
+        self, candidate: Candidate, chosen: Iterable[Candidate], tokens: Sequence[Token]
+    ) -> bool:
         """An ambiguous term without a context list needs a matched, plain, same-category
         term within five words on either side."""
         _, i, j, term_id = candidate
@@ -127,8 +141,7 @@ class Matcher:
             return False
         return not any(
             self._plain.get(other_id) == category
-            and other_j >= i - CONTEXT_WINDOW
-            and other_i <= j + CONTEXT_WINDOW
+            and _near(tokens[other_i], tokens[other_j], tokens[i], tokens[j])
             for _, other_i, other_j, other_id in chosen
         )
 
@@ -149,7 +162,7 @@ class Matcher:
         # Dropping a lonely ambiguous match can free its words for a shorter term, so repeat.
         while True:
             chosen = _select(candidates, len(tokens))
-            lonely = {c for c in chosen if self._is_lonely(c, chosen)}
+            lonely = {c for c in chosen if self._is_lonely(c, chosen, tokens)}
             if not lonely:
                 break
             candidates = [c for c in candidates if c not in lonely]

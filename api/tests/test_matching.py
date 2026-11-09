@@ -92,6 +92,24 @@ def test_ambiguous_term_needs_context_within_five_words(matcher: Matcher) -> Non
     assert "service" not in [m.term_id for m in matcher.match(far)]
 
 
+def test_context_window_counts_spoken_words_not_tokens(matcher: Matcher) -> None:
+    def ids(text: str) -> list[str]:
+        return [m.term_id for m in matcher.match(text.split())]
+
+    # A hyphenated word is one word, although it becomes two tokens.
+    assert ids("the pod uses long-running self-healing service") == ["pod", "service"]
+    assert ids("the pod a-b c-d e-f g-h service") == ["pod", "service"]  # five words away
+    assert ids("the pod a-b c-d e-f g-h i-j service") == ["pod"]  # six words away
+    # "twenty five" is two words, although it becomes one token.
+    assert ids("the pod has twenty five replicas service") == ["pod", "service"]  # five away
+    assert ids("the pod has twenty five replicas per service") == ["pod"]  # six away
+    # The same holds for the same-category rule (agent has no context list).
+    assert ids("a knowledge base that long-running self-healing agent") == [
+        "knowledge-base",
+        "ai-agent",
+    ]
+
+
 def test_empty_input(matcher: Matcher) -> None:
     assert matcher.match([]) == []
     assert matcher.match(["...", "-"]) == []
