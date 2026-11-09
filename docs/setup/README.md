@@ -34,3 +34,6 @@ For Kubernetes, fill `deploy/base/secret.yaml` locally or create the secret with
 ## Team
 Repo: github.com/zackhada/confpilot (private). Collaborators invited: osideskyler, crstall4, tannernielson27.
 Everyone: accept the invite, then do Gitar setup is a one-time step for the repo owner.
+
+## AI disclosure
+This project is built with AI coding assistants (OpenAI Codex, DeepSeek V4 Pro subagents via pi, Claude Code). All code is reviewed and understood by the team.
