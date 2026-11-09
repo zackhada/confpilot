@@ -48,18 +48,29 @@ There is no login. `user_id` is a UUID kept on the phone, and a persona switcher
 A room is a short code in the URL (`/?room=slc1`). The stage view (`/stage?room=slc1`) joins
 as a `viewer` and shows a QR code for the room.
 
-Both phones may hear both voices. Speakers get a mic toggle, and the API drops a final
-transcript that repeats another speaker's final from the previous three seconds.
+Both phones may hear both voices, so the same sentence can arrive as two utterances from two
+speakers. Speakers get a mic toggle, and duplicates are handled in three places:
+
+- **Relay is never delayed.** The API relays every interim and final as it arrives.
+- **Captions:** two utterances are duplicates when their `started_at` values are within three
+  seconds and at least 80% of the normalized words of the shorter one appear in the other.
+  The one with the earlier `started_at` wins (ties go to the lower `user_id`). Phones hide the
+  loser, and the API applies the same test to finals before storing, so a sentence is stored
+  and percolated once.
+- **Cards:** a phone shows a term at most once per session, whatever utterance it came from.
+  A duplicate utterance therefore never produces a second card or a second `card.shown`.
 
 ## 6. One matcher behaviour, three implementations
 
 The phone (TypeScript), the glossary checker (Python) and the Elasticsearch percolator must
 agree. `fixtures/matcher_cases.json` is the shared test: every implementation runs it in CI.
 
-Normalizer rules, applied before matching:
+Normalizer rules, applied in this order to the transcript and to every term and alias:
 
-- lowercase, and strip punctuation except inside a term (`R.R.F.` becomes `rrf`)
-- join spelled-out letters (`r r f` becomes `rrf`)
+- lowercase
+- hyphens and slashes become spaces (`retrieval-augmented` becomes `retrieval augmented`)
+- every other punctuation mark is deleted (`R.R.F.` becomes `rrf`, `user's` becomes `users`)
+- join runs of single spelled-out letters (`r r f` becomes `rrf`)
 - join letter and number runs, and read number words (`bm 25`, `bm twenty five` become `bm25`)
 - match whole words only, longest term first
 - a term marked `ambiguous` needs tech context within five words on either side:

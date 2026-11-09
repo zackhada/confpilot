@@ -13,7 +13,7 @@ export type TermLevel = 1 | 2 | 3 | 4; // 1 business, 2 general tech, 3 practiti
 export interface Term {
   id: string; // slug, e.g. "rrf"
   term: string; // display form, e.g. "RRF"
-  aliases: string[]; // other spoken or written forms, already normalized
+  aliases: string[]; // other spoken or written forms, as written; matchers normalize them
   say: string | null; // pronunciation hint, e.g. "ar-ar-EFF"; null when it is obvious
   category: string;
   level: TermLevel;

@@ -18,6 +18,7 @@
   { "text": "a pod goes into crash loop back off", "expect": ["pod", "crashloopbackoff"] },
   { "text": "turned into vectors that can be retrieved", "expect": ["vector"] },
   { "text": "into a knowledge base the agent can pull from", "expect": ["knowledge-base", "ai-agent"], "note": "ambiguous with no context list: a same-category term is nearby" },
+  { "text": "an AI agent can search the knowledge base", "expect": ["ai-agent", "knowledge-base"], "note": "the alias is written as 'AI agent' and must be normalized by the matcher" },
   { "text": "my travel agent booked the flights", "expect": [], "note": "ambiguous with no context list and no same-category term nearby" },
   { "text": "the agent restarted the pod", "expect": ["pod"], "note": "pod is a different category, so it is not context for agent" },
   { "text": "Can I get your LinkedIn?", "expect": [] }
