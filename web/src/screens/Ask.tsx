@@ -13,6 +13,7 @@ const DEMO_QUESTION = 'What did Zack say about RAG?'
 
 interface Query {
   room: string
+  userId: string
   question: string
   hits: SearchHit[] | null
   answer: string | null
@@ -67,9 +68,12 @@ export function Ask() {
   const [text, setText] = useState('')
   const [query, setQuery] = useState<Query | null>(null)
   const active = useRef<AbortController | null>(null)
-  const status = query?.room === room ? query : null
+  const status = query?.room === room && query?.userId === me?.user_id ? query : null
 
-  useEffect(() => () => active.current?.abort(), [room, me])
+  useEffect(() => () => {
+    active.current?.abort()
+    setQuery(null)
+  }, [room, me?.user_id])
 
   const ask = (question: string): void => {
     const q = question.trim()
@@ -79,7 +83,7 @@ export function Ask() {
     active.current = controller
     setText(q)
 
-    let next: Query = { room, question: q, hits: null, answer: null, pending: true }
+    let next: Query = { room, userId: me.user_id, question: q, hits: null, answer: null, pending: true }
     setQuery(next)
     const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)])
     void askRoom(me.name, { room, question: q }, (event) => {

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { expect, it, vi } from 'vitest'
 import { askRoom } from '@/room/api'
 import { INITIAL_ROOM_DATA, useRoom } from '@/room/store'
@@ -29,4 +29,6 @@ it('answers arbitrary questions, keeps eight source moments, and suggests only t
   fireEvent.click(screen.getByRole('button', { name: 'Ask the agent' }))
   await waitFor(() => expect(screen.getByText('Grounded answer to What is hybrid search?')).toBeInTheDocument())
   expect(askRoom).toHaveBeenCalledTimes(2)
+  act(() => useRoom.setState({ me: { user_id: 'another-user', name: 'Ana' } }))
+  expect(screen.queryByText('Grounded answer to What is hybrid search?')).not.toBeInTheDocument()
 })
