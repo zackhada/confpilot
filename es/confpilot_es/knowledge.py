@@ -78,6 +78,10 @@ class KnowledgeMixin(StoreBase):
             learn_next=frontier[: max(learn_next_limit, 0)],
         )
 
+    async def term_counts(self, room: str) -> dict[str, int]:
+        """How many utterances in the room mention each term id, most heard first."""
+        return {item.term_id: item.count for item in await self._heard_terms(room)}
+
     async def _heard_terms(self, room: str) -> list[HeardTerm]:
         body = recap_body(room)
         with es_span("es.search", operation="recap_aggregation", room=room):

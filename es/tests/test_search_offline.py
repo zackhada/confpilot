@@ -54,7 +54,9 @@ async def test_index_utterance_writes_the_contract_fields() -> None:
     store, client = make_store()
     await store.index_utterance("u1", "slc1", SPEAKER, 1_794_000_000_000, "we use RRF", ["rrf"], 412.0)
     call = client.calls_to("index")[0]
-    assert (call["index"], call["id"], call["refresh"]) == ("confpilot-test-stub-utterances", "u1", False)
+    # Keyed by room, speaker and utterance id, so one speaker cannot overwrite another's words.
+    assert (call["index"], call["id"]) == ("confpilot-test-stub-utterances", "slc1:user-zack:u1")
+    assert call["refresh"] is False
     assert call["document"] == {
         "utterance_id": "u1",
         "room": "slc1",

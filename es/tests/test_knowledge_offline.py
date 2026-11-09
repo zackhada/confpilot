@@ -45,6 +45,13 @@ async def test_recap_for_a_newcomer_offers_only_terms_without_prerequisites() ->
     assert recap.learn_next == ["vector"]
 
 
+async def test_term_counts_come_from_the_aggregation() -> None:
+    store, client = make_store(known=[])
+    assert await store.term_counts("slc1") == dict(HEARD)
+    call = client.calls_to("search")[0]
+    assert call["index"] == "confpilot-test-stub-utterances" and call["size"] == 0
+
+
 async def test_recap_ranks_the_frontier_by_heard_count() -> None:
     store, _ = make_store(known=["vector", "keyword-search"])
     recap = await store.recap("slc1", "u")

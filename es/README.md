@@ -29,9 +29,9 @@ query, and removes seed terms that left the glossary (terms the LLM added are ke
 | --- | --- | --- |
 | `confpilot-terms` | glossary term (`_id` = term id) | Cards, prerequisites; `semantic_text` = term + definition |
 | `confpilot-term-queries` | term, as a stored **percolator** query over its spoken forms | Live detection |
-| `confpilot-utterances` | final utterance | Search (`text` BM25 + `semantic_text`), recap (`term_ids`), latency |
+| `confpilot-utterances` | final utterance (`_id` = `{room}:{user_id}:{utterance_id}`) | Search (`text` BM25 + `semantic_text`), recap (`term_ids`), latency |
 | `confpilot-user-knowledge` | user and term (`_id` = `{user_id}:{term_id}`) | Personalization, SM-2 state |
-| `confpilot-sessions` | talk or conversation | Recap metadata (mapping only for now) |
+| `confpilot-sessions` | room (`_id` = room code) | When the conversation started, last activity, who spoke |
 
 Both `semantic_text` fields use the inference endpoint `.jina-embeddings-v5-text-small`
 (multilingual), named explicitly in `mappings/*.json`.
@@ -41,11 +41,13 @@ Both `semantic_text` fields use the inference endpoint `.jina-embeddings-v5-text
 ```python
 from confpilot_es import EsStore
 
-store = EsStore.from_env()  # one per process; `await store.close()` on shutdown
-term_ids = await store.percolate("It uses BM 25 and R.R.F. to rank the results")  # ["bm25", "rrf"]
+store = EsStore.from_env()                       # one per process; `await store.close()` on shutdown
+term_ids = await store.percolate("It uses BM 25 and R.R.F. to rank the results")   # ["bm25", "rrf"]
 await store.index_utterance(utterance_id, room, speaker, spoken_at, text, term_ids)
+await store.touch_session(room, speaker, spoken_at)
 hits = await store.search("¿cómo ordena los resultados?", room="slc1", size=5)
 await store.put_knowledge(user_id, "rrf", {"status": "known", "source": "tap"})
+counts = await store.term_counts("slc1")         # {"embedding": 2, "rrf": 1, ...}
 recap = await store.recap(room="slc1", user_id=user_id)
 ```
 
@@ -66,20 +68,6 @@ The same rules as the phone (`contracts/README.md` section 6), proven by
 3. `matching.py` applies the two rules that compare matches with each other: longest term first,
    and "an ambiguous term with no context list needs a non-ambiguous term of the same category
    within five words".
-
-## LLM helpers
-
-`define_term(term, sentence)` returns a contract-shaped `Term` (`source: "llm"`, definition of 20
-words or fewer, never using the term itself) for a word the glossary lacks; pass it to
-`upsert_terms([term])` to make it a glossary entry with its own percolator query.
-`translate_defs(terms, lang)` writes one-line translations into `translations.<lang>`, about 20
-terms per request.
-
-Both call an OpenAI-compatible `POST {LLM_BASE_URL}/chat/completions` endpoint with httpx,
-configured by `LLM_BASE_URL`, `LLM_API_KEY` and `LLM_MODEL` (environment or `ENV_FILE`). They use a
-small `max_tokens`, a 20 second timeout and one retry, raise `LlmError` on failure, and must run
-async, never in the request path. The Elastic Inference Service chat endpoints are not used: on
-the hackathon project they answer `403 Forbidden`.
 
 ## Queries to show the judges
 

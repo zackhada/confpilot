@@ -9,9 +9,14 @@ import pytest
 
 from confpilot_es import ConfigError, EsStore, Term
 from confpilot_es.config import load_llm_config
+from confpilot_es.translate import TranslateMixin
 
 from .stubs import StubClient
 from .test_llm import CONFIG, chat
+
+
+class TranslatingStore(EsStore, TranslateMixin):
+    """Translation is not part of `EsStore` yet; compose it here."""
 
 
 def make_terms(count: int) -> list[Term]:
@@ -19,7 +24,7 @@ def make_terms(count: int) -> list[Term]:
     return [Term(id=f"t{n}", term=f"T{n}", simple_def=f"Definition {n}.", **fields) for n in range(count)]
 
 
-def translate_store(*replies: str) -> tuple[EsStore, list[httpx.Request], StubClient]:
+def translate_store(*replies: str) -> tuple[TranslatingStore, list[httpx.Request], StubClient]:
     queue = [chat(reply) for reply in replies]
     requests: list[httpx.Request] = []
 
@@ -28,7 +33,7 @@ def translate_store(*replies: str) -> tuple[EsStore, list[httpx.Request], StubCl
         return queue.pop(0)
 
     client = StubClient(bulk={"errors": False, "items": []})
-    store = EsStore(client, prefix="confpilot-test-stub-")  # type: ignore[arg-type]
+    store = TranslatingStore(client, prefix="confpilot-test-stub-")  # type: ignore[arg-type]
     store.llm_config = CONFIG
     store.llm_transport = httpx.MockTransport(handler)
     return store, requests, client
@@ -63,7 +68,7 @@ async def test_translate_defs_live() -> None:
         load_llm_config()
     except ConfigError as exc:
         pytest.skip(f"live LLM not configured: {exc}")
-    store = EsStore(StubClient(), prefix="confpilot-test-stub-")  # type: ignore[arg-type]
+    store = TranslatingStore(StubClient(), prefix="confpilot-test-stub-")  # type: ignore[arg-type]
     terms = make_terms(2)
     translated = await store.translate_defs(terms, "es", save=False)
     assert set(translated) == {term.id for term in terms}

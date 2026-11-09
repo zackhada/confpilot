@@ -6,6 +6,7 @@
       "room": { "type": "keyword" },
       "title": { "type": "text" },
       "started_at": { "type": "date", "format": "epoch_millis" },
+      "last_at": { "type": "date", "format": "epoch_millis" },
       "ended_at": { "type": "date", "format": "epoch_millis" },
       "speakers": {
         "properties": {
