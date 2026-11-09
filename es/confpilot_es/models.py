@@ -77,6 +77,15 @@ class Speaker(BaseModel):
     name: str
 
 
+class RoomSession(BaseModel):
+    """Metadata for one room's conversation (not in contracts; it never reaches the browser)."""
+
+    room: str
+    started_at: int
+    last_at: int
+    speakers: list[Speaker] = []
+
+
 class SearchHit(BaseModel):
     utterance_id: str
     speaker: Speaker
