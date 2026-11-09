@@ -23,6 +23,21 @@ def test_client_events_are_validated_by_type() -> None:
     assert transcript.started_at == 1731177600001
 
 
+def test_non_finite_started_at_is_rejected() -> None:
+    with pytest.raises(ValidationError):
+        client_event_adapter.validate_python(
+            {
+                "type": "transcript",
+                "utterance_id": "3f2b-1",
+                "seq": 2,
+                "is_final": True,
+                "text": "we use rag",
+                "words": [{"w": "we", "start_ms": 0, "end_ms": 120.4}],
+                "started_at": 1e400,
+            }
+        )
+
+
 @pytest.mark.parametrize(
     "payload",
     [

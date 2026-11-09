@@ -1,5 +1,6 @@
 """Pydantic mirrors of contracts/types.ts. That file is the source of truth."""
 
+import math
 from typing import Annotated, Any, ClassVar, Literal
 
 from pydantic import (
@@ -21,7 +22,7 @@ EventId = Annotated[str, StringConstraints(pattern=r"^[A-Za-z0-9_.:-]{1,128}$")]
 
 def _round_ms(value: object) -> object:
     """Browsers produce fractional milliseconds. The wire type is whole epoch ms."""
-    return round(value) if isinstance(value, float) and value == value else value
+    return round(value) if isinstance(value, float) and math.isfinite(value) else value
 
 
 Ms = Annotated[int, BeforeValidator(_round_ms), Field(ge=0)]
