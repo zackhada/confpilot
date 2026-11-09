@@ -65,6 +65,8 @@ export default defineConfig({
   },
   server: {
     host: true,
+    // Tests read shared fixtures from the repo's contracts/ and content/ folders.
+    fs: { allow: ['.', '../contracts', '../content'] },
     proxy: {
       '/api': { target: API_TARGET, changeOrigin: true },
       '/ws': { target: API_TARGET, ws: true, changeOrigin: true },
