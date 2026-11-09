@@ -1,0 +1,18 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "session_id": { "type": "keyword" },
+      "room": { "type": "keyword" },
+      "title": { "type": "text" },
+      "started_at": { "type": "date", "format": "epoch_millis" },
+      "ended_at": { "type": "date", "format": "epoch_millis" },
+      "speakers": {
+        "properties": {
+          "user_id": { "type": "keyword" },
+          "name": { "type": "keyword" }
+        }
+      }
+    }
+  }
+}

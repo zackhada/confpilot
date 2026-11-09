@@ -1,0 +1,21 @@
+{
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "utterance_id": { "type": "keyword" },
+      "room": { "type": "keyword" },
+      "session_id": { "type": "keyword" },
+      "speaker": {
+        "properties": {
+          "user_id": { "type": "keyword" },
+          "name": { "type": "text", "fields": { "keyword": { "type": "keyword" } } }
+        }
+      },
+      "spoken_at": { "type": "date", "format": "epoch_millis" },
+      "text": { "type": "text", "analyzer": "english", "copy_to": "semantic_text" },
+      "semantic_text": { "type": "semantic_text", "inference_id": ".jina-embeddings-v5-text-small" },
+      "term_ids": { "type": "keyword" },
+      "word_to_card_ms": { "type": "float" }
+    }
+  }
+}
