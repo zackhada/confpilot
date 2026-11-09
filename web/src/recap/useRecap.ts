@@ -45,7 +45,7 @@ export function useRecap(): RecapView {
     return () => {
       current = false
     }
-    // Refetch only for distinct new terms, since Recap shows a list rather than frequencies.
+    // Refetch for distinct new terms so the list stays fresh without requesting frequency-only updates.
   }, [room, me, ready, heardCount])
 
   const useRemote = remote !== null && (remote.heard.length > 0 || local.heard.length === 0)
