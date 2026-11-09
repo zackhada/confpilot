@@ -1,8 +1,10 @@
 # Performance baseline
 
-Measured Nov 9, 2026, 3:30 to 3:40 PM MT, on `main` at `0036a06`. Targets are first guesses
-from the planning prompt, not requirements from the plan. This repo-wide baseline lives in the top-level
-`docs/` rather than `web/docs/` because it covers the phone, speech, API asset delivery and Elasticsearch.
+Hops 1, 2 and 4 measured Nov 9, 2026, 3:30 to 3:40 PM MT, on `main` at `0036a06`. Hop 3 and the 4b Lighthouse
+'after' run were measured later on `main` at `42c051e` (#39). Targets are first guesses from the planning prompt,
+not requirements from the plan. This repo-wide baseline lives in the top-level `docs/` rather than `web/docs/`
+because it covers the phone, speech, API asset delivery and Elasticsearch. This update adds room-relay timing and
+the Lighthouse comparison to capture the end-to-end performance impact of #39's asset delivery change.
 
 ## Hot path
 
