@@ -17,6 +17,7 @@ Commands are PowerShell, run from the repo root.
 | `rollout.ps1` | Rolls an image tag out from a laptop |
 | `make-deployer-kubeconfig.ps1` | Builds the kubeconfig for the `KUBE_CONFIG` repo secret |
 | `../.github/workflows/deploy.yml` | Builds, pushes and rolls out on every merge to `main` |
+| `../.github/workflows/deploy-check.yml` | On pull requests: kubeconform on the manifests, image build and a `/healthz` probe |
 
 ## From an empty cluster to a public URL
 
@@ -41,11 +42,19 @@ frames, which proves the path the app needs.
 
 ### 3. Secrets (a human runs these; values never go in a file in the repo)
 
-App credentials. Put the five keys in a file outside the repo, one `KEY=value` per line, with
-no quotes: `DEEPGRAM_API_KEY`, `ES_URL`, `ES_API_KEY`, `LLM_API_KEY`,
-`OTEL_EXPORTER_OTLP_HEADERS` (as `Authorization=Bearer <token>,Dash0-Dataset=default`).
+App credentials. Put these keys in a file outside the repo, one `KEY=value` per line, with
+no quotes:
+
+| Key | Value |
+| --- | --- |
+| `SESSION_SECRET` | A random string, made once and kept, so sessions survive a restart |
+| `ES_URL`, `ES_API_KEY` | The Elastic Cloud Serverless project |
+| `DEEPGRAM_API_KEY` | Speech-to-text |
+| `LLM_API_KEY` | The definer and the probe |
+| `OTEL_EXPORTER_OTLP_HEADERS` | `Authorization=Bearer <dash0 token>,Dash0-Dataset=default` |
 
 ```powershell
+python -c "import secrets; print(secrets.token_urlsafe(48))"    # a value for SESSION_SECRET
 kubectl -n confpilot create secret generic app-credentials --from-env-file=$HOME\confpilot-credentials.env
 kubectl -n confpilot rollout restart deployment/confpilot   # only if the app is already running
 ```
@@ -64,8 +73,9 @@ does not become public when the repo does: change it under Package settings > Ch
 
 ### 4. The real app
 
-The first merge to `main` that contains `api/` and `web/` makes the Deploy workflow push
-`ghcr.io/zackhada/confpilot:<sha>` and `:main`. Then:
+Every merge to `main` makes the Deploy workflow push `ghcr.io/zackhada/confpilot:<sha>` and
+`:main`. The image builds whether or not `web/` and `es/` are on `main` yet; without `web/`
+it is the API alone and `/` returns 404. Then:
 
 ```powershell
 kubectl apply -k deploy/k8s      # swaps the placeholder for ghcr.io/zackhada/confpilot:main
@@ -110,8 +120,14 @@ docker build --platform linux/amd64 -f deploy/Dockerfile -t confpilot:dev .
 docker run --rm -p 8000:8000 --read-only --tmpfs /tmp confpilot:dev   # http://localhost:8000/healthz
 ```
 
-The image starts `uvicorn confpilot.main:app`. If the app object lives elsewhere, change the
-`CMD` in the Dockerfile.
+The image mirrors the repo: `/app/api` (working directory, with the virtualenv), `/app/es`,
+`/app/content/glossary.json` (`GLOSSARY_PATH`) and `/app/static` (`STATIC_DIR`, the built
+`web/`). It starts `uvicorn confpilot.main:app` as uid 10001. Only `api/`, `web/`, `es/`,
+`contracts/` and `content/glossary.json` enter the build context; to add another path,
+allow it in `Dockerfile.dockerignore` and copy it in the Dockerfile.
+
+Non-secret settings are in `k8s/configmap.yaml`. `ALLOWED_ORIGINS` is empty there because
+the phone app is served from the API's own origin.
 
 ## One replica, and what a release costs
 
@@ -189,7 +205,8 @@ Where it meets our manifests:
 - The app's own OTel SDK reads `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_SERVICE_NAME` and
   `OTEL_RESOURCE_ATTRIBUTES` from the `app-config` ConfigMap and `OTEL_EXPORTER_OTLP_HEADERS`
   from `app-credentials`, so traces reach Dash0 directly even without the operator.
-- Confirm the endpoint in `k8s/configmap.yaml` against Dash0 > Settings > Endpoints.
+- The endpoint in `k8s/configmap.yaml` is our Dash0 region, us-west-2
+  (`https://ingress.us-west-2.aws.dash0.com:4318`).
 - The pod has a read-only root filesystem and only `/tmp` writable.
 
 ## Radar (documented, not connected)
