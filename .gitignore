@@ -2,3 +2,7 @@
 __pycache__/
 .venv/
 .env
+
+# voice recordings may contain personal data; keep them out of the repo
+docs/recordings/
+*.m4a
