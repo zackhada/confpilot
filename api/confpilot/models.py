@@ -26,6 +26,7 @@ def _round_ms(value: object) -> object:
 
 
 Ms = Annotated[int, BeforeValidator(_round_ms), Field(ge=0)]
+Finite = Annotated[float, Field(allow_inf_nan=False)]  # JSON has no Infinity or NaN
 
 
 class WireModel(BaseModel):
@@ -153,8 +154,8 @@ class Member(Speaker):
 
 class Word(BaseModel):
     w: str = Field(max_length=100)
-    start_ms: float = Field(ge=0)
-    end_ms: float = Field(ge=0)
+    start_ms: Finite = Field(ge=0)
+    end_ms: Finite = Field(ge=0)
 
 
 class TranscriptEvent(WireModel):
@@ -188,7 +189,7 @@ class CardShownEvent(WireModel):
     utterance_id: EventId
     spoken_at: Ms
     rendered_at: Ms
-    word_to_card_ms: float
+    word_to_card_ms: Finite
     user: Speaker | None = None  # set by the server on relay
 
 
@@ -200,12 +201,12 @@ class KnowledgeSetEvent(BaseModel):
 
 class TimePing(BaseModel):
     type: Literal["time.ping"] = "time.ping"
-    t0: float
+    t0: Finite
 
 
 class TimePong(BaseModel):
     type: Literal["time.pong"] = "time.pong"
-    t0: float
+    t0: Finite
     server_ts: Ms
 
 
@@ -214,9 +215,12 @@ class RoomState(BaseModel):
     members: list[Member]
 
 
+ErrorCode = Literal["bad_request", "bad_event", "forbidden", "store_unavailable", "internal"]
+
+
 class ErrorEvent(BaseModel):
     type: Literal["error"] = "error"
-    code: str
+    code: ErrorCode
     message: str
 
 
