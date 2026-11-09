@@ -8,8 +8,22 @@ from typing import Any
 from confpilot_es.base import StoreBase
 from confpilot_es.matching import Candidate, resolve_matches
 from confpilot_es.normalizer import variants
-from confpilot_es.queries import percolate_body
 from confpilot_es.telemetry import es_span
+
+MAX_PERCOLATE_MATCHES = 50
+
+
+def percolate_body(forms: list[str]) -> dict[str, Any]:
+    """Percolate every normalized form of an utterance as one multi-valued field.
+
+    Each value is analyzed on its own (positions do not run across values), so a phrase can
+    only match inside one form. No scoring is needed: a term either was said or was not.
+    """
+    return {
+        "query": {"constant_score": {"filter": {"percolate": {"field": "query", "document": {"text": forms}}}}},
+        "size": MAX_PERCOLATE_MATCHES,
+        "_source": ["term_id", "phrases", "category", "ambiguous", "context"],
+    }
 
 
 class PercolateMixin(StoreBase):

@@ -9,7 +9,6 @@ from confpilot_es.matching import CONTEXT_MAX_GAPS
 from confpilot_es.models import Term
 from confpilot_es.normalizer import variants
 
-MAX_PERCOLATE_MATCHES = 50
 _PARENTHETICAL = re.compile(r"\s*\(.*?\)\s*")
 
 Body = dict[str, Any]
@@ -82,12 +81,3 @@ def term_doc(term: Term) -> Body:
     """The `terms` document: the contract fields plus the text that gets embedded."""
     definition = " ".join(part for part in (term.simple_def, term.long_def) if part)
     return {**term.model_dump(exclude_none=True), "semantic_text": f"{term.term}: {definition}"}
-
-
-def percolate_body(forms: list[str]) -> Body:
-    """Percolate both normalized forms of an utterance as one multi-valued field."""
-    return {
-        "query": {"constant_score": {"filter": {"percolate": {"field": "query", "document": {"text": forms}}}}},
-        "size": MAX_PERCOLATE_MATCHES,
-        "_source": ["term_id", "phrases", "category", "ambiguous", "context"],
-    }
