@@ -1,0 +1,21 @@
+[
+  { "text": "we do SRE for Kubernetes clusters", "expect": ["sre", "kubernetes", "cluster"] },
+  { "text": "It uses BM25 for keyword matches", "expect": ["bm25"] },
+  { "text": "it uses BM 25 for that", "expect": ["bm25"] },
+  { "text": "it uses bm twenty five for that", "expect": ["bm25"] },
+  { "text": "and R.R.F. to rank the results", "expect": ["rrf"] },
+  { "text": "and r r f to rank the results", "expect": ["rrf"] },
+  { "text": "including RAG and keyword search", "expect": ["rag", "keyword-search"] },
+  { "text": "retrieval-augmented generation is common now", "expect": ["rag"] },
+  { "text": "I had to drag the file over", "expect": [], "note": "never alias drag to RAG" },
+  { "text": "customers embed thousands of documents", "expect": ["embedding"] },
+  { "text": "the embeddings handle meaning", "expect": ["embedding"] },
+  { "text": "I work at ElasticSock", "expect": ["elasticsearch"], "note": "known mis-hearing" },
+  { "text": "managed hybrid search", "expect": ["hybrid-search"] },
+  { "text": "we have some internal search service use cases", "expect": [], "note": "service is ambiguous and has no context word nearby" },
+  { "text": "expose the pod with a Kubernetes service", "expect": ["pod", "kubernetes", "service"] },
+  { "text": "a pod goes into CrashLoopBackOff", "expect": ["pod", "crashloopbackoff"] },
+  { "text": "a pod goes into crash loop back off", "expect": ["pod", "crashloopbackoff"] },
+  { "text": "turned into vectors that can be retrieved", "expect": ["vector"] },
+  { "text": "Can I get your LinkedIn?", "expect": [] }
+]
