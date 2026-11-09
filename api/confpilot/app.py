@@ -6,6 +6,7 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from confpilot.auth import SessionSigner
 from confpilot.glossary import load_glossary
+from confpilot.logsafe import install_session_masking
 from confpilot.matching import Matcher
 from confpilot.ratelimit import RateLimiter
 from confpilot.rooms import Hub
@@ -21,6 +22,7 @@ def create_app(settings: Settings | None = None, store: Store | None = None) -> 
     """Build the app. ``store`` is the seam for the Elasticsearch store."""
     settings = settings or Settings()
     setup_telemetry(settings.app_version)
+    install_session_masking()
 
     app = FastAPI(title="ConfPilot API", version=settings.app_version)
     app.state.settings = settings
