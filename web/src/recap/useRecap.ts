@@ -20,6 +20,7 @@ export function useRecap(): RecapView {
   const me = useRoom((s) => s.me)
   const ready = useRoom((s) => s.status === 'open' && s.members.some((m) => m.user_id === s.me?.user_id))
   const heard = useRoom((s) => s.heard)
+  const heardCount = Object.keys(heard).length
   const shownTermIds = useRoom((s) => s.stack.shownTermIds)
   const terms = useRoom((s) => s.terms)
   const knowledge = useRoom((s) => s.knowledge)
@@ -44,8 +45,8 @@ export function useRecap(): RecapView {
     return () => {
       current = false
     }
-    // Refetch when the phone has heard more, so the screen stays fresh while it is open.
-  }, [room, me, ready, heard])
+    // Refetch when the phone has heard a new distinct term, so the screen stays fresh while it is open.
+  }, [room, me, ready, heardCount])
 
   const useRemote = remote !== null && (remote.heard.length > 0 || local.heard.length === 0)
   return useRemote ? { recap: remote, source: 'api' } : { recap: local, source: 'local' }
