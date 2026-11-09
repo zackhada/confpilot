@@ -20,6 +20,7 @@ $selector = 'app.kubernetes.io/name=cloudflared'
 $pattern = 'https://[a-z0-9-]+\.trycloudflare\.com'
 
 function Get-TunnelUrl {
+    $ErrorActionPreference = 'Continue'
     $logs = kubectl -n $Namespace logs -l $selector --tail=-1 2>$null
     $found = $logs | Select-String -Pattern $pattern -AllMatches |
         ForEach-Object { $_.Matches.Value } | Select-Object -Last 1
