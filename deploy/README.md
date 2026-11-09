@@ -40,29 +40,14 @@ deploy/tunnel-url.ps1 -Wait      # prints https://<random-words>.trycloudflare.c
 Open the URL on a phone. `/healthz` returns 200, and `wss://<host>/echo` echoes WebSocket
 frames, which proves the path the app needs.
 
-### 3. Secrets (a human runs these; values never go in a file in the repo)
+The placeholder (`traefik/whoami`) is a debug server on a public URL: it prints its own
+environment to anyone who asks. The overlay gives it no config and no secrets, and CI checks
+that. Keep it that way, and swap the real app in (step 4) before creating `app-credentials`.
 
-App credentials. Put these keys in a file outside the repo, one `KEY=value` per line, with
-no quotes:
+### 3. Image pull secret (a human runs this; only while the GHCR package is private)
 
-| Key | Value |
-| --- | --- |
-| `SESSION_SECRET` | A random string, made once and kept, so sessions survive a restart |
-| `ES_URL`, `ES_API_KEY` | The Elastic Cloud Serverless project |
-| `DEEPGRAM_API_KEY` | Speech-to-text |
-| `LLM_API_KEY` | The definer and the probe |
-| `OTEL_EXPORTER_OTLP_HEADERS` | `Authorization=Bearer <dash0 token>,Dash0-Dataset=default` |
-
-```powershell
-python -c "import secrets; print(secrets.token_urlsafe(48))"    # a value for SESSION_SECRET
-kubectl -n confpilot create secret generic app-credentials --from-env-file=$HOME\confpilot-credentials.env
-kubectl -n confpilot rollout restart deployment/confpilot   # only if the app is already running
-```
-
-The pod starts without this Secret (it is `optional`), so the hello works before it exists.
-
-Image pull secret, needed while the GHCR package is private. Use a GitHub token with the
-`read:packages` scope (`gh auth refresh -s read:packages` adds it to the gh token):
+Use a GitHub token with the `read:packages` scope (`gh auth refresh -s read:packages` adds it
+to the gh token):
 
 ```powershell
 kubectl -n confpilot create secret docker-registry ghcr-pull --docker-server=ghcr.io --docker-username=<github-user> --docker-password=$(gh auth token)
@@ -83,7 +68,38 @@ kubectl -n confpilot rollout status deployment/confpilot
 deploy/tunnel-url.ps1            # the URL is unchanged: the tunnel pod was not touched
 ```
 
-### 5. Deploy on merge (repo admin, once)
+This `apply` is the only way off the placeholder. `rollout.ps1` and the Deploy workflow only
+change the image tag, and the placeholder's pod spec cannot run the real image.
+
+### 5. App credentials (a human runs this; values never go in a file in the repo)
+
+**Create `app-credentials` only after step 4, when the real image is running. Never while the
+placeholder is.** Check first:
+
+```powershell
+kubectl -n confpilot get deployment confpilot -o jsonpath='{.spec.template.spec.containers[0].image}'   # must be ghcr.io/zackhada/confpilot:...
+```
+
+Put these keys in a file outside the repo, one `KEY=value` per line, with no quotes:
+
+| Key | Value |
+| --- | --- |
+| `SESSION_SECRET` | A random string, made once and kept, so sessions survive a restart |
+| `ES_URL`, `ES_API_KEY` | The Elastic Cloud Serverless project |
+| `DEEPGRAM_API_KEY` | Speech-to-text |
+| `LLM_API_KEY` | The definer and the probe |
+| `OTEL_EXPORTER_OTLP_HEADERS` | `Authorization=Bearer <dash0 token>,Dash0-Dataset=default` |
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(48))"    # a value for SESSION_SECRET
+kubectl -n confpilot create secret generic app-credentials --from-env-file=$HOME\confpilot-credentials.env
+kubectl -n confpilot rollout restart deployment/confpilot   # the pod reads the Secret at start
+```
+
+The Secret is `optional` in the Deployment, so the app starts without it and picks it up on
+the restart. To go back to the placeholder later, delete the Secret first.
+
+### 6. Deploy on merge (repo admin, once)
 
 The workflow rolls out only if the `KUBE_CONFIG` repo secret exists. Without it the workflow
 still pushes the image and succeeds.
