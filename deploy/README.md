@@ -15,7 +15,9 @@ Commands are PowerShell, run from the repo root.
 | `hello/` | The same manifests with a public placeholder image |
 | `tunnel-url.ps1` | Prints the current public URL |
 | `rollout.ps1` | Rolls an image tag out from a laptop |
-| `make-deployer-kubeconfig.ps1` | Builds the kubeconfig for the `KUBE_CONFIG` repo secret |
+| `make-deployer-kubeconfig.ps1` | Builds the kubeconfig for the `KUBE_CONFIG` secret |
+| `cluster/deployer-admission-policy.yaml` | Cluster-scoped policy that limits the CI credential to changing the app image |
+| `eks/public-lb.yaml` | Network load balancer Service, the origin for CloudFront |
 | `../.github/workflows/deploy.yml` | Builds, pushes and rolls out on every merge to `main` |
 | `../.github/workflows/deploy-check.yml` | On pull requests: kubeconform on the manifests, image build and a `/healthz` probe |
 
@@ -99,25 +101,45 @@ kubectl -n confpilot rollout restart deployment/confpilot   # the pod reads the 
 The Secret is `optional` in the Deployment, so the app starts without it and picks it up on
 the restart. To go back to the placeholder later, delete the Secret first.
 
-### 6. Deploy on merge (repo admin, once)
+### 6. Deploy on merge (cluster admin and repo admin, once)
 
-The workflow rolls out only if the `KUBE_CONFIG` repo secret exists. Without it the workflow
-still pushes the image and succeeds.
+The Deploy workflow builds and pushes on every merge to `main`. It rolls out only if a
+`KUBE_CONFIG` secret exists; without it the workflow still pushes the image and succeeds.
+The rollout job runs in the `production` GitHub environment and only on `main`.
 
-```powershell
-deploy/make-deployer-kubeconfig.ps1      # writes $env:TEMP\confpilot-deployer.kubeconfig
-Get-Content -Raw $env:TEMP\confpilot-deployer.kubeconfig | gh secret set KUBE_CONFIG --repo zackhada/confpilot
-Remove-Item $env:TEMP\confpilot-deployer.kubeconfig
-```
+1. Cluster admin: apply the admission policy that limits what the CI credential can do, then
+   build its kubeconfig.
 
-Setting the secret needs repo admin. If the admin is on another machine, they can paste the
-file content at Settings > Secrets and variables > Actions > New repository secret.
+   ```powershell
+   kubectl apply -f deploy/cluster/deployer-admission-policy.yaml
+   deploy/make-deployer-kubeconfig.ps1      # writes $env:TEMP\confpilot-deployer.kubeconfig
+   ```
 
-The identity behind it is the `deployer` ServiceAccount (`k8s/deployer-rbac.yaml`). It can
-patch the `confpilot` Deployment and watch the rollout, and nothing else. Patching a
-Deployment does let it choose the image the pod runs, so treat the secret as a deploy key.
-Revoke it with `kubectl -n confpilot delete secret deployer-token`.
+2. Repo admin: in Settings > Environments > `production`, set "Deployment branches and tags"
+   to "Selected branches and tags" with `main`. Then store the secret in that environment,
+   not as a repository secret, so a workflow on another branch cannot read it.
 
+   ```powershell
+   Get-Content -Raw $env:TEMP\confpilot-deployer.kubeconfig | gh secret set KUBE_CONFIG --env production --repo zackhada/confpilot
+   Remove-Item $env:TEMP\confpilot-deployer.kubeconfig
+   ```
+
+What the credential is, plainly:
+
+- It is the `deployer` ServiceAccount (`k8s/deployer-rbac.yaml`). RBAC lets it patch the
+  `confpilot` Deployment and watch the rollout: no Secrets, no exec, no other namespace.
+- A patch can change the whole pod spec, so RBAC alone is close to namespace admin. The
+  admission policy (`cluster/deployer-admission-policy.yaml`) rejects any update by the
+  deployer unless the only change is the image of the `app` container and the image is from
+  `ghcr.io/zackhada/confpilot`. Without the policy applied, treat the secret as a full
+  deploy key for the namespace.
+- **The token is long-lived. It does not expire.** Revoke it with
+  `kubectl -n confpilot delete secret deployer-token`; to rotate, delete it, run
+  `kubectl apply -k deploy/k8s` to get a new one, and repeat the two steps above.
+- The proper fix is OIDC federation: GitHub Actions assumes an AWS role with a short-lived
+  token and no stored credential. That needs an IAM OIDC provider for
+  `token.actions.githubusercontent.com` and a role mapped into the cluster, which our AWS
+  role cannot create today. Switch to it as soon as the account allows.
 ## Roll out by hand
 
 ```powershell
@@ -171,7 +193,31 @@ Limits to know:
   server-sent events. We use WebSockets only.
 - The pod needs outbound access to Cloudflare on UDP or TCP 7844 and TCP 443.
 
-### Stable URL (upgrade path, not done)
+### CloudFront in front of a load balancer (the stable URL, being set up)
+
+`eks/public-lb.yaml` is a second Service, `confpilot-public`: `type: LoadBalancer`, a Network
+Load Balancer on port 80 that selects the same pod. It is applied by hand, because it creates
+an AWS load balancer, and it is not part of `kubectl apply -k deploy/k8s`:
+
+```powershell
+kubectl apply -f deploy/eks/public-lb.yaml
+kubectl -n confpilot get service confpilot-public   # EXTERNAL-IP is the load balancer's DNS name
+```
+
+A CloudFront distribution uses that DNS name as its origin (HTTP only, port 80), terminates
+TLS and gives a `https://<id>.cloudfront.net` URL that does not change when pods restart.
+Things to keep in mind:
+
+- The load balancer itself answers plain HTTP to anyone. Phones must use the CloudFront URL;
+  the microphone does not work over HTTP.
+- The origin request policy has to forward the WebSocket upgrade and all query strings, and
+  caching must be off for `/api/*` and `/ws/*`.
+- The same rules as for the tunnel apply to the placeholder: it must never get secrets.
+
+The quick tunnel stays as the fallback until the CloudFront URL has carried a WebSocket from
+a phone.
+
+### Other upgrade paths (not done)
 
 1. **Named Cloudflare tunnel.** Needs a Cloudflare account and a domain on it. Create the
    tunnel in the Zero Trust dashboard, store its token in a Secret, and change the args in
