@@ -12,6 +12,7 @@ from opentelemetry.sdk.trace.export import SimpleSpanProcessor
 from opentelemetry.sdk.trace.export.in_memory_span_exporter import InMemorySpanExporter
 
 from confpilot.app import create_app
+from confpilot.glossary import SAMPLE_GLOSSARY
 from confpilot.settings import Settings
 
 _spans = InMemorySpanExporter()
@@ -37,7 +38,8 @@ def metric_reader() -> InMemoryMetricReader:
 @pytest.fixture
 def make_settings() -> Callable[..., Settings]:
     def _make(**overrides: object) -> Settings:
-        return Settings(_env_file=None, **overrides)
+        # Tests pin the small contracts sample, whose term ids never change.
+        return Settings(_env_file=None, **{"glossary_path": SAMPLE_GLOSSARY} | overrides)
 
     return _make
 
