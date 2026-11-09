@@ -1,9 +1,16 @@
 """A small in-memory sliding-window rate limit. One replica, so one process sees everything.
 
-The client address prefers Cloudflare's ``CF-Connecting-IP`` header, which is overwritten by
-Cloudflare because all traffic arrives through its tunnel, then falls back to
-``request.client``. This module never reads X-Forwarded-For itself, because any client can set
-that header.
+Which address is "the client" depends on what sits in front of the API, so it is configured:
+
+- ``CLIENT_IP_HEADER`` unset: ``request.client``, the peer uvicorn reports. This is only the
+  real client when uvicorn's ``--forwarded-allow-ips`` names the proxy; with ``*`` it is the
+  leftmost X-Forwarded-For entry, which the caller controls.
+- ``CLIENT_IP_HEADER`` set: that header, for an edge that overwrites it on every request,
+  such as ``CF-Connecting-IP`` (Cloudflare) or ``CloudFront-Viewer-Address`` (CloudFront).
+  Set it only when callers cannot reach the API without passing through that edge, otherwise
+  the header is just another value the caller chooses.
+
+This module never reads X-Forwarded-For itself, because any client can set that header.
 """
 
 import math
@@ -36,13 +43,21 @@ class RateLimiter:
         return 0.0
 
 
+def client_address(request: Request) -> str:
+    """The address to rate limit by: the configured edge header, else the peer."""
+    header: str = request.app.state.settings.client_ip_header
+    value = request.headers.get(header, "").strip() if header else ""
+    if value and header.lower() == "cloudfront-viewer-address":
+        value = value.rpartition(":")[0]  # "ip:port", and the port changes per connection
+    if value:
+        return value[:64]
+    return request.client.host if request.client else "unknown"
+
+
 def enforce_rate_limit(request: Request, scope: str, user_id: str | None = None) -> None:
     """Raise 429 when this client address, or this user, is over the limit for ``scope``."""
     limiter: RateLimiter = request.app.state.rate_limiter
-    address = request.headers.get("cf-connecting-ip") or (
-        request.client.host if request.client else "unknown"
-    )
-    keys = [f"{scope}:ip:{address}"]
+    keys = [f"{scope}:ip:{client_address(request)}"]
     if user_id is not None:
         keys.append(f"{scope}:user:{user_id}")
     now = time.monotonic()

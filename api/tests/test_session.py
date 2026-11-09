@@ -102,8 +102,53 @@ def test_post_session_is_rate_limited_per_client(make_settings) -> None:
     assert 1 <= int(blocked.headers["retry-after"]) <= 60
 
 
-def test_post_session_uses_cloudflare_ip_and_ignores_forwarded_for(make_settings) -> None:
+def test_an_edge_header_is_not_trusted_unless_configured(make_settings) -> None:
+    """Without CLIENT_IP_HEADER, a caller cannot pick its own bucket by sending the header."""
     with TestClient(create_app(make_settings(rate_limit_per_minute=3))) as client:
+        statuses = [
+            client.post(
+                "/api/session",
+                json={"name": "Ana"},
+                headers={
+                    "cf-connecting-ip": f"192.0.2.{index}",
+                    "cloudfront-viewer-address": f"192.0.2.{index}:4000",
+                },
+            ).status_code
+            for index in range(1, 5)
+        ]
+
+    assert statuses == [200, 200, 200, 429]
+
+
+def test_cloudfront_viewer_address_is_used_without_its_port(make_settings) -> None:
+    settings = make_settings(rate_limit_per_minute=2, client_ip_header="CloudFront-Viewer-Address")
+    with TestClient(create_app(settings)) as client:
+        same_viewer = [
+            client.post(
+                "/api/session",
+                json={"name": "Ana"},
+                headers={"cloudfront-viewer-address": f"198.51.100.7:{port}"},
+            ).status_code
+            for port in (40001, 40002, 40003)  # the port changes with every connection
+        ]
+        ipv6 = [
+            client.post(
+                "/api/session",
+                json={"name": "Ana"},
+                headers={"cloudfront-viewer-address": f"2001:db8::7:{port}"},
+            ).status_code
+            for port in (40001, 40002, 40003)
+        ]
+
+    assert same_viewer == [200, 200, 429]
+    assert ipv6 == [200, 200, 429]
+
+
+def test_post_session_uses_the_configured_edge_header_and_ignores_forwarded_for(
+    make_settings,
+) -> None:
+    settings = make_settings(rate_limit_per_minute=3, client_ip_header="cf-connecting-ip")
+    with TestClient(create_app(settings)) as client:
         statuses = [
             client.post(
                 "/api/session",
