@@ -1,4 +1,5 @@
 import { useRoom } from '@/room/store'
+import { useCaptions } from './useCaptions'
 
 const SPOKEN_HISTORY = 3
 
@@ -9,7 +10,7 @@ const SPOKEN_HISTORY = 3
  */
 export function Announcer() {
   const meId = useRoom((s) => s.me?.user_id)
-  const finals = useRoom((s) => s.utterances).filter((u) => u.is_final).slice(-SPOKEN_HISTORY)
+  const finals = useCaptions().filter((u) => u.is_final).slice(-SPOKEN_HISTORY)
   const newest = useRoom((s) => s.stack.full[0])
   const term = useRoom((s) => (newest ? s.terms[newest.term_id] : undefined))
 

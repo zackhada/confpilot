@@ -1,8 +1,8 @@
 import type { KnowledgeStatus, Lang } from '@contracts'
-import { readStored, readStoredJson, removeStored, writeStored } from '@/shared/storage'
+import { readStoredJson, removeStored, writeStored } from '@/shared/storage'
+import { clearSession } from './auth'
 import { isLang, isPersonaId, type PersonaId } from './personas'
 
-const USER_ID_KEY = 'confpilot.user_id'
 const PROFILE_KEY = 'confpilot.profile'
 const KNOWLEDGE_KEY = 'confpilot.knowledge'
 const SAVED_KEY = 'confpilot.saved'
@@ -14,7 +14,7 @@ export interface Profile {
   lang: Lang | null
 }
 
-function newUuid(): string {
+export function newUuid(): string {
   // randomUUID needs a secure context; phones on a LAN dev URL fall back to getRandomValues.
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
   const b = crypto.getRandomValues(new Uint8Array(16))
@@ -22,15 +22,6 @@ function newUuid(): string {
   b[8] = (b[8]! & 0x3f) | 0x80
   const hex = [...b].map((x) => x.toString(16).padStart(2, '0')).join('')
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
-}
-
-/** There is no login: the phone keeps a UUID, and switching persona makes a new one. */
-export function getUserId(): string {
-  const existing = readStored(USER_ID_KEY)
-  if (existing) return existing
-  const created = newUuid()
-  writeStored(USER_ID_KEY, created)
-  return created
 }
 
 function isProfile(value: unknown): value is Profile {
@@ -52,9 +43,10 @@ export function saveProfile(profile: Profile): void {
   writeStored(PROFILE_KEY, JSON.stringify(profile))
 }
 
-/** Forget this persona entirely, so the next join starts as a new person. */
+/** Forget this persona entirely: the next join asks the server for a new session. */
 export function clearIdentity(): void {
-  for (const key of [PROFILE_KEY, USER_ID_KEY, KNOWLEDGE_KEY, SAVED_KEY]) removeStored(key)
+  for (const key of [PROFILE_KEY, KNOWLEDGE_KEY, SAVED_KEY]) removeStored(key)
+  clearSession()
 }
 
 function isStatusMap(value: unknown): value is Record<string, KnowledgeStatus> {

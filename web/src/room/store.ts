@@ -36,6 +36,8 @@ export interface Utterance {
   is_final: boolean
   seq: number
   started_at: number
+  /** Local ms when this utterance first arrived; arrival order settles duplicates. */
+  first_seen_at: number
 }
 
 export interface RoomData {
@@ -114,7 +116,12 @@ function reopen(stack: CardStackState, card: LiveCard): CardStackState {
 }
 
 /** Fold one interim or final transcript into the room: captions, heard counts and new cards. */
-export function reduceTranscript(state: RoomData, event: TranscriptEvent, matches: Match[]): RoomData {
+export function reduceTranscript(
+  state: RoomData,
+  event: TranscriptEvent,
+  matches: Match[],
+  now: number = Date.now(),
+): RoomData {
   const previous = state.utterances.find((u) => u.utterance_id === event.utterance_id)
   if (previous && (previous.is_final || event.seq <= previous.seq)) return state
   const words = wordsOf(event)
@@ -126,6 +133,7 @@ export function reduceTranscript(state: RoomData, event: TranscriptEvent, matche
     is_final: event.is_final,
     seq: event.seq,
     started_at: event.started_at,
+    first_seen_at: previous?.first_seen_at ?? now,
   }
   const utterances = previous
     ? state.utterances.map((u) => (u.utterance_id === utterance.utterance_id ? utterance : u))

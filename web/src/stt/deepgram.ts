@@ -84,11 +84,10 @@ export function createTranscriptAssembler({ idPrefix, streamStartedAt }: Assembl
 
 /**
  * How a browser authenticates a Deepgram WebSocket: it cannot set an Authorization header,
- * so the credential travels as a subprotocol pair. A temporary access token (a JWT from
- * /v1/auth/grant) uses "bearer"; a short-lived API key uses "token". This mirrors what
- * Deepgram's own JavaScript SDK does.
+ * so the temporary token from POST /api/token travels as the subprotocol pair
+ * ["bearer", token]. Confirmed against the live service: ["token", ...] is for long-lived
+ * API keys and is rejected with a 401 for temporary tokens.
  */
 export function deepgramProtocols(token: string): [string, string] {
-  const looksLikeJwt = token.split('.').length === 3
-  return [looksLikeJwt ? 'bearer' : 'token', token]
+  return ['bearer', token]
 }

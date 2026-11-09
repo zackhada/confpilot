@@ -1,7 +1,10 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { LiveScreen } from '@/live/LiveScreen'
-import { ComingSoon } from '@/screens/ComingSoon'
+import { Ask } from '@/screens/Ask'
+import { Cards } from '@/screens/Cards'
+import { Recap } from '@/screens/Recap'
 import { AppShell } from '@/shell/AppShell'
+import { StageView } from '@/stage/StageView'
 
 export default function App() {
   return (
@@ -9,10 +12,11 @@ export default function App() {
       <Routes>
         <Route element={<AppShell />}>
           <Route index element={<LiveScreen />} />
-          <Route path="recap" element={<ComingSoon title="Recap">Your recap appears after a talk.</ComingSoon>} />
-          <Route path="cards" element={<ComingSoon title="Cards">Saved terms become flashcards.</ComingSoon>} />
-          <Route path="ask" element={<ComingSoon title="Ask">Search what you heard.</ComingSoon>} />
+          <Route path="recap" element={<Recap />} />
+          <Route path="cards" element={<Cards />} />
+          <Route path="ask" element={<Ask />} />
         </Route>
+        <Route path="stage" element={<StageView />} />
       </Routes>
     </BrowserRouter>
   )

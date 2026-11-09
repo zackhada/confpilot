@@ -16,6 +16,7 @@ function utterance(id: string, speaker: typeof zack, text: string, matches: Utte
     is_final: true,
     seq: 1,
     started_at: 0,
+    first_seen_at: 0,
   }
 }
 

@@ -101,6 +101,18 @@ describe('createRoomSocket', () => {
     expect(latest().sent).toEqual(['{"type":"knowledge.set","term_id":"rrf","status":"known"}'])
   })
 
+  it('treats 45 seconds of silence as a dead socket and reconnects', () => {
+    const { statuses } = setup()
+    latest().open()
+    vi.advanceTimersByTime(40_000)
+    latest().onmessage?.({ data: '{"type":"room.state","members":[]}' })
+    vi.advanceTimersByTime(40_000)
+    expect(statuses[statuses.length - 1]).toBe('open')
+    vi.advanceTimersByTime(11_000)
+    expect(statuses).toContain('reconnecting')
+    expect(FakeSocket.instances.length).toBeGreaterThan(1)
+  })
+
   it('stops reconnecting once closed on purpose', () => {
     const { socket, statuses } = setup()
     latest().open()

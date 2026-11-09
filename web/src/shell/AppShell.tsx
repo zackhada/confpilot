@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, useSearchParams } from 'react-router'
-import { getUserId, parseRoomCode } from '@/room/identity'
+import { parseRoomCode } from '@/room/identity'
 import { personaById } from '@/room/personas'
 import { useProfile } from '@/room/profile'
 import { joinRoom, leaveRoom } from '@/room/session'
@@ -22,7 +22,7 @@ export function AppShell() {
     joinRoom({
       room,
       role: 'speaker',
-      me: { user_id: getUserId(), name: profile.name },
+      name: profile.name,
       lang: profile.lang,
       persona: personaById(profile.persona),
     })

@@ -1,6 +1,5 @@
 import { LoaderCircle, Mic, MicOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { getUserId } from '@/room/identity'
 import { cn } from '@/shared/cn'
 import { startListening, stopListening, useMic, type MicState } from '@/stt/mic'
 
@@ -8,7 +7,7 @@ const ACTIVE: ReadonlySet<MicState> = new Set(['starting', 'listening', 'reconne
 
 function toggleMic(state: MicState): void {
   if (ACTIVE.has(state)) stopListening()
-  else void startListening(getUserId())
+  else void startListening()
 }
 
 /** Compact mic toggle for the header. Filled while the mic is on; the icon changes too. */
@@ -60,7 +59,7 @@ export function MicNotice() {
     >
       <p className="min-w-0 flex-1 font-semibold text-ink">{notice.text}</p>
       {notice.retry && (
-        <Button className="shrink-0" onClick={() => void startListening(getUserId())}>
+        <Button className="shrink-0" onClick={() => void startListening()}>
           Try again
         </Button>
       )}

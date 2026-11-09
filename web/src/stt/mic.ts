@@ -2,8 +2,10 @@
 // 16-bit PCM and never touches our servers; the API only hands out a short-lived token.
 import type { TokenRequest, TokenResponse } from '@contracts'
 import { create } from 'zustand'
+import { apiFetch } from '@/room/auth'
 import { publishTranscript, serverNow } from '@/room/session'
 import { backoffDelayMs } from '@/room/socket'
+import { useRoom } from '@/room/store'
 import { createTranscriptAssembler, deepgramProtocols, type TranscriptAssembler } from './deepgram'
 import { createDownsampler, TARGET_SAMPLE_RATE, type Downsampler } from './pcm'
 
@@ -26,6 +28,7 @@ class SttUnavailableError extends Error {}
 
 interface MicSession {
   userId: string
+  name: string
   context: AudioContext
   stream: MediaStream | null
   downsample: Downsampler | null
@@ -50,9 +53,11 @@ function isTokenResponse(value: unknown): value is TokenResponse {
   return typeof v.token === 'string' && typeof v.ws_url === 'string' && v.ws_url.startsWith('wss://')
 }
 
-async function fetchToken(userId: string): Promise<TokenResponse> {
+/** The token lives about a minute and only has to be valid as the socket opens, so every
+ * connection, including each reconnect, fetches a fresh one. */
+async function fetchToken(userId: string, name: string): Promise<TokenResponse> {
   const body: TokenRequest = { user_id: userId }
-  const response = await fetch('/api/token', {
+  const response = await apiFetch('/api/token', name, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(body),
@@ -89,7 +94,7 @@ function onResult(current: MicSession, data: unknown): void {
 
 /** Open the speech-to-text socket. Resolves once it is open; rejects if it cannot open. */
 async function connect(current: MicSession): Promise<void> {
-  const token = await fetchToken(current.userId)
+  const token = await fetchToken(current.userId, current.name)
   if (current.stopped) return
   await new Promise<void>((resolve, reject) => {
     const socket = new WebSocket(token.ws_url, deepgramProtocols(token.token))
@@ -166,11 +171,13 @@ function micSupported(): boolean {
 }
 
 /** Call from a tap: browsers only start audio from a user gesture. */
-export async function startListening(userId: string): Promise<void> {
-  if (session) return
+export async function startListening(): Promise<void> {
+  const me = useRoom.getState().me
+  if (session || !me) return
   if (!micSupported()) return setState('unsupported')
   const current: MicSession = {
-    userId,
+    userId: me.user_id,
+    name: me.name,
     context: new AudioContext(),
     stream: null,
     downsample: null,

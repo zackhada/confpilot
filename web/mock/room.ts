@@ -96,6 +96,11 @@ export class MockRoom {
     }
   }
 
+  /** Resend room.state; clients treat 45 s of silence as a dead socket. */
+  heartbeat(): void {
+    this.broadcastState()
+  }
+
   /** Start the scripted conversation again from the top. */
   restartReplay(): void {
     this.stopReplay()

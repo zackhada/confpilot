@@ -3,11 +3,13 @@
 //
 //   GET  /api/health            -> Health
 //   GET  /api/glossary          -> the sample glossary fixture (or content/glossary.json)
+//   POST /api/session           -> { user_id, session, expires_at }, any opaque string
 //   POST /api/token             -> 503, there is no speech-to-text in mock mode
 //   POST /api/mock/replay?room= -> restart the scripted conversation
-//   WS   /ws/rooms/{room}?user_id=&name=&role=
+//   WS   /ws/rooms/{room}?session=&name=&role=
 //
 // Set MOCK_LOOP=1 to replay the conversation forever, and PORT to move off 8000.
+import { randomUUID } from 'node:crypto'
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http'
@@ -18,7 +20,8 @@ import { MockRoom } from './room.ts'
 
 const PORT = Number(process.env.PORT ?? 8000)
 const LOOP = process.env.MOCK_LOOP === '1'
-const PING_INTERVAL_MS = 20_000
+const HEARTBEAT_INTERVAL_MS = 20_000
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000
 const ROOM_PATH = /^\/ws\/rooms\/([a-z0-9-]{1,32})$/i
 
 const repoRoot = new URL('../../', import.meta.url)
@@ -27,6 +30,8 @@ const sampleGlossary = fileURLToPath(new URL('contracts/fixtures/glossary.sample
 const glossaryPath = process.env.GLOSSARY_PATH ?? (existsSync(realGlossary) ? realGlossary : sampleGlossary)
 
 const rooms = new Map<string, MockRoom>()
+/** session string -> user id. Lost on restart, which exercises the client's renew path. */
+const sessions = new Map<string, string>()
 
 function roomFor(code: string): MockRoom {
   const key = code.toLowerCase()
@@ -55,6 +60,12 @@ async function handleHttp(req: IncomingMessage, res: ServerResponse): Promise<vo
     res.end(body)
     return
   }
+  if (route === 'POST /api/session') {
+    const userId = randomUUID()
+    const session = `mock-${randomUUID()}`
+    sessions.set(session, userId)
+    return sendJson(res, 200, { user_id: userId, session, expires_at: Date.now() + SESSION_TTL_MS })
+  }
   if (route === 'POST /api/token') {
     return sendJson(res, 503, { code: 'stt_unavailable', message: 'The mock server has no speech-to-text.' })
   }
@@ -80,10 +91,18 @@ const wss = new WebSocketServer({ noServer: true })
 server.on('upgrade', (req, socket, head) => {
   const url = new URL(req.url ?? '/', `http://${req.headers.host ?? 'localhost'}`)
   const match = ROOM_PATH.exec(url.pathname)
-  const userId = url.searchParams.get('user_id')
-  if (!match?.[1] || !userId) {
+  if (!match?.[1]) {
     socket.write('HTTP/1.1 400 Bad Request\r\n\r\n')
     socket.destroy()
+    return
+  }
+  const userId = sessions.get(url.searchParams.get('session') ?? '')
+  if (!userId) {
+    // Accept, explain, close: a browser cannot read a 401 on the handshake itself.
+    wss.handleUpgrade(req, socket, head, (ws) => {
+      ws.send(JSON.stringify({ type: 'error', code: 'unauthorized', message: 'Unknown session.' }))
+      ws.close(4401, 'unauthorized')
+    })
     return
   }
   const room = roomFor(match[1])
@@ -100,10 +119,10 @@ server.on('upgrade', (req, socket, head) => {
   })
 })
 
-// The real API pings every 20 seconds so load balancers keep the socket open; so does the mock.
+// The real API resends room.state every 20 seconds as its heartbeat; so does the mock.
 const pinger = setInterval(() => {
-  for (const client of wss.clients) client.ping()
-}, PING_INTERVAL_MS)
+  rooms.forEach((room) => room.heartbeat())
+}, HEARTBEAT_INTERVAL_MS)
 
 server.listen(PORT, () => {
   process.stdout.write(`ConfPilot mock room server on http://localhost:${PORT} (glossary: ${glossaryPath})\n`)

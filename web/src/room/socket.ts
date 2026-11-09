@@ -28,6 +28,9 @@ const SERVER_EVENT_TYPES: ReadonlySet<string> = new Set([
 const BASE_DELAY_MS = 400
 const MAX_DELAY_MS = 5000
 const MAX_QUEUE = 50
+/** The server resends room.state every 20 s; this much silence means the socket is dead. */
+export const STALE_AFTER_MS = 45_000
+const WATCHDOG_INTERVAL_MS = 5000
 
 /** Server data is untrusted until it is at least an object with a known `type`. */
 export function parseServerEvent(raw: unknown): ServerEvent | null {
@@ -58,6 +61,13 @@ export function createRoomSocket(options: RoomSocketOptions): RoomSocket {
   let timer: ReturnType<typeof setTimeout> | null = null
   let closedByUs = false
   let queue: ClientEvent[] = []
+  let lastHeardAt = Date.now()
+
+  // A phone that changes network can keep a socket that looks open but carries nothing.
+  const watchdog = setInterval(() => {
+    const silentMs = Date.now() - lastHeardAt
+    if (socket?.readyState === WebSocket.OPEN && silentMs > STALE_AFTER_MS) socket.close()
+  }, WATCHDOG_INTERVAL_MS)
 
   const connect = (): void => {
     if (closedByUs) return
@@ -65,6 +75,7 @@ export function createRoomSocket(options: RoomSocketOptions): RoomSocket {
     const next = create(options.url)
     socket = next
     next.onopen = () => {
+      lastHeardAt = Date.now()
       attempt = 0
       options.onStatus('open')
       const pending = queue
@@ -72,6 +83,7 @@ export function createRoomSocket(options: RoomSocketOptions): RoomSocket {
       pending.forEach((event) => next.send(JSON.stringify(event)))
     }
     next.onmessage = (message: MessageEvent) => {
+      lastHeardAt = Date.now()
       const event = parseServerEvent(message.data)
       if (event) options.onEvent(event)
     }
@@ -106,6 +118,7 @@ export function createRoomSocket(options: RoomSocketOptions): RoomSocket {
     },
     close() {
       closedByUs = true
+      clearInterval(watchdog)
       if (timer) clearTimeout(timer)
       socket?.close()
       socket = null

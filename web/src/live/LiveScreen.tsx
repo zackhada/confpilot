@@ -9,10 +9,11 @@ import { Captions } from './Captions'
 import { CardStack } from './CardStack'
 import { MicButton, MicNotice } from './MicControls'
 import { RoomStatus } from './RoomStatus'
+import { useCaptions } from './useCaptions'
 
 /** The hero screen: rolling captions on top, jargon cards by the thumb. Nothing scrolls. */
 export function LiveScreen() {
-  const utterances = useRoom((s) => s.utterances)
+  const utterances = useCaptions()
   const knowledge = useRoom((s) => s.knowledge)
   const me = useRoom((s) => s.me)
   const glossaryError = useRoom((s) => s.glossaryError)

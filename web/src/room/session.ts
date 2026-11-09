@@ -1,21 +1,26 @@
 // The live room session: one socket, one clock, one matcher. React components read the
 // zustand store; they call the functions here to act on the room.
-import type { Lang, Role, ServerEvent, Speaker, Term, TranscriptEvent } from '@contracts'
+import type { Lang, Role, ServerEvent, Term, TranscriptEvent } from '@contracts'
 import { createClock } from '@/lib/clock'
 import { wordToCardMs } from '@/lib/latency'
 import { createMatcher, type Match } from '@/lib/match/matcher'
+import { ensureSession, storedSession } from './auth'
 import { cachedGlossary, indexTerms, loadGlossary } from './glossary'
 import { loadKnowledge, loadSaved, storeKnowledge, storeSaved } from './identity'
 import { seedKnowledge, type Persona } from './personas'
-import { createRoomSocket, type RoomSocket } from './socket'
+import { createRoomSocket, type RoomSocket, type SocketStatus } from './socket'
 import { allCards, useRoom, wordsOf } from './store'
 
 const TIME_SYNC_INTERVAL_MS = 30_000
+const SESSION_RETRY_MS = 3000
+/** Failed connection attempts in a row before the session is assumed to be rejected. */
+const FAILURES_BEFORE_RENEW = 2
 
 export interface JoinOptions {
   room: string
   role: Role
-  me: Speaker
+  /** Display name. The user id comes from the server-issued session. */
+  name: string
   lang?: Lang | null
   /** Seeds the terms this person already knows. Omitted for the stage view. */
   persona?: Persona
@@ -25,17 +30,20 @@ const clock = createClock()
 let socket: RoomSocket | null = null
 let matcher: (words: string[]) => Match[] = () => []
 let syncTimer: ReturnType<typeof setInterval> | null = null
+let retryTimer: ReturnType<typeof setTimeout> | null = null
 let joinToken = 0
+let failures = 0
+let renewed = false
 
 /** The current time in server milliseconds. Every timestamp on the wire uses this. */
 export function serverNow(): number {
   return clock.now()
 }
 
-function roomUrl({ room, role, me }: JoinOptions): string {
+function roomUrl(options: JoinOptions, session: string): string {
   const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws'
-  const query = new URLSearchParams({ user_id: me.user_id, name: me.name, role })
-  return `${scheme}://${window.location.host}/ws/rooms/${encodeURIComponent(room)}?${query}`
+  const query = new URLSearchParams({ session, name: options.name, role: options.role })
+  return `${scheme}://${window.location.host}/ws/rooms/${encodeURIComponent(options.room)}?${query}`
 }
 
 function applyTerms(terms: readonly Term[], persona: Persona | undefined): void {
@@ -53,7 +61,16 @@ function sendPing(): void {
   socket?.send({ type: 'time.ping', t0: Date.now() })
 }
 
-function handleEvent(event: ServerEvent): void {
+/** The server rejected the session: get a new one, once, and reconnect with it. */
+function renewSession(options: JoinOptions, token: number): void {
+  if (renewed || token !== joinToken) return
+  renewed = true
+  socket?.close()
+  socket = null
+  void openSocket(options, token, true)
+}
+
+function handleEvent(event: ServerEvent, options: JoinOptions, token: number): void {
   const room = useRoom.getState()
   switch (event.type) {
     case 'transcript':
@@ -72,8 +89,42 @@ function handleEvent(event: ServerEvent): void {
       room.patch({ members: event.members })
       return
     case 'error':
-      room.patch({ notice: event.message })
+      if (event.code === 'unauthorized') renewSession(options, token)
+      else room.patch({ notice: event.message })
       return
+  }
+}
+
+function handleStatus(status: SocketStatus, options: JoinOptions, token: number): void {
+  if (token !== joinToken) return
+  useRoom.getState().patch({ status })
+  if (status === 'open') {
+    failures = 0
+    renewed = false
+    sendPing()
+  }
+  if (status === 'reconnecting') {
+    // A browser cannot see a 401 on a WebSocket handshake; repeated failures stand in for it.
+    failures += 1
+    if (failures >= FAILURES_BEFORE_RENEW) renewSession(options, token)
+  }
+}
+
+async function openSocket(options: JoinOptions, token: number, fresh: boolean): Promise<void> {
+  try {
+    const session = await ensureSession(options.name, fresh)
+    if (token !== joinToken) return
+    useRoom.getState().patch({ me: { user_id: session.user_id, name: options.name } })
+    socket = createRoomSocket({
+      url: roomUrl(options, session.session),
+      onEvent: (event) => handleEvent(event, options, token),
+      onStatus: (status) => handleStatus(status, options, token),
+    })
+  } catch {
+    if (token !== joinToken) return
+    // No session means no network or no API yet; keep trying quietly.
+    useRoom.getState().patch({ status: 'reconnecting' })
+    retryTimer = setTimeout(() => void openSocket(options, token, fresh), SESSION_RETRY_MS)
   }
 }
 
@@ -81,41 +132,38 @@ function wake(): void {
   if (document.visibilityState === 'visible') socket?.nudge()
 }
 
-export function joinRoom(options: JoinOptions): void {
-  leaveRoom()
-  joinToken += 1
-  const token = joinToken
-  useRoom.getState().reset({
-    status: 'connecting',
-    room: options.room,
-    role: options.role,
-    me: options.me,
-    lang: options.lang ?? null,
-    saved: options.role === 'speaker' ? loadSaved() : [],
-  })
-
+function loadTerms(persona: Persona | undefined, token: number): void {
   // The copy saved on the phone makes the matcher ready before any network round trip.
   const cached = cachedGlossary()
-  if (cached) applyTerms(cached.terms, options.persona)
+  if (cached) applyTerms(cached.terms, persona)
   loadGlossary()
     .then((glossary) => {
-      if (token === joinToken) applyTerms(glossary.terms, options.persona)
+      if (token === joinToken) applyTerms(glossary.terms, persona)
     })
     .catch((error: unknown) => {
       if (token !== joinToken) return
       const message = error instanceof Error ? error.message : 'The glossary could not be loaded.'
       useRoom.getState().patch({ glossaryError: message })
     })
+}
 
-  socket = createRoomSocket({
-    url: roomUrl(options),
-    onEvent: handleEvent,
-    onStatus: (status) => {
-      if (token !== joinToken) return
-      useRoom.getState().patch({ status })
-      if (status === 'open') sendPing()
-    },
+export function joinRoom(options: JoinOptions): void {
+  leaveRoom()
+  joinToken += 1
+  const token = joinToken
+  failures = 0
+  renewed = false
+  const known = storedSession(options.name)
+  useRoom.getState().reset({
+    status: 'connecting',
+    room: options.room,
+    role: options.role,
+    me: known ? { user_id: known.user_id, name: options.name } : null,
+    lang: options.lang ?? null,
+    saved: options.role === 'speaker' ? loadSaved() : [],
   })
+  loadTerms(options.persona, token)
+  void openSocket(options, token, false)
   syncTimer = setInterval(sendPing, TIME_SYNC_INTERVAL_MS)
   document.addEventListener('visibilitychange', wake)
   window.addEventListener('online', wake)
@@ -124,7 +172,9 @@ export function joinRoom(options: JoinOptions): void {
 export function leaveRoom(): void {
   joinToken += 1
   if (syncTimer) clearInterval(syncTimer)
+  if (retryTimer) clearTimeout(retryTimer)
   syncTimer = null
+  retryTimer = null
   socket?.close()
   socket = null
   document.removeEventListener('visibilitychange', wake)

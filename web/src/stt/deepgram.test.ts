@@ -75,11 +75,7 @@ describe('createTranscriptAssembler', () => {
 })
 
 describe('deepgramProtocols', () => {
-  it('sends a temporary access token (JWT) as a bearer subprotocol', () => {
+  it('sends the temporary token as a bearer subprotocol', () => {
     expect(deepgramProtocols('aaa.bbb.ccc')).toEqual(['bearer', 'aaa.bbb.ccc'])
-  })
-
-  it('sends a short-lived API key as a token subprotocol', () => {
-    expect(deepgramProtocols('0123456789abcdef')).toEqual(['token', '0123456789abcdef'])
   })
 })

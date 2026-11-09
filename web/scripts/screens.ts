@@ -67,6 +67,7 @@ async function phoneShots(browser: Browser): Promise<void> {
   await shot(light, 'live-375-light')
   await waitForCard(dark, 'RRF')
   await shot(dark, 'live-375-dark')
+  await dark.getByRole('button', { name: 'Save', exact: true }).click()
   for (const tab of ['Recap', 'Cards', 'Ask']) {
     await dark.getByRole('link', { name: tab }).click()
     await dark.waitForTimeout(250)
