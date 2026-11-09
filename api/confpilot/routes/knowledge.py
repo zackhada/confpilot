@@ -130,7 +130,15 @@ async def ask(request: Request, body: AskRequest, user: CurrentUser) -> Streamin
     enforce_rate_limit(request, "ask", user)
     store: Store = request.app.state.store
     with tracer.start_as_current_span("ask.retrieve", attributes={"confpilot.room": body.room}):
-        hits = await store.search(body.question, room=body.room, limit=8)
+        # Acronyms alone often rank mic checks above actual explanations.
+        term_ids = {m.term_id for m in request.app.state.matcher.match(body.question.split())}
+        subjects = [
+            f"{term.term} {' '.join(term.aliases)} {term.simple_def}"
+            for term in request.app.state.glossary.terms
+            if term.id in term_ids
+        ]
+        query = " ".join(subjects) or body.question
+        hits = await store.search(query, room=body.room, limit=8)
 
     async def events() -> AsyncIterator[str]:
         moments = [hit.model_dump() for hit in hits]
