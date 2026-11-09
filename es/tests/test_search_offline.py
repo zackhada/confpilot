@@ -41,6 +41,7 @@ async def test_search_maps_hits_and_escapes_text_that_has_no_keyword_highlight()
     assert found[0].speaker.name == "Zack" and found[0].term_ids == []
     call = client.calls_to("search")[0]
     assert call["index"] == "confpilot-test-stub-utterances" and call["size"] == MAX_SEARCH_SIZE
+    assert call["search_type"] == "dfs_query_then_fetch"  # index-wide BM25 statistics
 
 
 async def test_blank_question_never_reaches_elasticsearch() -> None:

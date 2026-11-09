@@ -14,6 +14,9 @@ DEFAULT_SEARCH_SIZE = 10
 MAX_SEARCH_SIZE = 50
 RRF_RANK_WINDOW = 50
 RRF_RANK_CONSTANT = 20
+# A room holds few utterances spread over several shards. Per-shard term statistics would make
+# the BM25 ranking depend on which shard a line landed in, so score with index-wide statistics.
+SEARCH_TYPE = "dfs_query_then_fetch"
 
 
 def hybrid_search_body(q: str, room: str, size: int) -> dict[str, Any]:
@@ -88,6 +91,7 @@ class SearchMixin(StoreBase):
                 size=body["size"],
                 source=body["_source"],
                 highlight=body["highlight"],
+                search_type=SEARCH_TYPE,
             )
             hits = response["hits"]["hits"]
             span.set_attribute("confpilot.hit_count", len(hits))

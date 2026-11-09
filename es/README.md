@@ -110,7 +110,7 @@ with explicit context is stored like this (from the sample glossary):
 **3. Hybrid search with RRF, asked in Spanish, answered from English speech.**
 
 ```
-GET confpilot-utterances/_search
+GET confpilot-utterances/_search?search_type=dfs_query_then_fetch
 {
   "size": 5,
   "retriever": { "rrf": {
