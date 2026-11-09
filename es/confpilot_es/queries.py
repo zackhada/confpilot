@@ -75,3 +75,9 @@ def percolator_doc(term: Term) -> Body:
         "source": term.source,
         "query": percolator_query(term),
     }
+
+
+def term_doc(term: Term) -> Body:
+    """The `terms` document: the contract fields plus the text that gets embedded."""
+    definition = " ".join(part for part in (term.simple_def, term.long_def) if part)
+    return {**term.model_dump(exclude_none=True), "semantic_text": f"{term.term}: {definition}"}
