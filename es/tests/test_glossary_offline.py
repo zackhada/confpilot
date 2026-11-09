@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
+from unittest.mock import Mock
 
 import pytest
+from opentelemetry import trace
 
 from confpilot_es import EsStore, EsStoreError, Glossary
 from confpilot_es.queries import percolator_query, term_doc
@@ -59,11 +63,24 @@ async def test_upsert_terms_indexes_each_term_and_its_percolator_query() -> None
     assert client.calls_to("put_mapping")[0]["meta"] == {"glossary_version": SAMPLE.version}
 
 
-async def test_bulk_failures_are_surfaced() -> None:
+async def test_bulk_failures_are_surfaced_and_recorded_on_span(monkeypatch: pytest.MonkeyPatch) -> None:
     failed = {"errors": True, "items": [{"index": {"_index": "i", "_id": "rrf", "error": {"reason": "boom"}}}]}
     store, _ = make_store(bulk=failed)
-    with pytest.raises(EsStoreError, match="rrf: boom"):
+    span = Mock()
+
+    @contextmanager
+    def recording_span(*_args: object, **_kwargs: object) -> Iterator[Mock]:
+        yield span
+
+    monkeypatch.setattr("confpilot_es.glossary.es_span", recording_span)
+    with pytest.raises(EsStoreError, match="rrf: boom") as raised:
         await store.upsert_terms(SAMPLE.terms[:1])
+
+    span.record_exception.assert_called_once_with(raised.value)
+    span.set_status.assert_called_once()
+    status = span.set_status.call_args.args[0]
+    assert status.status_code is trace.StatusCode.ERROR
+    assert status.description == str(raised.value)
 
 
 async def test_prune_only_removes_seed_terms_that_left_the_glossary() -> None:
