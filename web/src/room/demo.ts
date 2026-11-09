@@ -84,5 +84,5 @@ export async function applyDemoLink(): Promise<void> {
     return
   }
   seedReturning()
-  await pushReviews()
+  void pushReviews()
 }
