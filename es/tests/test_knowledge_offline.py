@@ -64,12 +64,25 @@ async def test_put_knowledge_upserts_one_document_per_user_and_term() -> None:
     saved = {"user_id": "u", "term_id": "rrf", "status": "learning", "source": "tap", "due_at": None}
     client = StubClient(update={"get": {"_source": saved}})
     store = EsStore(client, prefix="confpilot-test-stub-")  # type: ignore[arg-type]
-    knowledge = await store.put_knowledge("u", "rrf", {"status": "learning", "due_at": None})
+    knowledge = await store.put_knowledge("u", "rrf", {"status": "learning", "source": None, "due_at": None})
     call = client.calls_to("update")[0]
     assert (call["index"], call["id"]) == ("confpilot-test-stub-user-knowledge", "u:rrf")
-    assert call["doc"] == {"status": "learning", "due_at": None}  # only what the patch set
+    assert call["doc"] == {"status": "learning", "due_at": None}  # null source is ignored
     assert call["upsert"]["ease"] == 2.5 and call["upsert"]["status"] == "learning"
     assert (knowledge.status, knowledge.ease, knowledge.learned) == ("learning", 2.5, False)
+
+
+@pytest.mark.parametrize(("interval_days", "learned"), [(6, False), (7, True)])
+async def test_put_knowledge_derives_learned_from_interval_days(interval_days: int, learned: bool) -> None:
+    saved = {"user_id": "u", "term_id": "rrf", "interval_days": interval_days, "learned": learned}
+    client = StubClient(update={"get": {"_source": saved}})
+    store = EsStore(client, prefix="confpilot-test-stub-")  # type: ignore[arg-type]
+    knowledge = await store.put_knowledge("u", "rrf", {"interval_days": interval_days})
+
+    call = client.calls_to("update")[0]
+    assert call["doc"] == {"interval_days": interval_days, "learned": learned}
+    assert call["upsert"]["learned"] is learned
+    assert knowledge.learned is learned
 
 
 async def test_put_knowledge_rejects_fields_outside_the_contract() -> None:

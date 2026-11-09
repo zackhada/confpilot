@@ -40,9 +40,13 @@ class KnowledgeMixin(StoreBase):
         """Merge `patch` into the user's record for a term, creating it with SM-2 defaults.
 
         The document id is `"{user_id}:{term_id}"`, so there is exactly one per user and term.
-        A field set to null in the patch (only `due_at` is nullable) is written as null.
+        Null fields are ignored except for `due_at`, which can be cleared by setting it to null.
         """
-        changes = KnowledgePatch.model_validate(patch).model_dump(exclude_unset=True)
+        raw = patch.model_dump(exclude_unset=True) if hasattr(patch, "model_dump") else dict(patch)
+        raw = {key: value for key, value in raw.items() if value is not None or key == "due_at"}
+        changes = KnowledgePatch.model_validate(raw).model_dump(exclude_unset=True)
+        if "learned" not in changes and "interval_days" in changes:
+            changes["learned"] = changes["interval_days"] >= 7
         created = Knowledge.model_validate({**changes, "user_id": user_id, "term_id": term_id})
         with es_span("es.index", operation="put_knowledge", term_id=term_id):
             response = await self.client.update(
