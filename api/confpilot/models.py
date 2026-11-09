@@ -279,6 +279,11 @@ class SearchResponse(BaseModel):
     hits: list[SearchHit]
 
 
+class AskRequest(BaseModel):
+    room: SafeId
+    question: str = Field(min_length=1, max_length=200, pattern=r"\S")
+
+
 class HeardTerm(BaseModel):
     term_id: str
     count: int

@@ -72,7 +72,7 @@ async function afterTalkShots(page: Page): Promise<void> {
   await page.waitForTimeout(600)
   await shot(page, 'cards-375-dark-answer')
 
-  await tab('Ask')
+  await tab('Agent')
   await shot(page, 'ask-375-dark-empty')
   await page.getByRole('button', { name: 'What did Zack say about RAG?' }).click()
   await page.getByText(/\d moments?$/).waitFor()

@@ -1,6 +1,10 @@
+import json
+
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 from helpers import bearer, room_url
+from pydantic import SecretStr
 
 from confpilot.models import Glossary, Knowledge, Term
 from confpilot.routes.knowledge import build_recap
@@ -151,3 +155,26 @@ def test_search_finds_utterances_with_escaped_highlights(talked: TestClient, spa
     assert len(talked.get("/api/search?q=rag&room=slc1&limit=2").json()["hits"]) == 2
     span = next(s for s in spans.get_finished_spans() if s.name == "search")
     assert span.attributes["confpilot.search.hit_count"] == 2
+
+
+def test_agent_streams_retrieved_moments_then_model_answer(talked: TestClient, monkeypatch) -> None:
+    def complete(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        context = json.loads(payload["messages"][-1]["content"])
+        assert context["question"] == "What did Ana say about RAG?"
+        assert len(context["moments"]) == 3
+        assert all(moment["speaker"] == "Ana" for moment in context["moments"])
+        return httpx.Response(
+            200, json={"choices": [{"message": {"content": "Ana said RAG needs vectors."}}]}
+        )
+
+    monkeypatch.setattr(talked.app.state.settings, "llm_api_key", SecretStr("test"))
+    monkeypatch.setattr(talked.app.state, "http_transport", httpx.MockTransport(complete))
+    body = {"room": "slc1", "question": "What did Ana say about RAG?"}
+    response = talked.post("/api/ask", json=body)
+    assert response.headers["content-type"].startswith("text/event-stream")
+    moments, answer = [json.loads(line[6:]) for line in response.text.splitlines() if line]
+    assert moments["type"] == "moments"
+    assert len(moments["hits"]) == 3
+    assert answer == {"type": "answer", "answer": "Ana said RAG needs vectors."}
+    assert talked.post("/api/ask", json=body, headers=bearer(talked, "u-ben")).status_code == 403

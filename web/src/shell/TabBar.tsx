@@ -13,7 +13,7 @@ const TABS: Tab[] = [
   { to: '/', label: 'Live', Icon: Captions },
   { to: '/recap', label: 'Recap', Icon: NotebookText },
   { to: '/cards', label: 'Cards', Icon: Layers },
-  { to: '/ask', label: 'Ask', Icon: MessageCircleQuestion },
+  { to: '/ask', label: 'Agent', Icon: MessageCircleQuestion },
 ]
 
 /** Bottom tab bar. It sits in the thumb zone and keeps the room code in the URL. */
