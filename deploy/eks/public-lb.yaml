@@ -1,0 +1,24 @@
+# Public network load balancer in front of the app. It is the origin for the CloudFront
+# distribution that gives us HTTPS without a domain. It speaks plain HTTP on port 80;
+# CloudFront terminates TLS and redirects viewers to HTTPS.
+apiVersion: v1
+kind: Service
+metadata:
+  name: confpilot-public
+  namespace: confpilot
+  labels:
+    app.kubernetes.io/name: confpilot
+    app.kubernetes.io/component: edge
+    app.kubernetes.io/part-of: confpilot
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: confpilot
+    app.kubernetes.io/component: api
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
