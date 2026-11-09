@@ -2,6 +2,7 @@ import time
 
 import pytest
 from fastapi.testclient import TestClient
+from opentelemetry.trace import StatusCode
 from starlette.websockets import WebSocketDisconnect
 
 from confpilot.app import create_app
@@ -161,6 +162,24 @@ def test_knowledge_set_updates_the_store(client: TestClient, room) -> None:
 
     record = client.app.state.store._knowledge["u-ana"]["rag"]
     assert (record.status, record.source) == ("known", "tap")
+
+
+def test_knowledge_set_records_store_failure_on_span(client, room, spans, monkeypatch) -> None:
+    ana, _ = room
+
+    async def fail_put_knowledge(*_args) -> None:
+        raise RuntimeError("write failed")
+
+    monkeypatch.setattr(client.app.state.store, "put_knowledge", fail_put_knowledge)
+    ana.send_json({"type": "knowledge.set", "term_id": "rag", "status": "known"})
+
+    assert ana.receive_json()["code"] == "store_unavailable"
+    assert ping(ana)["type"] == "time.pong"
+    span = next(s for s in spans.get_finished_spans() if s.name == "knowledge.set")
+    assert span.status.status_code == StatusCode.ERROR
+    assert span.status.description == "store unavailable"
+    exception = next(event for event in span.events if event.name == "exception")
+    assert exception.attributes["exception.message"] == "write failed"
 
 
 @pytest.mark.parametrize(

@@ -6,6 +6,7 @@ import time
 from collections.abc import Coroutine
 
 from fastapi import APIRouter, WebSocket
+from opentelemetry.trace import Status, StatusCode
 from pydantic import BaseModel, Field, ValidationError
 from starlette.datastructures import State
 from starlette.websockets import WebSocketDisconnect
@@ -124,13 +125,15 @@ async def save_knowledge(
         "confpilot.term_id": event.term_id,
         "confpilot.knowledge.status": event.status,
     }
-    with tracer.start_as_current_span("knowledge.set", attributes=attributes):
+    with tracer.start_as_current_span("knowledge.set", attributes=attributes) as span:
         patch = KnowledgePatch(status=event.status, source="tap")
         try:
             await websocket.app.state.store.put_knowledge(
                 connection.member.user_id, event.term_id, patch
             )
-        except Exception:
+        except Exception as exc:
+            span.record_exception(exc)
+            span.set_status(Status(StatusCode.ERROR, "store unavailable"))
             _log.exception("knowledge.set could not be saved")
             connection.send(ErrorEvent(code="store_unavailable", message="Could not save that"))
 
