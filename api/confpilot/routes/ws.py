@@ -106,8 +106,11 @@ def handle_transcript(state: State, connection: Connection, event: TranscriptEve
             connection.room, connection.member.user_id, transcript_words(event), time.monotonic()
         )
         span.set_attribute("confpilot.utterance.duplicate", not fresh)
-        if fresh:
-            spawn(store_final(state.store, state.matcher, connection.room, relayed), "store_final")
+        if fresh and not spawn(
+            store_final(state.store, state.matcher, connection.room, relayed), "store_final"
+        ):
+            state.recent_finals.forget(connection.room, connection.member.user_id)
+            span.set_attribute("confpilot.utterance.store_dropped", True)
 
 
 def handle_card_shown(hub: Hub, connection: Connection, event: CardShownEvent) -> None:

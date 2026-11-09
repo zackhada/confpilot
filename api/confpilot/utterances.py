@@ -56,6 +56,18 @@ class RecentFinals:
             self._rooms.pop(room, None)  # quiet rooms cost nothing
         return fresh
 
+    def forget(self, room: str, user_id: str) -> None:
+        """Undo the most recent admission for a user when its storage work is dropped."""
+        recent = self._rooms.get(room)
+        if recent is None:
+            return
+        for index in range(len(recent) - 1, -1, -1):
+            if recent[index][1] == user_id:
+                del recent[index]
+                break
+        if not recent:
+            self._rooms.pop(room, None)
+
 
 async def store_final(store: Store, matcher: Matcher, room: str, event: TranscriptEvent) -> None:
     """Run the matcher and save the utterance with its term ids. ``event.speaker`` is set."""

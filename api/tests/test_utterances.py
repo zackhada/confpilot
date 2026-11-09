@@ -94,6 +94,23 @@ def test_finals_are_matched_and_stored_once(client: TestClient, spans) -> None:
     assert len([s for s in spans.get_finished_spans() if s.name == "utterance.store"]) == 2
 
 
+def test_dropped_store_work_does_not_suppress_another_speakers_copy(
+    client: TestClient, spans, monkeypatch
+) -> None:
+    monkeypatch.setattr("confpilot.routes.ws.MAX_BACKGROUND_TASKS", 0)
+    with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
+        ana.send_json(final("utt-a1", SENTENCE))
+        settle(ana)
+        ben.send_json(final("utt-b1", SENTENCE))
+        settle(ben)
+
+    assert stored(client) == {}
+    assert client.app.state.recent_finals._rooms == {}
+    relays = [s for s in spans.get_finished_spans() if s.name == "transcript.relay"]
+    assert [s.attributes["confpilot.utterance.duplicate"] for s in relays] == [False, False]
+    assert [s.attributes["confpilot.utterance.store_dropped"] for s in relays] == [True, True]
+
+
 def test_a_one_word_final_cannot_suppress_or_replace_a_long_one(client: TestClient) -> None:
     with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
         ben.send_json(final("utt-b1", "search"))  # arrives first, shares a word
