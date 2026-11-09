@@ -37,9 +37,11 @@ def test_blank_env_values_count_as_unset(monkeypatch: pytest.MonkeyPatch) -> Non
 
 
 def test_secrets_are_not_printed(make_settings) -> None:
-    settings = make_settings(deepgram_api_key="dg-secret", llm_api_key="llm-secret")
+    settings = make_settings(
+        deepgram_api_key="hidden-dg", llm_api_key="hidden-llm", session_secret="hidden-session"
+    )
 
-    assert "secret" not in repr(settings)
+    assert "hidden" not in repr(settings)
 
 
 @pytest.mark.parametrize(
