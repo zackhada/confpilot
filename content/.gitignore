@@ -1,0 +1,5 @@
+# Transcripts and audio stay local: generated, large, or real voices
+stt-out/
+stt-fixtures/*.wav
+stt-fixtures/*.m4a
+stt-fixtures/*.aiff

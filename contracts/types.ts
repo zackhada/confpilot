@@ -14,16 +14,16 @@ export interface Term {
   id: string; // slug, e.g. "rrf"
   term: string; // display form, e.g. "RRF"
   aliases: string[]; // other spoken or written forms, already normalized
-  say: string; // pronunciation hint, e.g. "ar-ar-EFF"
+  say: string | null; // pronunciation hint, e.g. "ar-ar-EFF"; null when it is obvious
   category: string;
   level: TermLevel;
-  simple_def: string; // 15 words or fewer, plain English
+  simple_def: string; // 20 words or fewer, plain English
   long_def?: string;
   example?: string;
   prereqs: string[]; // term ids this one builds on
   translations?: Partial<Record<Lang, string>>; // one line per language
-  ambiguous?: boolean; // common word: only match near a word in `context`
-  context?: string[];
+  ambiguous?: boolean; // common word: needs nearby tech context (README section 6)
+  context?: string[]; // optional explicit context words for an ambiguous term
   source: "seed" | "llm";
 }
 
