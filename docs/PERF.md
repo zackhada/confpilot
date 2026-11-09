@@ -1,7 +1,8 @@
 # Performance baseline
 
 Measured Nov 9, 2026, 3:30 to 3:40 PM MT, on `main` at `0036a06`. Targets are first guesses
-from the planning prompt, not requirements from the plan.
+from the planning prompt, not requirements from the plan. This repo-wide baseline lives in the top-level
+`docs/` rather than `web/docs/` because it covers the phone, speech, API asset delivery and Elasticsearch.
 
 ## Hot path
 
