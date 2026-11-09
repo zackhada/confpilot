@@ -102,17 +102,27 @@ def handle_transcript(state: State, connection: Connection, event: TranscriptEve
         if not event.is_final:
             return
         # Storage work starts only now, after the relay is queued.
+        words = transcript_words(event)
+        admitted_at = time.monotonic()
         fresh = state.recent_finals.admit(
-            connection.room, connection.member.user_id, transcript_words(event), time.monotonic()
+            connection.room, connection.member.user_id, words, admitted_at
         )
         span.set_attribute("confpilot.utterance.duplicate", not fresh)
         if not fresh:
             return
         storing = store_final_or_release(
-            state.store, state.matcher, state.recent_finals, connection.room, relayed
+            state.store,
+            state.matcher,
+            state.recent_finals,
+            connection.room,
+            relayed,
+            words,
+            admitted_at,
         )
         if not spawn(storing, "store_final"):
-            state.recent_finals.forget(connection.room, connection.member.user_id)
+            state.recent_finals.forget(
+                connection.room, connection.member.user_id, words, admitted_at
+            )
             span.set_attribute("confpilot.utterance.store_dropped", True)
 
 

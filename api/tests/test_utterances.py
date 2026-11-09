@@ -65,6 +65,18 @@ def test_recent_finals_keep_the_first_arrival_and_drop_a_later_copy() -> None:
     assert "slc1" not in recent._rooms  # everything aged out, so the room is forgotten
 
 
+def test_forget_removes_only_the_exact_admission() -> None:
+    recent = RecentFinals()
+    words = SENTENCE.split()
+
+    assert recent.admit("slc1", "u-ana", words, now=10.0)
+    assert recent.admit("slc1", "u-ana", words, now=11.0)
+
+    recent.forget("slc1", "u-ana", words, at=10.0)
+
+    assert not recent.admit("slc1", "u-ben", words, now=11.5)
+
+
 def test_finals_are_matched_and_stored_once(client: TestClient, spans) -> None:
     with client.websocket_connect(ANA_URL) as ana, client.websocket_connect(BEN_URL) as ben:
         ana.send_json(final("utt-a1", SENTENCE, is_final=False))

@@ -56,21 +56,28 @@ class RecentFinals:
             self._rooms.pop(room, None)  # quiet rooms cost nothing
         return fresh
 
-    def forget(self, room: str, user_id: str) -> None:
-        """Undo the most recent admission for a user when its storage work is dropped."""
+    def forget(self, room: str, user_id: str, words: Sequence[str], at: float) -> None:
+        """Undo this admission when its storage work is dropped."""
+        normalized = tuple(token.text for token in normalize(words))
         recent = self._rooms.get(room)
         if recent is None:
             return
-        for index in range(len(recent) - 1, -1, -1):
-            if recent[index][1] == user_id:
-                del recent[index]
-                break
+        try:
+            recent.remove((at, user_id, normalized))
+        except ValueError:
+            pass  # already expired
         if not recent:
             self._rooms.pop(room, None)
 
 
 async def store_final_or_release(
-    store: Store, matcher: Matcher, recent: RecentFinals, room: str, event: TranscriptEvent
+    store: Store,
+    matcher: Matcher,
+    recent: RecentFinals,
+    room: str,
+    event: TranscriptEvent,
+    words: Sequence[str],
+    admitted_at: float,
 ) -> None:
     """Store an admitted final. If storing fails, release its admission, so that the other
     phone's copy of the same sentence can still be stored, then let the failure be logged."""
@@ -78,7 +85,7 @@ async def store_final_or_release(
         await store_final(store, matcher, room, event)
     except Exception:
         if event.speaker is not None:
-            recent.forget(room, event.speaker.user_id)
+            recent.forget(room, event.speaker.user_id, words, admitted_at)
         raise
 
 
