@@ -69,7 +69,7 @@ Each person owns one sponsor track, one piece of the product, and the directorie
 | --- | --- | --- | --- |
 | Zack | Elasticsearch | The API and Elasticsearch layer: ingest, percolate, knowledge, search and recap endpoints, plus the STT `/token` endpoint | `api/`, `es/` |
 | Clayton | Radar | EKS, HTTPS, ECR, CI deploy, Dash0 operator install, the Radar connection and investigation | `deploy/`, deploy workflows |
-| Tanner | Dash0 | **The phone app**, with browser monitoring, the latency badge and the stage view; also the Dash0 dashboard, SLO and Agent0 loop | `web/`, `observability/` |
+| Tanner | Dash0 | **The phone app**, with browser monitoring, the latency badge and the stage view; also the Dash0 dashboard, SLO and Agent0 loop | `web/` |
 | Skyler | Gitar + Merge Forward | Gitar rules, CI and auto-apply; speech-to-text with keyterms and the transcription test; LLM services; glossary; **demo script, deck and submission** | `.gitar/`, `stt/`, `worker/`, `content/`, `docs/` |
 
 Rules for parallel agents working in the same repo:
