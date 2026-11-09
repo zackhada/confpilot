@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     llm_api_key: SecretStr | None = None
     llm_base_url: str = "https://api.openai.com/v1"
     llm_model: str = "gpt-4o-mini"
-    probe_timeout_s: float = 6.0
+    probe_timeout_s: float = 8.0
 
     ws_heartbeat_s: float = 20.0
 

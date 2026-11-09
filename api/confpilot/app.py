@@ -15,7 +15,7 @@ from confpilot.logsafe import install_session_masking
 from confpilot.matching import Matcher
 from confpilot.ratelimit import RateLimiter
 from confpilot.rooms import Hub
-from confpilot.routes import glossary, health, knowledge, session, token, ws
+from confpilot.routes import glossary, health, knowledge, probe, session, token, ws
 from confpilot.settings import Settings
 from confpilot.static import add_static_routes
 from confpilot.store import MemoryStore, Store
@@ -63,6 +63,7 @@ def create_app(
     app.include_router(session.router)
     app.include_router(knowledge.router)
     app.include_router(token.router)
+    app.include_router(probe.router)
     app.include_router(ws.router)
 
     if settings.static_dir is not None:
