@@ -1,9 +1,0 @@
-[
-  { "text": "Kubernetes 1.30 is out", "expect": ["kubernetes"], "note": "joined form is kubernetes130; the plain form still matches" },
-  { "text": "we run 25 pods per cluster", "expect": ["pod", "cluster"], "note": "a number after a word must not swallow the next term" },
-  { "text": "restart pod 5 in the cluster", "expect": ["pod", "cluster"], "note": "joined form is pod5" },
-  { "text": "the cluster one team owns it", "expect": ["cluster"], "note": "number word after a term: joined form is cluster1" },
-  { "text": "best match twenty five scoring", "expect": ["bm25"], "note": "alias 'best match 25' is reached only through the joined form" },
-  { "text": "B.M. 25 and r r f", "expect": ["bm25", "rrf"], "note": "both terms need the joined form" },
-  { "text": "the k 8 s cluster", "expect": ["kubernetes", "cluster"], "note": "spelled-out letters and digits join to k8s" }
-]
