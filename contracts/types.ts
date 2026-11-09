@@ -64,6 +64,12 @@ export interface SessionResponse {
   session: string; // opaque signed string; treat it like a password
   expires_at: number; // epoch ms in server time; a session lasts 12 hours
 }
+//
+// Every other /api route except GET /api/glossary needs the header
+//   Authorization: Bearer <session>
+// 401: the session is missing, invalid or expired (get a new one from POST /api/session).
+// 403: a user_id in the path, query or body that is not the session's own, or a room the
+//      session's user has never joined.
 
 // POST /api/token
 export interface TokenRequest { user_id: string }
@@ -89,7 +95,7 @@ export interface ProbeResponse {
   goals: string[];
 }
 
-// GET /api/rooms/{room}/recap?user_id=
+// GET /api/rooms/{room}/recap?user_id=   (members of the room only; always the caller's own recap)
 export interface Recap {
   room: string;
   new_term_count: number;
@@ -97,7 +103,7 @@ export interface Recap {
   learn_next: string[]; // term ids, ranked by heard count x on-frontier
 }
 
-// GET /api/search?q=&room=&user_id=
+// GET /api/search?q=&room=&user_id=&limit=   (room is required; members of the room only)
 export interface SearchHit {
   utterance_id: string;
   speaker: Speaker;
@@ -108,7 +114,9 @@ export interface SearchHit {
 }
 export interface SearchResponse { hits: SearchHit[] }
 
-// ---------- Room WebSocket: /ws/rooms/{room}?user_id=&name=&role= ----------
+// ---------- Room WebSocket: /ws/rooms/{room}?session=&name=&role= ----------
+// The user id comes from the session; there is no user_id parameter. The handshake is
+// refused (HTTP 403) when the Origin header is neither the API's own host nor allow-listed.
 
 export type Role = "speaker" | "viewer"; // the stage view joins as a viewer
 export interface Speaker { user_id: string; name: string }
@@ -159,11 +167,13 @@ export interface TimePong { type: "time.pong"; t0: number; server_ts: number }
 // every 20 seconds as its heartbeat; there is no separate ping event.
 export interface RoomState { type: "room.state"; members: (Speaker & { role: Role })[] }
 
+// unauthorized: the session is missing, invalid or expired; the socket then closes (1008).
 // bad_request: bad join parameters; the socket then closes with code 1008.
 // bad_event: a frame that is not a valid ClientEvent. forbidden: e.g. a viewer sent a transcript.
 // store_unavailable: a knowledge.set could not be saved. internal: the event failed on the server.
-// After every code except bad_request the socket stays open.
-export type ErrorCode = "bad_request" | "bad_event" | "forbidden" | "store_unavailable" | "internal";
+// After every code except unauthorized and bad_request the socket stays open.
+export type ErrorCode =
+  | "unauthorized" | "bad_request" | "bad_event" | "forbidden" | "store_unavailable" | "internal";
 export interface ErrorEvent { type: "error"; code: ErrorCode; message: string }
 
 export type ClientEvent = TranscriptEvent | CardShownEvent | KnowledgeSetEvent | TimePing;

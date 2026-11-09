@@ -27,6 +27,7 @@ class Settings(BaseSettings):
 
     session_secret: SecretStr | None = None  # unset: a random key per process
     session_ttl_s: int = 12 * 60 * 60
+    allowed_origins: str = ""  # comma-separated extra origins; the API's own host is always allowed
     rate_limit_per_minute: int = 20  # per client address (and per user where a route says so)
     client_ip_header: str = (
         ""  # header an edge overwrites with the client address; see ratelimit.py

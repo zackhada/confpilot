@@ -1,4 +1,4 @@
-"""Room WebSocket: /ws/rooms/{room}?user_id=&name=&role=  (contracts/README.md section 1)."""
+"""Room WebSocket: /ws/rooms/{room}?session=&name=&role=  (contracts/README.md section 1)."""
 
 import asyncio
 import logging
@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field, ValidationError
 from starlette.datastructures import State
 from starlette.websockets import WebSocketDisconnect
 
+from confpilot.auth import INVALID, origin_allowed
 from confpilot.models import (
     CardShownEvent,
     ErrorEvent,
@@ -189,9 +190,19 @@ def handle(websocket: WebSocket, connection: Connection, raw: str | None) -> Non
 
 @router.websocket("/ws/rooms/{room}")
 async def room_socket(
-    websocket: WebSocket, room: str, user_id: str = "", name: str = "", role: str = "speaker"
+    websocket: WebSocket, room: str, session: str = "", name: str = "", role: str = "speaker"
 ) -> None:
+    state = websocket.app.state
+    if not origin_allowed(websocket.headers, state.allowed_origins):
+        await websocket.close(code=1008)  # before accept: the handshake is refused with 403
+        return
     await websocket.accept()
+    user_id = state.signer.verify(session)
+    if user_id is None:
+        error = ErrorEvent(code="unauthorized", message=INVALID)
+        await websocket.send_text(error.model_dump_json())
+        await websocket.close(code=1008)
+        return
     try:
         clean_name = "".join(c for c in name if c.isprintable()).strip() or "Guest"
         params = JoinParams(room=room, user_id=user_id, name=clean_name, role=role)
@@ -201,7 +212,7 @@ async def room_socket(
         await websocket.close(code=1008)
         return
 
-    hub: Hub = websocket.app.state.hub
+    hub: Hub = state.hub
     member = Member(user_id=params.user_id, name=params.name, role=params.role)
     connection = Connection(websocket=websocket, room=params.room, member=member)
     attributes = {
@@ -211,7 +222,7 @@ async def room_socket(
     }
     with tracer.start_as_current_span("room.join", attributes=attributes):
         hub.join(connection)
-    heartbeat_s = websocket.app.state.settings.ws_heartbeat_s
+    heartbeat_s = state.settings.ws_heartbeat_s
     helpers = [
         asyncio.create_task(connection.pump()),
         asyncio.create_task(_heartbeat(hub, connection, heartbeat_s)),

@@ -1,6 +1,7 @@
 """Application factory."""
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from confpilot.auth import SessionSigner
@@ -32,6 +33,15 @@ def create_app(settings: Settings | None = None, store: Store | None = None) -> 
     app.state.recent_finals = RecentFinals()
     app.state.signer = SessionSigner.from_setting(settings.session_secret, settings.session_ttl_s)
     app.state.rate_limiter = RateLimiter(settings.rate_limit_per_minute)
+    origins = [origin.strip() for origin in settings.allowed_origins.split(",") if origin.strip()]
+    app.state.allowed_origins = frozenset(origins)
+    if origins:  # a web dev server on another origin; in production the API serves the app
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,
+            allow_methods=["GET", "POST", "PUT"],
+            allow_headers=["authorization", "content-type"],
+        )
     app.include_router(health.router)
     app.include_router(glossary.router)
     app.include_router(session.router)

@@ -2,6 +2,7 @@ import logging
 
 import pytest
 from fastapi.testclient import TestClient
+from helpers import room_url, session_for
 
 from confpilot.logsafe import UVICORN_LOGGERS, SessionMaskFilter, mask_session
 
@@ -67,3 +68,21 @@ def test_the_app_installs_the_filter_once_on_uvicorn_loggers(
     for name in UVICORN_LOGGERS:
         filters = [f for f in logging.getLogger(name).filters if isinstance(f, SessionMaskFilter)]
         assert len(filters) == 1, name
+
+
+def test_the_session_never_reaches_a_span_or_a_log_line(
+    client: TestClient, spans, caplog: pytest.LogCaptureFixture
+) -> None:
+    session = session_for(client, "u-ana")
+    with caplog.at_level(logging.DEBUG):
+        with client.websocket_connect(room_url(client, "u-ana", "Ana")) as ana:
+            ana.send_json({"type": "time.ping", "t0": 1})
+            ana.receive_json()
+        client.get("/api/users/u-ana/knowledge", headers={"Authorization": f"Bearer {session}"})
+
+    finished = spans.get_finished_spans()
+    assert {"room.join", "knowledge.list"} <= {s.name for s in finished}
+    assert all(session not in str(dict(s.attributes)) for s in finished)
+    join = next(s for s in finished if s.name == "room.join")
+    assert join.attributes["confpilot.user_id"] == "u-ana"  # only the derived user id
+    assert session not in caplog.text

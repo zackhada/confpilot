@@ -56,9 +56,15 @@ class Connection:
 class Hub:
     def __init__(self) -> None:
         self._rooms: dict[str, list[Connection]] = {}
+        self._ever: dict[str, set[str]] = {}  # room -> user ids that have joined it
+
+    def was_member(self, room: str, user_id: str) -> bool:
+        """Has this user joined the room, now or earlier, since this process started?"""
+        return user_id in self._ever.get(room, ())
 
     def join(self, connection: Connection) -> None:
         self._rooms.setdefault(connection.room, []).append(connection)
+        self._ever.setdefault(connection.room, set()).add(connection.member.user_id)
         self.broadcast(connection.room, self.state(connection.room))
 
     def leave(self, connection: Connection) -> None:

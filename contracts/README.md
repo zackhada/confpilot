@@ -8,7 +8,7 @@ These contracts also settle six questions the plan left open.
 
 ## 1. One WebSocket per phone, and partial transcripts are relayed
 
-Each phone opens `wss://<host>/ws/rooms/{room}` and keeps it open. There is no SSE.
+Each phone opens `wss://<host>/ws/rooms/{room}?session=...` and keeps it open. There is no SSE.
 
 In the demo each phone decodes the *other* speaker, so the fast path cannot depend on a
 phone's own mic. A speaker's phone sends every interim and final speech-to-text result as a
@@ -48,7 +48,24 @@ are relayed but not recorded. The Dash0 SLO (95% under 800 ms) is built on that 
 
 ## 5. Rooms and identity
 
-There is no login. `user_id` is a UUID kept on the phone, and a persona switcher changes it.
+There is no login, but identity is not client-claimed. A phone calls `POST /api/session`
+once and the server answers with a `user_id` (a UUID it generated) and a signed `session`
+that lasts 12 hours. The phone keeps both, and a persona switcher asks for a new session.
+
+- **HTTP:** every `/api` route except `GET /api/glossary` needs
+  `Authorization: Bearer <session>`. A missing, invalid or expired session is a 401. A
+  `user_id` in the path, query or body that is not the session's own is a 403.
+- **WebSocket:** the phone opens `/ws/rooms/{room}?session=<session>&name=&role=`. The user id
+  comes from the session. An invalid session gets an `error` event with code `unauthorized`
+  and the socket closes. A handshake from another site's `Origin` is refused.
+- **Room privacy:** recap and search need a `room`, and only someone who is in that room, or
+  was earlier, may read it (403 otherwise).
+
+The session is passed as a query parameter on the socket, because browsers cannot set headers
+on a WebSocket. It is masked in our logs and never put on a span, it is short-lived (12 hours),
+and it only identifies an anonymous learner profile. Moving it to `Sec-WebSocket-Protocol` is
+the planned hardening.
+
 A room is a short code in the URL (`/?room=slc1`). The stage view (`/stage?room=slc1`) joins
 as a `viewer` and shows a QR code for the room.
 

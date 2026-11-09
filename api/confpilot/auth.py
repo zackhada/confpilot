@@ -14,14 +14,21 @@ import re
 import secrets
 import time
 import uuid
+from typing import Annotated
 
+from fastapi import Depends, HTTPException, Request
 from pydantic import SecretStr
+from starlette.datastructures import Headers
 
 from confpilot.models import SAFE_ID_PATTERN
 
 SESSION_TTL_S = 12 * 60 * 60
 MAX_SESSION_CHARS = 512
 MIN_SECRET_CHARS = 16
+MISSING = (
+    "Sign in first: send 'Authorization: Bearer <session>' with a session from POST /api/session"
+)
+INVALID = "This session is invalid or has expired. Get a new one from POST /api/session"
 
 _SAFE_ID = re.compile(SAFE_ID_PATTERN)
 _log = logging.getLogger(__name__)
@@ -91,3 +98,35 @@ class SessionSigner:
         if not isinstance(expires_at, int) or expires_at <= now_ms:
             return None
         return user_id
+
+
+def current_user(request: Request) -> str:
+    """FastAPI dependency: the user id from a valid ``Authorization: Bearer <session>``."""
+    scheme, _, session = request.headers.get("authorization", "").partition(" ")
+    challenge = {"WWW-Authenticate": "Bearer"}
+    if scheme.lower() != "bearer" or not session.strip():
+        raise HTTPException(status_code=401, detail=MISSING, headers=challenge)
+    user_id = request.app.state.signer.verify(session.strip())
+    if user_id is None:
+        raise HTTPException(status_code=401, detail=INVALID, headers=challenge)
+    return user_id
+
+
+CurrentUser = Annotated[str, Depends(current_user)]
+
+
+def require_same_user(claimed_user_id: str | None, session_user_id: str) -> None:
+    """A user id in the path, query or body must be the session's own."""
+    if claimed_user_id is not None and claimed_user_id != session_user_id:
+        raise HTTPException(status_code=403, detail="That user_id is not yours")
+
+
+def origin_allowed(headers: Headers, allowed: frozenset[str]) -> bool:
+    """Browsers always send Origin on a WebSocket handshake. Accept the page's own host and
+    the configured allow-list. No Origin means a non-browser client, which cannot be used
+    for cross-site WebSocket hijacking."""
+    origin = headers.get("origin")
+    if origin is None or origin in allowed:
+        return True
+    host = headers.get("host", "")
+    return bool(host) and origin.split("://", 1)[-1] == host
