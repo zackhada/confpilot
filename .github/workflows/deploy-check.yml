@@ -44,6 +44,28 @@ jobs:
             echo "::endgroup::"
           done
 
+      # The placeholder image prints its environment to anyone who asks, and the tunnel
+      # makes it public. Its pod spec must stay free of config and secrets.
+      - name: The hello placeholder gets no config and no secrets
+        run: |
+          set -euo pipefail
+          if [ ! -f deploy/hello/kustomization.yaml ]; then
+            echo "::notice::deploy/hello has no kustomization.yaml yet, skipped"
+            exit 0
+          fi
+          kubectl kustomize deploy/hello \
+            | yq 'select(.kind == "Deployment" and .metadata.name == "confpilot") | .spec.template.spec' \
+            > placeholder.yaml
+          if [ ! -s placeholder.yaml ]; then
+            echo "::error::deploy/hello no longer renders the confpilot Deployment, so this check cannot run"
+            exit 1
+          fi
+          if grep -n -i -E 'secret|configmap|envFrom|^[[:space:]-]*(env|volumes|volumeMounts):' placeholder.yaml; then
+            echo "::error file=deploy/hello/kustomization.yaml::The hello placeholder must not reference a Secret, a ConfigMap, env or volumes"
+            exit 1
+          fi
+          echo "Placeholder pod spec is self-contained."
+
   image:
     name: Image build
     runs-on: ubuntu-latest
