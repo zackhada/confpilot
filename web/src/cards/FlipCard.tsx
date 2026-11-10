@@ -1,5 +1,5 @@
 import type { Lang, Term } from '@contracts'
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 
 interface FlipCardProps {
   term: Term | undefined
@@ -21,7 +21,7 @@ export function FlipCard({ term, termId, lang, flipped, onFlip }: FlipCardProps)
   const native = lang ? term?.translations?.[lang] : undefined
   return (
     <div className="min-h-0 flex-1 [perspective:1200px]">
-      <motion.div
+      <m.div
         className="relative h-full [transform-style:preserve-3d]"
         initial={false}
         animate={{ rotateY: flipped ? 180 : 0 }}
@@ -52,7 +52,7 @@ export function FlipCard({ term, termId, lang, flipped, onFlip }: FlipCardProps)
           {native && lang && <p lang={lang} className="pt-2 leading-snug text-lit-soft">{native}</p>}
           {term?.example && <p className="pt-4 leading-snug text-lit-soft">&ldquo;{term.example}&rdquo;</p>}
         </div>
-      </motion.div>
+      </m.div>
     </div>
   )
 }

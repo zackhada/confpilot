@@ -1,5 +1,5 @@
 import type { Term } from '@contracts'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, m } from 'motion/react'
 import { useEffect, useState } from 'react'
 import type { LiveCard } from '@/lib/cards'
 import { cardPainted, markKnown, reopenCard, toggleSave } from '@/room/session'
@@ -29,7 +29,7 @@ function StackedCard({ card, lit, onOpen }: StackedCardProps) {
   usePaintStamp(card.rendered_at === null, () => cardPainted(card.card_id))
 
   return (
-    <motion.li layout="position" initial={ENTER} animate={REST} exit={LEAVE} transition={SPRING}>
+    <m.li layout="position" initial={ENTER} animate={REST} exit={LEAVE} transition={SPRING}>
       <TermCard
         card={card}
         latencyMs={cardLatencyMs(card)}
@@ -43,14 +43,14 @@ function StackedCard({ card, lit, onOpen }: StackedCardProps) {
         onKnow={() => markKnown(card.term_id)}
         onSave={() => toggleSave(card.term_id)}
       />
-    </motion.li>
+    </m.li>
   )
 }
 
 function Chip({ card, term }: { card: LiveCard; term: Term | undefined }) {
   const count = useRoom((s) => s.heard[card.term_id] ?? 1)
   return (
-    <motion.li
+    <m.li
       layout="position"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -67,7 +67,7 @@ function Chip({ card, term }: { card: LiveCard; term: Term | undefined }) {
         {term?.term ?? card.term_id}
         {count > 1 && <span className="tabular font-medium text-ink-soft">×{count}</span>}
       </button>
-    </motion.li>
+    </m.li>
   )
 }
 
