@@ -104,8 +104,10 @@ the restart. To go back to the placeholder later, delete the Secret first.
 
 ### 6. Deploy on merge (cluster admin and repo admin, once)
 
-The Deploy workflow builds and pushes on every merge to `main`. It rolls out only if a
-`KUBE_CONFIG` secret exists; without it the workflow still pushes the image and succeeds.
+The Deploy workflow builds and pushes on every merge to `main`. It rolls out only if the repo
+variable `AUTO_ROLLOUT` is `true` and a `KUBE_CONFIG` secret exists; otherwise it still pushes
+the image and succeeds. Turn it on only once the cluster can pull from GHCR (public package or
+a `ghcr-pull` secret); the demo cluster runs hand-pushed ECR `demo-N` images until then.
 The rollout job runs in the `production` GitHub environment and only on `main`.
 
 1. Cluster admin: apply the admission policy that limits what the CI credential can do, then
