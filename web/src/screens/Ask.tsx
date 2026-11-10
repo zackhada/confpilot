@@ -112,7 +112,6 @@ export function Ask() {
 
   useEffect(() => {
     active.current?.abort()
-    setQuery(null)
     const controller = new AbortController()
     active.current = controller
     const timer = setTimeout(() => {
@@ -121,6 +120,7 @@ export function Ask() {
     return () => {
       clearTimeout(timer)
       active.current?.abort()
+      setQuery(null)
     }
   }, [text, ask])
 
