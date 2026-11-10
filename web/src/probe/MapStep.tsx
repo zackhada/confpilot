@@ -56,7 +56,7 @@ function Band({ band }: { band: MapBand }) {
   return (
     <m.section
       aria-labelledby={headingId}
-      initial={{ y: 28, opacity: 0 }}
+      initial={{ y: 28, opacity: 0.88 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 260, damping: 30, delay: 0.15 + RISE_ORDER[band.key] * 0.16 }}
       className={cn('-mt-4 rounded-t-[1.75rem] px-5 pt-4 pb-8 first:mt-0 last:rounded-b-[1.75rem] last:pb-5', look.band)}

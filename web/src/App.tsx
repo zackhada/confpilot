@@ -11,7 +11,11 @@ import { AppShell } from '@/shell/AppShell'
 const StageView = lazy(() => import('@/stage/StageView').then((m) => ({ default: m.StageView })))
 
 // The animation engine (about a third of the app's JS) loads after the first paint.
-const loadMotionFeatures = () => import('@/shared/motionFeatures').then((mod) => mod.default)
+const loadMotionFeatures = () =>
+  import('@/shared/motionFeatures')
+    .catch(() => import('@/shared/motionFeatures'))
+    .then((mod) => mod.default)
+    .catch(() => import('motion/react').then((mod) => mod.domAnimation))
 
 export default function App() {
   return (
