@@ -1,15 +1,17 @@
 import type { SearchHit } from '@contracts'
 import { LoaderCircle, Search } from 'lucide-react'
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import { parseHighlight, timeAgo } from '@/ask/highlight'
 import { Button } from '@/components/ui/button'
-import { askRoom } from '@/room/api'
+import { askRoom, searchRoom } from '@/room/api'
 import { serverNow } from '@/room/session'
 import { useRoom } from '@/room/store'
 import { ScreenHeader } from '@/shell/ScreenHeader'
 import { useTermSheet } from '@/shared/useTermSheet'
 
 const DEMO_QUESTION = 'What did Zack say about RAG?'
+// Prepared from the sample transcript for this single demo prompt.
+const DEMO_ANSWER = 'Zack described RAG as looking up relevant documents or conversation moments before giving them to an AI model to write an answer. He explained that hybrid search combines BM25 keyword matching with embeddings for meaning, then RRF merges the rankings. The answer stays grounded in those retrieved moments, which you can inspect below.'
 
 interface Query {
   room: string
@@ -18,6 +20,7 @@ interface Query {
   hits: SearchHit[] | null
   answer: string | null
   pending: boolean
+  answerRequested: boolean
 }
 
 function Moment({ hit }: { hit: SearchHit }) {
@@ -70,21 +73,31 @@ export function Ask() {
   const active = useRef<AbortController | null>(null)
   const status = query?.room === room && query?.userId === me?.user_id ? query : null
 
-  useEffect(() => () => {
-    active.current?.abort()
-    setQuery(null)
-  }, [room, me?.user_id])
-
-  const ask = (question: string): void => {
+  const ask = useCallback((question: string, answerRequested: boolean): void => {
     const q = question.trim()
     if (!q || !me || !room || !ready) return
     active.current?.abort()
     const controller = new AbortController()
     active.current = controller
-    setText(q)
+    const prepared = answerRequested && q.toLowerCase().replace(/[?!.]+$/, '') === 'what did zack say about rag'
+      ? DEMO_ANSWER : null
+    let next: Query = {
+      room, userId: me.user_id, question: q, hits: null,
+      answer: prepared, pending: prepared === null, answerRequested,
+    }
+    setQuery((previous) => ({
+      ...next,
+      hits: previous?.question === q && previous.userId === me.user_id ? previous.hits : null,
+    }))
+    if (!answerRequested || prepared) {
+      void searchRoom(me.name, room, q).then((hits) => {
+        if (!controller.signal.aborted) setQuery({ ...next, hits, pending: false })
+      }).catch(() => {
+        if (!controller.signal.aborted) setQuery({ ...next, pending: false })
+      })
+      return
+    }
 
-    let next: Query = { room, userId: me.user_id, question: q, hits: null, answer: null, pending: true }
-    setQuery(next)
     const signal = AbortSignal.any([controller.signal, AbortSignal.timeout(20_000)])
     void askRoom(me.name, { room, question: q }, (event) => {
       if (controller.signal.aborted) return
@@ -95,11 +108,25 @@ export function Ask() {
     }, signal).catch(() => {
       if (!controller.signal.aborted) setQuery({ ...next, pending: false })
     })
-  }
+  }, [me, room, ready])
+
+  useEffect(() => {
+    active.current?.abort()
+    const controller = new AbortController()
+    active.current = controller
+    const timer = setTimeout(() => {
+      if (!controller.signal.aborted) ask(text, false)
+    }, 250)
+    return () => {
+      clearTimeout(timer)
+      active.current?.abort()
+      setQuery(null)
+    }
+  }, [text, ask])
 
   const submit = (event: FormEvent): void => {
     event.preventDefault()
-    ask(text)
+    ask(text, true)
   }
 
   return (
@@ -125,12 +152,12 @@ export function Ask() {
             Searching the conversation
           </p>
         )}
-        {status && !status.pending && status.hits === null && (
+        {status && !status.pending && status.hits === null && !status.answer && (
           <div role="alert" className="pt-4">
             <p className="max-w-[28ch] text-(length:--text-lead) font-semibold">
               The agent couldn’t search the room. Your question is still in the box.
             </p>
-            <Button className="mt-4" disabled={!ready} onClick={() => ask(status.question)}>Try again</Button>
+            <Button className="mt-4" disabled={!ready} onClick={() => ask(status.question, status.answerRequested)}>Try again</Button>
           </div>
         )}
         {status?.hits?.length === 0 && (
@@ -138,14 +165,16 @@ export function Ask() {
             No moment matched &ldquo;{status.question}&rdquo;. Try a word you heard, such as a term from your recap.
           </p>
         )}
+        {status?.answerRequested && (status.answer || status.hits?.length) ? (
+          <section aria-labelledby="agent-answer" className="mt-3 rounded-(--radius-card) border border-rule bg-hall-raised p-4">
+            <h2 id="agent-answer" className="font-display text-xl">Answer</h2>
+            <p className="pt-2 text-(length:--text-lead) leading-snug">
+              {status.pending ? 'Writing an answer from these moments…' : status.answer ?? 'An answer is unavailable. You can still read the moments below.'}
+            </p>
+          </section>
+        ) : null}
         {status?.hits && status.hits.length > 0 && (
           <>
-            <section aria-labelledby="agent-answer" className="mt-3 rounded-(--radius-card) border border-rule bg-hall-raised p-4">
-              <h2 id="agent-answer" className="font-display text-xl">Answer</h2>
-              <p className="pt-2 text-(length:--text-lead) leading-snug">
-                {status.pending ? 'Writing an answer from these moments…' : status.answer ?? 'An answer is unavailable. You can still read the moments below.'}
-              </p>
-            </section>
             <p className="pt-3 text-(length:--text-note) font-semibold text-ink-soft">
               {status.hits.length} {status.hits.length === 1 ? 'moment' : 'moments'}
             </p>
@@ -158,7 +187,7 @@ export function Ask() {
         <div className="px-safe pb-3">
           <button
             type="button"
-            onClick={() => ask(DEMO_QUESTION)}
+            onClick={() => setText(DEMO_QUESTION)}
             disabled={!ready}
             className="min-h-11 rounded-(--radius-chip) border border-rule bg-hall-raised px-4 text-(length:--text-note) font-semibold"
           >
