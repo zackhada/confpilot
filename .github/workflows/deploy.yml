@@ -63,11 +63,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Secrets cannot be read in `if:`, so the steps test this variable instead.
-      KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+      # Rollout is opt-in: the demo cluster runs hand-pushed ECR images, and the runner has no
+      # AWS credentials or GHCR pull secret. Set repo variable AUTO_ROLLOUT=true to turn it on.
+      KUBE_CONFIG: ${{ vars.AUTO_ROLLOUT == 'true' && secrets.KUBE_CONFIG || '' }}
     steps:
       - name: Skip when KUBE_CONFIG is not set
         if: env.KUBE_CONFIG == ''
-        run: echo "::notice::KUBE_CONFIG secret is not set. Image pushed; rollout skipped."
+        run: echo "::notice::Rollout skipped (AUTO_ROLLOUT is not true or KUBE_CONFIG is not set). Image pushed."
 
       - name: Write kubeconfig
         if: env.KUBE_CONFIG != ''
