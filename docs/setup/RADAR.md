@@ -16,13 +16,9 @@ open -a Docker
 ```
 
 ## Cluster + app
-```bash
-deploy/kind-up.sh                    # kind cluster, builds + loads image, applies deploy/base
-kubectl -n confpilot create secret generic confpilot-secrets \
-  --from-env-file=.env --dry-run=client -o yaml | kubectl apply -f -
-kubectl radar                        # UI at http://localhost:9280
-```
-If organizers give us a cluster/namespace at kickoff, point `kubectl` at it instead of kind.
+The app runs on the `confpilot` EKS cluster; [`deploy/README.md`](../../deploy/README.md) is the runbook.
+Radar is installed in that cluster in the `radar` namespace (see "Use the in-cluster Radar" below).
+`kubectl radar` (UI at http://localhost:9280) also works from a laptop against the current context.
 
 ## MCP — let your coding agent see the cluster
 Radar must be running (`kubectl radar`). Read-only endpoint is safest:
@@ -106,12 +102,12 @@ make the local MCP work.
 
 ## AI investigation
 ```bash
-radar diagnose deploy/embed-worker -n confpilot
-radar diagnose deploy/embed-worker -n confpilot --json > conclusion.json
+radar diagnose deploy/confpilot -n confpilot
+radar diagnose deploy/confpilot -n confpilot --json > conclusion.json
 ```
 Requires: an agent CLI on the machine running Radar, MCP on, auth off. **Does not work from an in-cluster (Helm) install** — run Radar on the laptop.
 
 ## Demo moment
-`embed-worker` has a deliberately tight memory limit → gets OOMKilled → Radar AI investigation finds it → apply the fix overlay (`kubectl apply -k deploy/overlays/oom-fix`) via a Gitar-reviewed PR.
+Show the `confpilot` workloads, their health and events in Radar. Investigate only real issues; nothing is broken on purpose (see `AGENTS.md`).
 
 Sources: https://github.com/skyhook-io/radar (Installation, Connect your agent, AI investigations)

@@ -1,9 +1,10 @@
 # Deploy
 
 ConfPilot runs as one image (FastAPI plus the built phone app) on the `confpilot` EKS
-cluster: account 045129524740, `us-east-1`, AWS CLI profile `hackathon-team`. Our AWS role
-cannot create IAM roles or OIDC providers, and we have no DNS name yet, so public HTTPS comes
-from a Cloudflare quick tunnel and images live on GHCR.
+cluster: the hackathon AWS account, `us-east-1`, AWS CLI profile `hackathon-team`. Our AWS role
+cannot create IAM roles or OIDC providers, and we have no DNS name yet, so public HTTPS
+came first from a Cloudflare quick tunnel; the stable public URL is now CloudFront in front of
+a load balancer (see "The public URL"). Images live on GHCR.
 
 Commands are PowerShell, run from the repo root.
 
@@ -193,7 +194,7 @@ Limits to know:
   server-sent events. We use WebSockets only.
 - The pod needs outbound access to Cloudflare on UDP or TCP 7844 and TCP 443.
 
-### CloudFront in front of a load balancer (the stable URL, being set up)
+### CloudFront in front of a load balancer (the stable URL)
 
 `eks/public-lb.yaml` is a second Service, `confpilot-public`: `type: LoadBalancer`, a Network
 Load Balancer on port 80 that selects the same pod. It is applied by hand, because it creates
@@ -273,7 +274,10 @@ Where it meets our manifests:
   (`https://ingress.us-west-2.aws.dash0.com:4318`).
 - The pod has a read-only root filesystem and only `/tmp` writable.
 
-## Radar (documented, not connected)
+## Radar
+
+Radar is installed in the cluster in the `radar` namespace. Reach its UI and read-only MCP
+through a local port-forward: [`docs/setup/RADAR.md`](../docs/setup/RADAR.md). Other options:
 
 - **Local, read-only, no install in the cluster:** `kubectl radar` opens the UI at
   `http://localhost:9280` against the current kubectl context. Agents connect with

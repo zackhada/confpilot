@@ -15,19 +15,14 @@ ES_URL=https://<deployment>.es.<region>.elastic-cloud.com
 ES_API_KEY=<api key>
 ```
 
-## Option B — Local Docker
-```bash
-cd data && docker compose up -d     # single-node, security off, dev only
-export ES_URL=http://localhost:9200
+## Load the glossary
+```powershell
+cd es
+uv sync
+uv run python -m confpilot_es.bootstrap --glossary ..\content\glossary.json
 ```
-Semantic search needs the inference API; locally that needs a trial license (`xpack.license.self_generated.type=trial`). Check with `curl $ES_URL/_license`.
-
-## Load the data
-```bash
-cd data && pip install -r requirements.txt
-python ingest.py     # creates index 'talks' (BM25 + semantic) and loads 150 talks
-python search.py "something on eBPF and security"   # hybrid search with RRF
-```
+This creates the five `confpilot-*` indices and stores one percolator query per term. Mappings,
+queries and demo queries for Kibana: [`es/README.md`](../../es/README.md).
 
 ## Pin the embedding model
 `semantic_text` uses a default inference endpoint if you don't set one, and the default depends on version:
@@ -39,6 +34,6 @@ python search.py "something on eBPF and security"   # hybrid search with RRF
 Run `GET _inference` on your deployment and pin that id in the mapping so indexing and queries always use the same model.
 
 ## Demo moment
-Search "talks about keeping containers safe at the kernel level" → finds the eBPF security talk even though those words aren't in the title. Show the RAG assistant answering from talk abstracts.
+Ask "¿cómo ordena los resultados?" in Ask your conference → hybrid search with RRF finds the English moment where RRF was explained. Show the percolator turning a spoken sentence into term ids.
 
 Sources: https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/semantic-text · https://www.elastic.co/docs/reference/elasticsearch/mapping-reference/semantic-text-setup-configuration

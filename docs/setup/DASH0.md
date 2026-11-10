@@ -17,14 +17,16 @@
 4. Copy the exact OTLP endpoint from Settings → Endpoints (shows a ready cURL snippet).
 
 ## Wire up the app
-The app already exports traces, metrics and logs over OTLP/HTTP (`app/confpilot/telemetry.py`). Set in `.env`:
+The API exports traces, metrics and logs over OTLP/HTTP ([`api/confpilot/telemetry.py`](../../api/confpilot/telemetry.py)); the `es/` layer adds `es.*` spans ([`es/confpilot_es/telemetry.py`](../../es/confpilot_es/telemetry.py)). Set in `.env`:
 ```bash
 OTEL_EXPORTER_OTLP_ENDPOINT=https://ingress.us-west-2.aws.dash0.com:4318   # confirm in Settings → Endpoints
 OTEL_EXPORTER_OTLP_HEADERS="Authorization=Bearer <backend token>,Dash0-Dataset=default"
 OTEL_SERVICE_NAME=confpilot-api
 ```
-On Kubernetes the OTel Collector in `deploy/base/otel-collector-*.yaml` forwards to Dash0 using the token from the secret.
-Frontend RUM: replace the Dash0 RUM placeholder in `app/static/index.html` with the snippet from Dash0's website-monitoring setup.
+On Kubernetes the pod reads the endpoint and service name from the `app-config` ConfigMap and the headers from the `app-credentials` Secret, and exports straight to Dash0 (see [`deploy/README.md`](../../deploy/README.md)).
+Frontend RUM: [`web/src/telemetry/dash0.ts`](../../web/src/telemetry/dash0.ts) uses the Dash0 web SDK. Set `VITE_DASH0_RUM_TOKEN` and `VITE_DASH0_RUM_ENDPOINT` at build time; with either unset, browser monitoring is off.
+
+The key signal is the `confpilot.card.word_to_card_ms` histogram, recorded under the `card.push` span in [`api/confpilot/routes/ws.py`](../../api/confpilot/routes/ws.py). The dashboard "confpilot-word-to-card" and SLO of 95% of cards within 800 ms are kept as code in [`observability/dash0/`](../../observability/dash0/); measurements are in [`PERF.md`](../PERF.md).
 
 ## MCP — let your coding agent read live telemetry
 Endpoint format: `https://api.<region>.<cloud>.dash0.com/mcp` → ours: `https://api.us-west-2.aws.dash0.com/mcp`
@@ -39,6 +41,6 @@ claude mcp add --transport http --scope user dash0 https://api.us-west-2.aws.das
 ```
 
 ## Demo moment
-Hit `/api/chaos` to inject latency/errors → ask Agent0 "why did /api/search get slow?" → it points to the cause → fix it in a Gitar-reviewed PR. Show a dashboard/SLO for health.
+Show the word-to-card dashboard and SLO during the live demo. Nothing is broken on purpose (see `AGENTS.md`); ask Agent0 about real latency or errors only.
 
 Sources: https://www.dash0.com/docs/dash0/ai/mcp · https://www.dash0.com/docs/dash0/get-started · https://www.dash0.com/docs/dash0/miscellaneous/glossary/auth-tokens

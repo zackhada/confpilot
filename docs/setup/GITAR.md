@@ -20,10 +20,11 @@
 | Path | Purpose |
 |---|---|
 | `.gitar/review/confpilot.md` | Review instructions: timezone-safe times, API/frontend contract, OTel span on new endpoints, ARIA on UI changes |
-| `.gitar/rules/confpilot-guardrails.md` | Automation rule enforcing those on PRs touching `app/` |
+| `.gitar/rules/confpilot-guardrails.md` | Check rule enforcing those on PRs touching `api/`, `web/`, `es/`, `deploy/`, `content/` or `contracts/` |
 | `.gitar/config/apply.md` | What auto-apply may fix (lint, imports, failing tests) and may not (auth, ES mappings) |
 | `AGENTS.md` / `CLAUDE.md` | Gitar reads these on every PR too |
-| `.github/workflows/ci.yml` | ruff + pytest + Docker build — Gitar diagnoses failures here |
+| `.github/workflows/*.yml` | Repo rules, per-part CI (`api`, `es`, `web`), deploy checks — Gitar diagnoses failures here |
+| `.github/workflows/gitar-auto-apply.yml` | Labels every PR `gitar-managed`, which turns auto-apply on |
 
 Supported `.gitar/` paths (docs.gitar.ai/configuration/repository-config): `rules/`, `review/`, `skills/<name>/SKILL.md`, `instructions/`, `cross-repo.md`, `config/{apply,approve,merge,risk}.md`.
 
@@ -37,6 +38,6 @@ git switch -c feat/<thing>        # one small feature per branch
 git push -u origin HEAD && gh pr create --fill
 # read Gitar's review, fix or let auto-apply fix, merge, repeat
 ```
-**Demo moment:** break CI on purpose (e.g. a failing test) in one PR and let Gitar diagnose + auto-apply the fix live. Order of PRs: `docs/PR_PLAN.md`.
+**Demo moment:** show the merged PR history and Gitar's findings and fixes on real PRs. Nothing is broken on purpose (see `AGENTS.md`).
 
 Sources: https://docs.gitar.ai/quickstart · https://docs.gitar.ai/connecting-code/github · https://docs.gitar.ai/configuration/repository-config · https://docs.gitar.ai/commands

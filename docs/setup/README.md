@@ -29,10 +29,10 @@ gh auth status && codex --version && kubectl version --client
 
 ## Secrets
 Never commit secrets. Put them in `.env` (gitignored) — template in [`.env.example`](../../.env.example).
-For Kubernetes, fill `deploy/base/secret.yaml` locally or create the secret with `kubectl create secret` (see RADAR.md).
+For Kubernetes, a human creates the secrets with `kubectl create secret` (see [`deploy/README.md`](../../deploy/README.md)).
 
 ## Team
-Repo: github.com/zackhada/confpilot (private). Collaborators invited: osideskyler, crstall4, tannernielson27.
+Repo: github.com/zackhada/confpilot. Collaborators invited: osideskyler, crstall4, tannernielson27.
 Everyone: accept the invite, then do Gitar setup is a one-time step for the repo owner.
 
 ## AI disclosure
