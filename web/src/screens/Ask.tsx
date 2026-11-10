@@ -110,19 +110,20 @@ export function Ask() {
     })
   }, [me, room, ready])
 
+  const askRef = useRef(ask)
   useEffect(() => {
+    askRef.current = ask
+  }, [ask])
+
+  useEffect(() => () => {
     active.current?.abort()
-    const controller = new AbortController()
-    active.current = controller
-    const timer = setTimeout(() => {
-      if (!controller.signal.aborted) ask(text, false)
-    }, 250)
-    return () => {
-      clearTimeout(timer)
-      active.current?.abort()
-      setQuery(null)
-    }
-  }, [text, ask])
+    setQuery(null)
+  }, [room, me?.user_id])
+
+  useEffect(() => {
+    const timer = setTimeout(() => askRef.current(text, false), 250)
+    return () => clearTimeout(timer)
+  }, [text])
 
   const submit = (event: FormEvent): void => {
     event.preventDefault()
@@ -165,7 +166,7 @@ export function Ask() {
             No moment matched &ldquo;{status.question}&rdquo;. Try a word you heard, such as a term from your recap.
           </p>
         )}
-        {status?.answerRequested && (status.answer || status.hits?.length) ? (
+        {status?.answerRequested && ((status.answer && (status.hits?.length ?? 0) > 0) || status.hits?.length) ? (
           <section aria-labelledby="agent-answer" className="mt-3 rounded-(--radius-card) border border-rule bg-hall-raised p-4">
             <h2 id="agent-answer" className="font-display text-xl">Answer</h2>
             <p className="pt-2 text-(length:--text-lead) leading-snug">

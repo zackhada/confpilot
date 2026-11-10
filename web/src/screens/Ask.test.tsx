@@ -6,6 +6,23 @@ import { Ask } from './Ask'
 
 vi.mock('@/room/api', () => ({ askRoom: vi.fn(), searchRoom: vi.fn() }))
 
+it('does not show the prepared RAG answer when the room has no matching moments', async () => {
+  const me = { user_id: 'demo-zack', name: 'Zack' }
+  useRoom.setState({ ...INITIAL_ROOM_DATA, me, room: 'slc1', status: 'open', members: [{ ...me, role: 'speaker' }] })
+  vi.mocked(searchRoom).mockResolvedValue([])
+
+  render(<Ask />)
+  const input = screen.getByRole('searchbox', { name: 'Your question' })
+  fireEvent.change(input, { target: { value: 'What did Zack say about RAG?' } })
+  await waitFor(() => expect(searchRoom).toHaveBeenCalledTimes(1))
+  fireEvent.submit(input.closest('form')!)
+
+  await waitFor(() => expect(searchRoom).toHaveBeenCalledTimes(2))
+  expect(await screen.findByText(/No moment matched/)).toBeInTheDocument()
+  expect(screen.queryByRole('heading', { name: 'Answer' })).not.toBeInTheDocument()
+  expect(screen.queryByText(/Zack described RAG as/)).not.toBeInTheDocument()
+})
+
 it('previews matches while typing, then shows the prepared RAG answer on submit', async () => {
   const me = { user_id: 'demo-zack', name: 'Zack' }
   const hits = Array.from({ length: 8 }, (_, i) => ({
@@ -32,6 +49,10 @@ it('previews matches while typing, then shows the prepared RAG answer on submit'
   fireEvent.click(screen.getByRole('button', { name: 'Ask the agent' }))
   await waitFor(() => expect(screen.getByText('Grounded answer to What is hybrid search?')).toBeInTheDocument())
   expect(askRoom).toHaveBeenCalledTimes(1)
+  act(() => useRoom.setState({ status: 'reconnecting' }))
+  expect(screen.getByText('Grounded answer to What is hybrid search?')).toBeInTheDocument()
+  act(() => useRoom.setState({ status: 'open' }))
+  expect(screen.getByText('Grounded answer to What is hybrid search?')).toBeInTheDocument()
   act(() => useRoom.setState({ me: { user_id: 'another-user', name: 'Ana' } }))
   expect(screen.queryByText('Grounded answer to What is hybrid search?')).not.toBeInTheDocument()
 })
